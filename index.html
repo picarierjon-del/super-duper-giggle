@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Libro Presenze Digitale</title>
+<style>
+  :root { --pad: 10px; --fs: 16px; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 20px; }
+  h1 { margin: 0 0 10px; }
+  .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:15px; }
+  select, input, button { font-size: var(--fs); padding: 8px 10px; }
+  button.primary { background:#1a73e8; color:white; border:none; border-radius:6px; }
+  button.secondary { background:#eee; border:1px solid #ddd; border-radius:6px; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+  thead th { position: sticky; top: 0; background: #fafafa; z-index: 2; }
+  th, td { border:1px solid #ccc; padding: var(--pad); text-align:center; font-size: calc(var(--fs) * 1.0); }
+  th:first-child, td:first-child { text-align: left; }
+  th.sticky, td.sticky { position: sticky; left: 0; background: #fff; z-index: 1; }
+  th.sticky2, td.sticky2 { position: sticky; left: 220px; background: #fff; z-index: 1; }
+  col.name { width: 220px; }
+  col.pay { width: 160px; }
+  tfoot td { font-weight: 700; background: #f6f9ff; }
+  .right { text-align: right; }
+  .muted { color:#666; font-size: 0.95em; }
+</style>
+</head>
+<body>
+  <h1>Libro Presenze Digitale</h1>
+  <div class="toolbar">
+    <label>Mese: 
+      <select id="mese"></select>
+    </label>
+    <label>Anno: 
+      <input id="anno" type="number" min="2000" max="2100" value="" style="width:110px">
+    </label>
+    <button class="secondary" id="genera">Genera mese</button>
+    <button class="primary" id="aggiungi">+ Aggiungi dipendente</button>
+    <button class="secondary" id="salva">💾 Salva</button>
+    <button class="secondary" id="ripristina">↩︎ Ripristina</button>
+    <button class="secondary" id="csv">⬇︎ Esporta CSV</button>
+    <span class="muted" id="status"></span>
+  </div>
+
+  <div style="overflow:auto; border:1px solid #ddd; border-radius:8px;">
+    <table id="presenze">
+      <colgroup>
+        <col class="name"><col class="pay">
+      </colgroup>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+      <tfoot id="tfoot"></tfoot>
+    </table>
+  </div>
+
+<script>
+const mesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const selMese = document.getElementById('mese');
+const inpAnno = document.getElementById('anno');
+const btnGenera = document.getElementById('genera');
+const btnAggiungi = document.getElementById('aggiungi');
+const btnSalva = document.getElementById('salva');
+const btnRipristina = document.getElementById('ripristina');
+const btnCsv = document.getElementById('csv');
+const statusEl = document.getElementById('status');
+
+const thead = document.getElementById('thead');
+const tbody = document.getElementById('tbody');
+const tfoot = document.getElementById('tfoot');
+
+// inizializza selettore mese
+mesi.forEach((m, i) => {
+  const opt = document.createElement('option');
+  opt.value = i+1;
+  opt.textContent = m;
+  selMese.appendChild(opt);
+});
+
+// default mese/anno attuali
+const now = new Date();
+selMese.value = (now.getMonth()+1);
+inpAnno.value = now.getFullYear();
+
+function daysInMonth(month, year) {
+  return new Date(year, month, 0).getDate();
+}
+
+function keyLS() {
+  return `presenze:${inpAnno.value}-${String(selMese.value).padStart(2,'0')}`;
+}
+
+function buildHeader() {
+  const m = parseInt(selMese.value, 10);
+  const y = parseInt(inpAnno.value, 10);
+  const n = daysInMonth(m, y);
+  thead.innerHTML = '';
+  const tr1 = document.createElement('tr');
+  const thName = document.createElement('th'); thName.textContent = 'Nome'; thName.className = 'sticky';
+  const thPay = document.createElement('th'); thPay.textContent = 'Paga oraria (€)'; thPay.className = 'sticky2';
+  tr1.appendChild(thName); tr1.appendChild(thPay);
+  for (let d=1; d<=n; d++) {
+    const th = document.createElement('th');
+    th.textContent = String(d).padStart(2,'0');
+    tr1.appendChild(th);
+  }
+  const thTotOre = document.createElement('th'); thTotOre.textContent = 'Totale ore';
+  const thTotPay = document.createElement('th'); thTotPay.textContent = 'Totale paga (€)';
+  const thAzioni = document.createElement('th'); thAzioni.textContent = 'Azioni';
+  tr1.appendChild(thTotOre); tr1.appendChild(thTotPay); tr1.appendChild(thAzioni);
+  thead.appendChild(tr1);
+}
+
+function addRow(data={nome:'', paga:0, ore:[]}) {
+  const m = parseInt(selMese.value, 10);
+  const y = parseInt(inpAnno.value, 10);
+  const n = daysInMonth(m, y);
+  const tr = document.createElement('tr');
+
+  // Nome
+  const tdNome = document.createElement('td'); tdNome.className='sticky';
+  const inputNome = document.createElement('input'); inputNome.type='text'; inputNome.value = data.nome||''; inputNome.style.width='100%';
+  tdNome.appendChild(inputNome); tr.appendChild(tdNome);
+
+  // Paga oraria
+  const tdPaga = document.createElement('td'); tdPaga.className='sticky2';
+  const inputPaga = document.createElement('input'); inputPaga.type='number'; inputPaga.step='0.01'; inputPaga.min='0'; inputPaga.value = data.paga ?? 0; inputPaga.style.width='100%';
+  tdPaga.appendChild(inputPaga); tr.appendChild(tdPaga);
+
+  // Giorni
+  const cells = [];
+  for (let d=1; d<=n; d++) {
+    const td = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.type='number'; inp.min='0'; inp.step='0.25'; inp.value = (data.ore && data.ore[d-1] != null) ? data.ore[d-1] : '';
+    inp.style.width='100%';
+    td.appendChild(inp); tr.appendChild(td);
+    cells.push(inp);
+  }
+
+  // Totali
+  const tdTotOre = document.createElement('td');
+  const tdTotPay = document.createElement('td');
+  tdTotOre.className='right'; tdTotPay.className='right';
+  tr.appendChild(tdTotOre); tr.appendChild(tdTotPay);
+
+  // Azioni
+  const tdActions = document.createElement('td');
+  const btnDel = document.createElement('button');
+  btnDel.textContent = 'Elimina';
+  btnDel.className = 'secondary';
+  btnDel.onclick = () => { tr.remove(); recalcAll(); };
+  tdActions.appendChild(btnDel);
+  tr.appendChild(tdActions);
+
+  tbody.appendChild(tr);
+
+  function recalcRow() {
+    const hours = cells.reduce((s, inp)=> s + (parseFloat(inp.value)||0), 0);
+    const pay = (parseFloat(inputPaga.value)||0) * hours;
+    tdTotOre.textContent = hours.toFixed(2);
+    tdTotPay.textContent = pay.toFixed(2);
+    recalcFooter();
+  }
+  [inputPaga, ...cells].forEach(el => el.addEventListener('input', recalcRow));
+  recalcRow();
+}
+
+function recalcFooter() {
+  let sumOre = 0, sumPay = 0;
+  [...tbody.querySelectorAll('tr')].forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    const totOre = parseFloat(tds[tds.length-3].textContent) || 0;
+    const totPay = parseFloat(tds[tds.length-2].textContent) || 0;
+    sumOre += totOre; sumPay += totPay;
+  });
+  tfoot.innerHTML = '';
+  const trF = document.createElement('tr');
+  const tdLbl = document.createElement('td'); tdLbl.colSpan = 2; tdLbl.textContent='Totale mese (tutti i dipendenti)';
+  trF.appendChild(tdLbl);
+  const m = parseInt(selMese.value, 10);
+  const y = parseInt(inpAnno.value, 10);
+  const n = daysInMonth(m, y);
+  for (let i=0;i<n;i++){ const td = document.createElement('td'); trF.appendChild(td); }
+  const tdOre = document.createElement('td'); tdOre.className='right'; tdOre.textContent = sumOre.toFixed(2);
+  const tdPay = document.createElement('td'); tdPay.className='right'; tdPay.textContent = sumPay.toFixed(2);
+  const tdEmpty = document.createElement('td'); tdEmpty.textContent='';
+  trF.appendChild(tdOre); trF.appendChild(tdPay); trF.appendChild(tdEmpty);
+  tfoot.appendChild(trF);
+}
+
+function recalcAll() {
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    if (inputs.length) inputs[0].dispatchEvent(new Event('input'));
+  });
+  recalcFooter();
+}
+
+function toData() {
+  const m = parseInt(selMese.value, 10);
+  const y = parseInt(inpAnno.value, 10);
+  const n = daysInMonth(m, y);
+  const rows = [];
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    const nome = tds[0].querySelector('input').value;
+    const paga = parseFloat(tds[1].querySelector('input').value) || 0;
+    const ore = [];
+    for (let i=0;i<n;i++){
+      const val = tds[2+i].querySelector('input').value;
+      ore.push(val === '' ? null : parseFloat(val));
+    }
+    rows.push({nome, paga, ore});
+  });
+  return {mese: m, anno: y, righe: rows};
+}
+
+function fromData(obj) {
+  if (!obj) return;
+  tbody.innerHTML='';
+  buildHeader();
+  obj.righe.forEach(r => addRow(r));
+  recalcAll();
+}
+
+btnGenera.onclick = () => {
+  buildHeader();
+  tbody.innerHTML='';
+  addRow({nome:'Mario Rossi', paga:12.5});
+  recalcAll();
+};
+
+btnAggiungi.onclick = () => addRow({});
+
+btnSalva.onclick = () => {
+  localStorage.setItem(keyLS(), JSON.stringify(toData()));
+  statusEl.textContent = 'Salvato in questo browser.';
+  setTimeout(()=> statusEl.textContent='', 2000);
+};
+
+btnRipristina.onclick = () => {
+  const data = localStorage.getItem(keyLS());
+  if (data) { fromData(JSON.parse(data)); statusEl.textContent='Caricato.'; setTimeout(()=> statusEl.textContent='', 2000); }
+  else { statusEl.textContent='Nessun salvataggio trovato.'; setTimeout(()=> statusEl.textContent='', 2000); }
+};
+
+btnCsv.onclick = () => {
+  const obj = toData();
+  const n = daysInMonth(obj.mese, obj.anno);
+  const headers = ['Nome','Paga Oraria (€)', ...Array.from({length:n}, (_,i)=>String(i+1).padStart(2,'0')), 'Totale Ore','Totale Paga (€)'];
+  const rows = [headers];
+  obj.righe.forEach(r => {
+    const totOre = r.ore.reduce((s,v)=> s + (parseFloat(v)||0), 0);
+    const totPay = (r.paga||0) * totOre;
+    rows.push([r.nome, r.paga, ...r.ore.map(v=>v==null?'':v), totOre.toFixed(2), totPay.toFixed(2)]);
+  });
+  const csv = rows.map(row => row.map(v => (v===null||v===undefined)?'':String(v).replace(/"/g,'""')).map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `presenze-${obj.anno}-${String(obj.mese).padStart(2,'0')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// inizializzazione
+buildHeader();
+addRow({nome:'Mario Rossi', paga:12.5});
+recalcAll();
+</script>
+</body>
+</html>
