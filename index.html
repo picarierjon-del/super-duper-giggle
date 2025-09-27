@@ -6,33 +6,76 @@
 <title>Libro Presenze Digitale</title>
 <style>
   :root { --pad: 10px; --fs: 16px; }
-  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 20px; }
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    margin: 20px;
+  }
   h1 { margin: 0 0 10px; }
-  .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:15px; }
-  select, input, button { font-size: var(--fs); padding: 8px 10px; }
+  .toolbar {
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:15px;
+  }
+  select, input, button {
+    font-size: var(--fs); padding: 8px 10px;
+  }
   button.primary { background:#1a73e8; color:white; border:none; border-radius:6px; }
   button.secondary { background:#eee; border:1px solid #ddd; border-radius:6px; }
-  table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-  thead th { position: sticky; top: 0; background: #fafafa; z-index: 2; }
-  th, td { border:1px solid #ccc; padding: var(--pad); text-align:center; font-size: calc(var(--fs) * 1.0); }
+
+  /* --- Tabella --- */
+  .table-wrapper {
+    overflow-x:auto;
+    -webkit-overflow-scrolling: touch;
+    border:1px solid #ddd;
+    border-radius:8px;
+  }
+  table {
+    border-collapse: collapse;
+    min-width: 900px;          /* Mantiene le colonne ampie e scorrevoli */
+    width: max-content;        /* Si adatta alla larghezza reale delle colonne */
+    table-layout: fixed;
+  }
+  thead th {
+    position: sticky; top: 0; background: #fafafa; z-index: 2;
+  }
+  th, td {
+    border:1px solid #ccc;
+    padding: var(--pad);
+    text-align:center;
+    font-size: calc(var(--fs) * 1.0);
+  }
   th:first-child, td:first-child { text-align: left; }
-  th.sticky, td.sticky { position: sticky; left: 0; background: #fff; z-index: 1; }
-  th.sticky2, td.sticky2 { position: sticky; left: 220px; background: #fff; z-index: 1; }
+
+  th.sticky, td.sticky {
+    position: sticky; left: 0; background: #fff; z-index: 3;
+  }
+  th.sticky2, td.sticky2 {
+    position: sticky; left: 220px; background: #fff; z-index: 2;
+  }
+
   col.name { width: 220px; }
-  col.pay { width: 160px; }
+  col.pay  { width: 160px; }
+
   tfoot td { font-weight: 700; background: #f6f9ff; }
-  .right { text-align: right; }
-  .muted { color:#666; font-size: 0.95em; }
+  .right   { text-align: right; }
+  .muted   { color:#666; font-size: 0.95em; }
+
+  /* --- Mobile tweaks --- */
+  @media (max-width: 768px) {
+    :root { --fs: 14px; --pad: 6px; }
+    input { font-size: 14px; padding: 4px; }
+    th, td { font-size: 14px; }
+    col.name { width: 160px; }
+    col.pay  { width: 120px; }
+  }
 </style>
 </head>
 <body>
   <h1>Libro Presenze Digitale</h1>
   <div class="toolbar">
-    <label>Mese: 
+    <label>Mese:
       <select id="mese"></select>
     </label>
-    <label>Anno: 
-      <input id="anno" type="number" min="2000" max="2100" value="" style="width:110px">
+    <label>Anno:
+      <input id="anno" type="number" min="2000" max="2100" style="width:110px">
     </label>
     <button class="secondary" id="genera">Genera mese</button>
     <button class="primary" id="aggiungi">+ Aggiungi dipendente</button>
@@ -42,7 +85,7 @@
     <span class="muted" id="status"></span>
   </div>
 
-  <div style="overflow:auto; border:1px solid #ddd; border-radius:8px;">
+  <div class="table-wrapper">
     <table id="presenze">
       <colgroup>
         <col class="name"><col class="pay">
@@ -84,7 +127,6 @@ inpAnno.value = now.getFullYear();
 function daysInMonth(month, year) {
   return new Date(year, month, 0).getDate();
 }
-
 function keyLS() {
   return `presenze:${inpAnno.value}-${String(selMese.value).padStart(2,'0')}`;
 }
@@ -96,7 +138,7 @@ function buildHeader() {
   thead.innerHTML = '';
   const tr1 = document.createElement('tr');
   const thName = document.createElement('th'); thName.textContent = 'Nome'; thName.className = 'sticky';
-  const thPay = document.createElement('th'); thPay.textContent = 'Paga oraria (€)'; thPay.className = 'sticky2';
+  const thPay  = document.createElement('th'); thPay.textContent  = 'Paga oraria (€)'; thPay.className  = 'sticky2';
   tr1.appendChild(thName); tr1.appendChild(thPay);
   for (let d=1; d<=n; d++) {
     const th = document.createElement('th');
@@ -123,7 +165,8 @@ function addRow(data={nome:'', paga:0, ore:[]}) {
 
   // Paga oraria
   const tdPaga = document.createElement('td'); tdPaga.className='sticky2';
-  const inputPaga = document.createElement('input'); inputPaga.type='number'; inputPaga.step='0.01'; inputPaga.min='0'; inputPaga.value = data.paga ?? 0; inputPaga.style.width='100%';
+  const inputPaga = document.createElement('input'); inputPaga.type='number'; inputPaga.step='0.01'; inputPaga.min='0';
+  inputPaga.value = data.paga ?? 0; inputPaga.style.width='100%';
   tdPaga.appendChild(inputPaga); tr.appendChild(tdPaga);
 
   // Giorni
@@ -131,7 +174,8 @@ function addRow(data={nome:'', paga:0, ore:[]}) {
   for (let d=1; d<=n; d++) {
     const td = document.createElement('td');
     const inp = document.createElement('input');
-    inp.type='number'; inp.min='0'; inp.step='0.25'; inp.value = (data.ore && data.ore[d-1] != null) ? data.ore[d-1] : '';
+    inp.type='number'; inp.min='0'; inp.step='0.25';
+    inp.value = (data.ore && data.ore[d-1] != null) ? data.ore[d-1] : '';
     inp.style.width='100%';
     td.appendChild(inp); tr.appendChild(td);
     cells.push(inp);
@@ -231,19 +275,16 @@ btnGenera.onclick = () => {
 };
 
 btnAggiungi.onclick = () => addRow({});
-
 btnSalva.onclick = () => {
   localStorage.setItem(keyLS(), JSON.stringify(toData()));
   statusEl.textContent = 'Salvato in questo browser.';
   setTimeout(()=> statusEl.textContent='', 2000);
 };
-
 btnRipristina.onclick = () => {
   const data = localStorage.getItem(keyLS());
   if (data) { fromData(JSON.parse(data)); statusEl.textContent='Caricato.'; setTimeout(()=> statusEl.textContent='', 2000); }
   else { statusEl.textContent='Nessun salvataggio trovato.'; setTimeout(()=> statusEl.textContent='', 2000); }
 };
-
 btnCsv.onclick = () => {
   const obj = toData();
   const n = daysInMonth(obj.mese, obj.anno);
