@@ -14,12 +14,13 @@
   header {
     background:#1a73e8; color:white; padding:10px 15px;
     display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap;
   }
   header h1 { margin:0; font-size:18px; }
   main { padding:15px; }
   button {
     font-size: var(--fs);
-    padding: 8px 14px;
+    padding: 6px 12px;
     border:none;
     border-radius:6px;
   }
@@ -27,6 +28,14 @@
   button.secondary { background:#eee; color:#333; }
 
   /* Lista movimenti */
+  .toolbar {
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;
+    align-items:center;
+  }
+  .toolbar input {
+    flex:1; padding:6px 8px; font-size:15px;
+    border:1px solid #ccc; border-radius:6px;
+  }
   .dip-list { list-style:none; margin:0; padding:0; }
   .dip-item {
     background:white;
@@ -34,13 +43,13 @@
     padding:12px;
     border-radius:8px;
     box-shadow:0 1px 2px rgba(0,0,0,0.1);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
   }
-  .dip-item .info { flex:1; }
-  .dip-item .nome { font-weight:600; }
-  .dip-item .tot { color:#555; font-size:14px; }
+  .dip-top {
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .dip-name { font-weight:600; font-size:16px; }
+  .dip-actions { display:flex; gap:6px; }
+  .dip-tot { color:#555; font-size:14px; margin-top:4px; }
 
   /* Scheda ore */
   .giorno-row {
@@ -58,12 +67,7 @@
     padding:6px;
   }
 
-  /* Vista nascosta/visibile */
   .hidden { display:none; }
-  .toolbar {
-    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px;
-  }
-  label { font-size:14px; margin-right:8px; }
 </style>
 </head>
 <body>
@@ -78,6 +82,9 @@
     </div>
   </header>
   <main>
+    <div class="toolbar">
+      <input type="text" id="search" placeholder="Filtra per nome…">
+    </div>
     <ul id="lista-dip" class="dip-list"></ul>
   </main>
 </div>
@@ -119,6 +126,7 @@ const giorniList= document.getElementById('giorni-list');
 const schedaTitle=document.getElementById('scheda-title');
 const inpNome   = document.getElementById('scheda-nome');
 const inpPaga   = document.getElementById('scheda-paga');
+const searchBox = document.getElementById('search');
 
 let editingIndex = null;
 
@@ -139,22 +147,37 @@ function saveData() {
 
 /* === Vista Movimenti === */
 function renderMovimenti() {
+  const filtro = searchBox.value.toLowerCase();
   listaDip.innerHTML = '';
   data.dip.forEach((d,idx) => {
+    if (filtro && !d.nome.toLowerCase().includes(filtro)) return;
     const totOre = d.ore.reduce((s,v)=> s + (parseFloat(v)||0), 0);
     const totPay = (parseFloat(d.paga)||0) * totOre;
     const li = document.createElement('li');
     li.className = 'dip-item';
     li.innerHTML = `
-      <div class="info">
-        <div class="nome">${d.nome || '—'}</div>
-        <div class="tot">${totOre.toFixed(2)} ore – €${totPay.toFixed(2)}</div>
+      <div class="dip-top">
+        <div class="dip-name">${d.nome || '—'}</div>
+        <div class="dip-actions">
+          <button class="secondary btn-edit">✏️</button>
+          <button class="secondary btn-del">🗑️</button>
+        </div>
       </div>
-      <button class="secondary">Modifica</button>
+      <div class="dip-tot">${totOre.toFixed(2)} ore – €${totPay.toFixed(2)}</div>
     `;
-    li.querySelector('button').onclick = () => openScheda(idx);
+    li.querySelector('.btn-edit').onclick = () => openScheda(idx);
+    li.querySelector('.btn-del').onclick = () => deleteDipendente(idx);
     listaDip.appendChild(li);
   });
+}
+
+/* === Elimina dipendente === */
+function deleteDipendente(index) {
+  if (confirm('Eliminare questo dipendente?')) {
+    data.dip.splice(index,1);
+    saveData();
+    renderMovimenti();
+  }
 }
 
 /* === Apertura scheda === */
@@ -221,6 +244,9 @@ document.getElementById('btn-mese').onclick = () => {
     renderMovimenti();
   }
 };
+
+/* === Filtro live === */
+searchBox.addEventListener('input', renderMovimenti);
 
 /* === Avvio === */
 renderMovimenti();
