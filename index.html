@@ -2,10 +2,14 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="BudgetApp" />
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10433/10433048.png">
+  
   <title>SimpleBudgetPersonalHome</title>
 
-  <!-- Chart.js (solo per grafici, nessun backend) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
@@ -23,6 +27,8 @@
                   radial-gradient(1200px 700px at 80% 10%, rgba(43,213,118,.14), transparent 55%),
                   var(--bg);
       color:var(--text);
+      /* Padding extra per la status bar di iPhone */
+      padding-top: env(safe-area-inset-top);
     }
     header{
       position:sticky; top:0; z-index:5;
@@ -40,9 +46,10 @@
       color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer;
       transition: transform .06s ease, background .2s ease, border-color .2s ease;
       user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn:hover{background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14)}
-    .btn:active{transform: translateY(1px)}
+    .btn:active{transform: translateY(1px); background: rgba(255,255,255,.1)}
     .btn.primary{background: rgba(122,162,255,.16); border-color: rgba(122,162,255,.35)}
     .btn.danger{background: rgba(255,90,122,.12); border-color: rgba(255,90,122,.35)}
     .btn.good{background: rgba(43,213,118,.12); border-color: rgba(43,213,118,.35)}
@@ -56,6 +63,7 @@
     }
     @media (max-width: 980px){
       .grid{grid-template-columns: 1fr}
+      .brand{flex-direction: column; align-items: flex-start;}
     }
 
     .card{
@@ -64,6 +72,7 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow:hidden;
+      margin-bottom: 14px;
     }
     .card .hd{
       padding:14px 14px 10px;
@@ -92,6 +101,7 @@
       padding:10px 10px;
       color:var(--text);
       outline:none;
+      font-size: 16px; /* Previene lo zoom automatico su iOS */
     }
     textarea{min-height:60px; resize:vertical}
     input:focus,select:focus,textarea:focus{border-color: rgba(122,162,255,.45)}
@@ -122,15 +132,17 @@
     .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
     .hint{font-size:12px; color:var(--muted)}
     .toast{
-      position: fixed; right: 16px; bottom: 16px;
-      background: rgba(18,26,43,.92);
-      border: 1px solid var(--line);
+      position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%);
+      background: rgba(122,162,255,.9);
+      backdrop-filter: blur(5px);
+      border: 1px solid white;
       box-shadow: var(--shadow);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 12px;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 20px;
       display:none;
-      max-width: 320px;
+      z-index: 99;
+      white-space: nowrap;
     }
     .miniNote{font-size:12px; color:var(--muted)}
   </style>
@@ -140,13 +152,12 @@
 <header>
   <div class="wrap brand">
     <div>
-      <h1>SimpleBudgetPersonalHome</h1>
-      <small class="muted">Budget personale + analisi — dati salvati localmente (localStorage)</small>
+      <h1>SimpleBudget</h1>
+      <small class="muted">Salvataggio locale su iPhone</small>
     </div>
-    <div class="flex">
-      <button class="btn small" id="btnExportJson">Export JSON</button>
-      <button class="btn small" id="btnImportJson">Import JSON</button>
-      <button class="btn small" id="btnExportCsv">Export CSV</button>
+    <div class="flex" style="margin-top: 8px;">
+      <button class="btn small" id="btnExportJson">Export</button>
+      <button class="btn small" id="btnImportJson">Import</button>
       <button class="btn small danger" id="btnReset">Reset</button>
     </div>
   </div>
@@ -155,11 +166,10 @@
 <main class="wrap">
   <div class="grid">
 
-    <!-- LEFT: Input / Setup -->
     <section class="card">
       <div class="hd">
-        <h2>Inserisci movimento</h2>
-        <span class="pill" title="Salvataggio automatico">Auto-save</span>
+        <h2>Nuovo Movimento</h2>
+        <span class="pill">Auto-save</span>
       </div>
       <div class="bd">
         <div class="formGrid3">
@@ -170,13 +180,13 @@
               <option value="income">Entrata</option>
             </select>
           </div>
-          <div>
+          <div class="span2">
             <label>Data</label>
             <input id="txDate" type="date" />
           </div>
           <div>
             <label>Importo (€)</label>
-            <input id="txAmount" type="number" step="0.01" placeholder="es. 12.50" />
+            <input id="txAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" />
           </div>
 
           <div>
@@ -190,39 +200,30 @@
               <option>Cash</option>
               <option>Bank</option>
               <option>Online</option>
-              <option>Other</option>
             </select>
-          </div>
-          <div>
-            <label>Tag (opz.)</label>
-            <input id="txTag" placeholder="es. casa, lavoro, vacanze" />
           </div>
 
           <div class="span3">
-            <label>Note (opz.)</label>
-            <textarea id="txNote" placeholder="Dettagli..."></textarea>
+            <label>Tag / Note</label>
+            <input id="txTag" placeholder="es. Spesa settimanale" />
           </div>
         </div>
 
-        <div class="flexBetween" style="margin-top:12px">
-          <div class="hint">Suggerimento: usa <span class="mono">tag</span> per cercare più velocemente.</div>
-          <button class="btn primary" id="btnAdd">Aggiungi</button>
-        </div>
+        <button class="btn primary" id="btnAdd" style="width:100%; margin-top:15px; font-weight:bold">AGGIUNGI</button>
 
         <div class="hr"></div>
 
         <div class="flexBetween">
-          <h2 style="margin:0; font-size:14px;">Setup avanzato: budget per categoria</h2>
-          <button class="btn small" id="btnAddBudget">+ Budget</button>
+          <h2 style="margin:0; font-size:14px;">Budget Mensile</h2>
+          <button class="btn small" id="btnAddBudget">+ Imposta</button>
         </div>
-        <div class="miniNote">Imposta un budget mensile per categoria e verifica scostamenti.</div>
-
+        
         <div style="margin-top:10px; overflow:auto">
           <table id="budgetsTable">
             <thead>
               <tr>
-                <th>Categoria</th>
-                <th class="right">Budget €/mese</th>
+                <th>Cat.</th>
+                <th class="right">Budget</th>
                 <th class="right">Azioni</th>
               </tr>
             </thead>
@@ -231,42 +232,18 @@
         </div>
 
         <div class="hr"></div>
-
-        <h2 style="margin:0 0 8px; font-size:14px;">Categorie</h2>
-        <div class="formGrid">
-          <div>
-            <label>Nuova categoria</label>
-            <input id="newCategory" placeholder="es. Spesa, Trasporti..." />
-          </div>
-          <div style="display:flex; align-items:end; gap:10px;">
-            <button class="btn" id="btnAddCategory">Aggiungi categoria</button>
-          </div>
-        </div>
-
-        <div class="hint" style="margin-top:10px">
-          Tutto resta sul tuo dispositivo. Se cambi browser/PC, usa Export/Import.
+        <h2 style="margin:0 0 8px; font-size:14px;">Nuova Categoria</h2>
+        <div class="flex" style="gap:5px">
+            <input id="newCategory" placeholder="Nome..." style="flex:1" />
+            <button class="btn small" id="btnAddCategory">Aggiungi</button>
         </div>
       </div>
     </section>
 
-    <!-- RIGHT: Dashboard / Analysis -->
     <section class="card">
       <div class="hd">
-        <h2>Dashboard & Analisi</h2>
-        <div class="flex">
-          <select id="filterMonth" class="btn" style="padding:10px 12px">
-            <!-- popolato via JS -->
-          </select>
-          <input id="filterText" placeholder="Cerca (categoria, tag, note...)" style="max-width:240px" />
-          <select id="filterType" class="btn" style="padding:10px 12px">
-            <option value="all">Tutti</option>
-            <option value="income">Solo entrate</option>
-            <option value="expense">Solo uscite</option>
-          </select>
-          <select id="filterCategory" class="btn" style="padding:10px 12px">
-            <option value="all">Tutte le categorie</option>
-          </select>
-        </div>
+        <h2>Analisi</h2>
+        <select id="filterMonth" class="btn small"></select>
       </div>
 
       <div class="bd">
@@ -275,17 +252,16 @@
         <div class="hr"></div>
 
         <div class="row">
-          <div class="card" style="flex: 1; min-width: 320px;">
-            <div class="hd"><h2>Spese per categoria</h2><span class="muted" id="catSubtitle"></span></div>
+          <div class="card" style="flex: 1; min-width: 280px; background: transparent; border:none; box-shadow:none">
+            <div class="hd" style="border:none"><h2>Spese</h2></div>
             <div class="bd">
-              <canvas id="chartCats" height="180"></canvas>
+              <canvas id="chartCats" height="200"></canvas>
             </div>
           </div>
-
-          <div class="card" style="flex: 1; min-width: 320px;">
-            <div class="hd"><h2>Saldo cumulato nel mese</h2><span class="muted" id="balSubtitle"></span></div>
+          <div class="card" style="flex: 1; min-width: 280px; background: transparent; border:none; box-shadow:none">
+            <div class="hd" style="border:none"><h2>Trend</h2></div>
             <div class="bd">
-              <canvas id="chartBalance" height="180"></canvas>
+              <canvas id="chartBalance" height="200"></canvas>
             </div>
           </div>
         </div>
@@ -293,8 +269,8 @@
         <div class="hr"></div>
 
         <div class="flexBetween">
-          <h2 style="margin:0; font-size:14px;">Movimenti</h2>
-          <div class="hint" id="rowsHint"></div>
+          <h2 style="margin:0; font-size:14px;">Lista Movimenti</h2>
+          <span class="hint" id="rowsHint"></span>
         </div>
 
         <div style="margin-top:10px; overflow:auto">
@@ -302,21 +278,13 @@
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Tipo</th>
-                <th>Categoria</th>
-                <th>Metodo</th>
-                <th>Tag</th>
-                <th>Note</th>
+                <th>Cat.</th>
                 <th class="right">Importo</th>
-                <th class="right">Azioni</th>
+                <th class="right">Az.</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
-        </div>
-
-        <div class="hint" style="margin-top:10px">
-          Analisi: saldo = entrate − uscite. “Risparmio” = saldo del mese selezionato.
         </div>
       </div>
     </section>
@@ -328,661 +296,163 @@
 
 <script>
 (() => {
-  // ---------------------------
-  // Storage keys / defaults
-  // ---------------------------
   const LS_KEY = "SBPH_v1_data";
-  const defaultCategories = [
-    "Spesa", "Casa", "Trasporti", "Salute", "Svago", "Ristoranti",
-    "Bollettе", "Abbonamenti", "Istruzione", "Regali", "Viaggi", "Altro"
-  ];
+  const defaultCategories = ["Spesa", "Casa", "Trasporti", "Salute", "Svago", "Bollette", "Altro"];
 
-  /** @typedef {{id:string,type:'income'|'expense',date:string,amount:number,category:string,method:string,tag?:string,note?:string}} Tx */
-  /** @typedef {{id:string,category:string,monthly:number}} BudgetRow */
-  /** @typedef {{categories:string[], txs:Tx[], budgets:BudgetRow[]}} State */
-
-  /** @returns {State} */
   function loadState(){
     try{
       const raw = localStorage.getItem(LS_KEY);
       if(!raw) return { categories: [...defaultCategories], txs: [], budgets: [] };
       const parsed = JSON.parse(raw);
-
-      // Hardening: ensure shape
-      const cats = Array.isArray(parsed.categories) ? parsed.categories : [...defaultCategories];
-      const txs  = Array.isArray(parsed.txs) ? parsed.txs : [];
-      const buds = Array.isArray(parsed.budgets) ? parsed.budgets : [];
-      return { categories: cats, txs, budgets: buds };
-    }catch{
-      return { categories: [...defaultCategories], txs: [], budgets: [] };
-    }
+      return { 
+        categories: Array.isArray(parsed.categories) ? parsed.categories : [...defaultCategories], 
+        txs: Array.isArray(parsed.txs) ? parsed.txs : [], 
+        budgets: Array.isArray(parsed.budgets) ? parsed.budgets : [] 
+      };
+    }catch{ return { categories: [...defaultCategories], txs: [], budgets: [] }; }
   }
 
-  /** @param {State} s */
-  function saveState(s){
-    localStorage.setItem(LS_KEY, JSON.stringify(s));
-  }
-
-  function uid(){
-    return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
-  }
-
-  function euro(n){
-    const v = Number.isFinite(n) ? n : 0;
-    return v.toLocaleString("it-IT", { style:"currency", currency:"EUR" });
-  }
-
-  function ymFromDate(iso){ // "YYYY-MM-DD" -> "YYYY-MM"
-    return (iso || "").slice(0,7);
-  }
-
-  function todayISO(){
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
+  function saveState(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
+  function uid(){ return Math.random().toString(16).slice(2); }
+  function euro(n){ return n.toLocaleString("it-IT", { style:"currency", currency:"EUR" }); }
+  function ymFromDate(iso){ return (iso || "").slice(0,7); }
+  function todayISO(){ return new Date().toISOString().split('T')[0]; }
 
   function showToast(msg){
     const el = document.getElementById("toast");
     el.textContent = msg;
     el.style.display = "block";
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> el.style.display="none", 2200);
+    setTimeout(()=> el.style.display="none", 2000);
   }
 
-  // ---------------------------
-  // DOM
-  // ---------------------------
   const $ = (id) => document.getElementById(id);
+  const txType = $("txType"), txDate = $("txDate"), txAmount = $("txAmount"), txCategory = $("txCategory"), 
+        txMethod = $("txMethod"), txTag = $("txTag"), btnAdd = $("btnAdd"), filterMonth = $("filterMonth"),
+        txTableBody = $("txTable").querySelector("tbody"), budgetsBody = $("budgetsTable").querySelector("tbody"),
+        kpisWrap = $("kpis"), newCategory = $("newCategory");
 
-  const txType = $("txType");
-  const txDate = $("txDate");
-  const txAmount = $("txAmount");
-  const txCategory = $("txCategory");
-  const txMethod = $("txMethod");
-  const txTag = $("txTag");
-  const txNote = $("txNote");
+  let chartCats = null, chartBalance = null;
 
-  const btnAdd = $("btnAdd");
-  const btnReset = $("btnReset");
-  const btnExportJson = $("btnExportJson");
-  const btnImportJson = $("btnImportJson");
-  const btnExportCsv = $("btnExportCsv");
-
-  const newCategory = $("newCategory");
-  const btnAddCategory = $("btnAddCategory");
-
-  const filterMonth = $("filterMonth");
-  const filterText = $("filterText");
-  const filterType = $("filterType");
-  const filterCategory = $("filterCategory");
-
-  const txTableBody = $("txTable").querySelector("tbody");
-  const budgetsBody = $("budgetsTable").querySelector("tbody");
-  const rowsHint = $("rowsHint");
-  const kpisWrap = $("kpis");
-
-  const catSubtitle = $("catSubtitle");
-  const balSubtitle = $("balSubtitle");
-
-  const btnAddBudget = $("btnAddBudget");
-
-  // ---------------------------
-  // Charts
-  // ---------------------------
-  let chartCats = null;
-  let chartBalance = null;
-
-  function buildCatsChart(labels, values){
-    const ctx = $("chartCats");
-    if(chartCats) chartCats.destroy();
-    chartCats = new Chart(ctx, {
-      type: "doughnut",
-      data: { labels, datasets: [{ data: values }] },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: "bottom", labels: { color: "#e9f0ff" } } }
-      }
-    });
-  }
-
-  function buildBalanceChart(labels, values){
-    const ctx = $("chartBalance");
-    if(chartBalance) chartBalance.destroy();
-    chartBalance = new Chart(ctx, {
-      type: "line",
-      data: { labels, datasets: [{ label: "Saldo cumulato", data: values, tension: 0.25 }] },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { color: "#8ea0c2" }, grid: { color: "rgba(255,255,255,.06)" } },
-          y: { ticks: { color: "#8ea0c2" }, grid: { color: "rgba(255,255,255,.06)" } }
-        }
-      }
-    });
-  }
-
-  // ---------------------------
-  // Rendering helpers
-  // ---------------------------
-  /** @param {State} state */
-  function refreshCategorySelects(state){
-    // Tx category select
-    txCategory.innerHTML = state.categories.map(c => `<option>${escapeHtml(c)}</option>`).join("");
-
-    // Filter category select
-    const current = filterCategory.value || "all";
-    const options = [`<option value="all">Tutte le categorie</option>`]
-      .concat(state.categories.map(c => `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`));
-    filterCategory.innerHTML = options.join("");
-    // Restore selection if possible
-    filterCategory.value = state.categories.includes(current) ? current : "all";
-  }
-
-  /** @param {State} state */
-  function refreshMonthFilter(state){
-    const months = Array.from(new Set(state.txs.map(t => ymFromDate(t.date)).filter(Boolean)))
-      .sort()
-      .reverse();
-
-    const current = filterMonth.value || "";
-    const nowYM = ymFromDate(todayISO());
-    const list = months.length ? months : [nowYM];
-
-    const opts = list.map(ym => `<option value="${ym}">${ym}</option>`).join("");
-    filterMonth.innerHTML = opts;
-
-    // default: current selection if still present else current month if present else first
-    const final =
-      list.includes(current) ? current :
-      list.includes(nowYM) ? nowYM :
-      list[0];
-    filterMonth.value = final;
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, (c)=>({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-  function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
-
-  /** @param {State} state */
-  function getFilteredTxs(state){
-    const ym = filterMonth.value;
-    const q = (filterText.value || "").trim().toLowerCase();
-    const t = filterType.value;
-    const cat = filterCategory.value;
-
-    return state.txs
-      .filter(x => !ym || ymFromDate(x.date) === ym)
-      .filter(x => t === "all" ? true : x.type === t)
-      .filter(x => cat === "all" ? true : x.category === cat)
-      .filter(x => {
-        if(!q) return true;
-        const hay = [
-          x.category, x.method, x.tag || "", x.note || "", x.type, x.date
-        ].join(" ").toLowerCase();
-        return hay.includes(q);
-      })
-      .sort((a,b) => (a.date < b.date ? 1 : -1)); // newest first
-  }
-
-  function sumBy(arr, fn){
-    let s = 0;
-    for(const x of arr){
-      const v = Number(fn(x));
-      if(Number.isFinite(v)) s += v;
-    }
-    return s;
-  }
-
-  function groupSum(arr, keyFn, valFn){
-    const m = new Map();
-    for(const x of arr){
-      const k = keyFn(x);
-      const v = Number(valFn(x));
-      if(!Number.isFinite(v)) continue;
-      m.set(k, (m.get(k) || 0) + v);
-    }
-    return m;
-  }
-
-  /** @param {State} state */
-  function renderBudgets(state){
-    const ym = filterMonth.value;
-    const monthTxs = state.txs.filter(t => ymFromDate(t.date) === ym && t.type === "expense");
-    const spentByCat = groupSum(monthTxs, t => t.category, t => t.amount);
-
-    budgetsBody.innerHTML = "";
-    for(const b of state.budgets){
-      const spent = spentByCat.get(b.category) || 0;
-      const diff = b.monthly - spent;
-      const badge =
-        diff >= 0
-          ? `<span class="pill good">OK: ${euro(diff)}</span>`
-          : `<span class="pill bad">Sforato: ${euro(Math.abs(diff))}</span>`;
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${escapeHtml(b.category)} <span style="margin-left:8px">${badge}</span></td>
-        <td class="right mono">${escapeHtml(b.monthly.toFixed(2))}</td>
-        <td class="right">
-          <button class="btn small" data-act="editBudget" data-id="${b.id}">Modifica</button>
-          <button class="btn small danger" data-act="delBudget" data-id="${b.id}">Elimina</button>
-        </td>
-      `;
-      budgetsBody.appendChild(tr);
-    }
-    if(state.budgets.length === 0){
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="3" class="muted">Nessun budget impostato.</td>`;
-      budgetsBody.appendChild(tr);
-    }
-  }
-
-  /** @param {State} state */
-  function renderTxTable(state, txs){
-    txTableBody.innerHTML = "";
-    for(const x of txs){
-      const pill = x.type === "income"
-        ? `<span class="pill good">Entrata</span>`
-        : `<span class="pill bad">Uscita</span>`;
-
-      const signed = x.type === "income" ? x.amount : -x.amount;
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="mono">${escapeHtml(x.date)}</td>
-        <td>${pill}</td>
-        <td>${escapeHtml(x.category)}</td>
-        <td>${escapeHtml(x.method)}</td>
-        <td>${escapeHtml(x.tag || "")}</td>
-        <td>${escapeHtml(x.note || "")}</td>
-        <td class="right mono">${euro(signed)}</td>
-        <td class="right">
-          <button class="btn small" data-act="edit" data-id="${x.id}">Modifica</button>
-          <button class="btn small danger" data-act="del" data-id="${x.id}">Elimina</button>
-        </td>
-      `;
-      txTableBody.appendChild(tr);
-    }
-    if(txs.length === 0){
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="8" class="muted">Nessun movimento per i filtri selezionati.</td>`;
-      txTableBody.appendChild(tr);
-    }
-    rowsHint.textContent = `${txs.length} righe`;
-  }
-
-  /** @param {State} state */
-  function renderKPIs(state){
-    const ym = filterMonth.value;
-    const monthTxs = state.txs.filter(t => ymFromDate(t.date) === ym);
-    const incomes = monthTxs.filter(t => t.type === "income");
-    const expenses = monthTxs.filter(t => t.type === "expense");
-
-    const totalIn = sumBy(incomes, t => t.amount);
-    const totalOut = sumBy(expenses, t => t.amount);
-    const balance = totalIn - totalOut;
-    const savingRate = totalIn > 0 ? (balance / totalIn) : 0;
-
-    // Averages (day-level)
-    const daysInMonth = (() => {
-      const [Y,M] = ym.split("-").map(Number);
-      if(!Y || !M) return 30;
-      return new Date(Y, M, 0).getDate(); // last day of month
-    })();
-
-    const avgPerDayOut = totalOut / daysInMonth;
-    const avgPerDayIn = totalIn / daysInMonth;
-
-    // Top category expenses
-    const byCat = groupSum(expenses, t => t.category, t => t.amount);
-    const sortedCats = Array.from(byCat.entries()).sort((a,b)=>b[1]-a[1]);
-    const topCat = sortedCats[0] ? `${sortedCats[0][0]} (${euro(sortedCats[0][1])})` : "—";
-
-    // Budget status (aggregate)
-    const budgets = state.budgets;
-    const budgetTotal = sumBy(budgets, b => b.monthly);
-    const budgetDiff = budgetTotal - totalOut;
-
-    const kpis = [
-      { t: "Entrate mese", v: euro(totalIn), cls: "good" },
-      { t: "Uscite mese", v: euro(totalOut), cls: "bad" },
-      { t: "Saldo (risparmio)", v: euro(balance), cls: balance >= 0 ? "good":"bad" },
-      { t: "Tasso di risparmio", v: (savingRate*100).toFixed(1) + "%", cls: savingRate >= 0 ? "good":"bad" },
-      { t: "Media entrate / giorno", v: euro(avgPerDayIn), cls: "good" },
-      { t: "Media uscite / giorno", v: euro(avgPerDayOut), cls: "bad" },
-      { t: "Top categoria spesa", v: topCat, cls: "warn" },
-      { t: "Budget totale (mese)", v: budgets.length ? `${euro(budgetTotal)} · ${budgetDiff>=0? "OK":"Sforato"} ${euro(Math.abs(budgetDiff))}` : "Non impostato", cls: budgets.length ? (budgetDiff>=0?"good":"bad") : "warn" }
-    ];
-
-    kpisWrap.innerHTML = kpis.map(k => `
-      <div class="kpi">
-        <div class="t">${escapeHtml(k.t)}</div>
-        <div class="v ${k.cls}">${escapeHtml(k.v)}</div>
-      </div>
-    `).join("");
-  }
-
-  /** @param {State} state */
   function renderCharts(state){
     const ym = filterMonth.value;
     const monthTxs = state.txs.filter(t => ymFromDate(t.date) === ym);
-
     const expenses = monthTxs.filter(t => t.type === "expense");
-    const byCat = groupSum(expenses, t => t.category, t => t.amount);
-    const catPairs = Array.from(byCat.entries()).sort((a,b)=>b[1]-a[1]);
+    
+    const byCat = new Map();
+    expenses.forEach(t => byCat.set(t.category, (byCat.get(t.category) || 0) + t.amount));
+    
+    if(chartCats) chartCats.destroy();
+    chartCats = new Chart($("chartCats"), {
+      type: "doughnut",
+      data: { 
+        labels: Array.from(byCat.keys()), 
+        datasets: [{ data: Array.from(byCat.values()), backgroundColor: ['#7aa2ff', '#2bd576', '#ff5a7a', '#ffc14a', '#8ea0c2'] }] 
+      },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
 
-    const catLabels = catPairs.map(x => x[0]);
-    const catValues = catPairs.map(x => Number(x[1].toFixed(2)));
-
-    catSubtitle.textContent = expenses.length ? `(${expenses.length} movimenti)` : "(nessun dato)";
-    buildCatsChart(catLabels.length ? catLabels : ["—"], catValues.length ? catValues : [1]);
-
-    // Balance cumulato per giorno
-    const dayMap = new Map(); // day -> signed sum
-    for(const t of monthTxs){
-      const day = (t.date || "").slice(8,10);
-      if(!day) continue;
-      const signed = t.type === "income" ? t.amount : -t.amount;
-      dayMap.set(day, (dayMap.get(day) || 0) + signed);
-    }
-    const days = Array.from(dayMap.keys()).sort((a,b)=>Number(a)-Number(b));
+    const dayMap = new Map();
+    monthTxs.forEach(t => {
+      const d = t.date.split('-')[2];
+      const val = t.type === 'income' ? t.amount : -t.amount;
+      dayMap.set(d, (dayMap.get(d) || 0) + val);
+    });
+    const days = Array.from(dayMap.keys()).sort();
     let run = 0;
-    const cum = days.map(d => (run += (dayMap.get(d)||0)));
-    balSubtitle.textContent = days.length ? `(${days.length} giorni con movimenti)` : "(nessun dato)";
-    buildBalanceChart(days.length ? days : ["—"], cum.length ? cum.map(x=>Number(x.toFixed(2))) : [0]);
+    const cum = days.map(d => run += dayMap.get(d));
+
+    if(chartBalance) chartBalance.destroy();
+    chartBalance = new Chart($("chartBalance"), {
+      type: "line",
+      data: { labels: days, datasets: [{ data: cum, borderColor: '#7aa2ff', tension: 0.3, fill: false }] },
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#8ea0c2' } } } }
+    });
   }
 
-  /** @param {State} state */
   function renderAll(state){
-    refreshCategorySelects(state);
-    refreshMonthFilter(state);
-    renderKPIs(state);
+    txCategory.innerHTML = state.categories.map(c => `<option>${c}</option>`).join("");
+    
+    const months = Array.from(new Set(state.txs.map(t => ymFromDate(t.date)).concat(ymFromDate(todayISO())))).sort().reverse();
+    const currM = filterMonth.value || ymFromDate(todayISO());
+    filterMonth.innerHTML = months.map(m => `<option value="${m}" ${m===currM?'selected':''}>${m}</option>`).join("");
 
-    const filtered = getFilteredTxs(state);
-    renderTxTable(state, filtered);
+    const filtered = state.txs.filter(t => ymFromDate(t.date) === filterMonth.value).sort((a,b)=> b.date.localeCompare(a.date));
+    
+    txTableBody.innerHTML = filtered.map(x => `
+      <tr>
+        <td>${x.date.slice(5)}</td>
+        <td>${x.category}</td>
+        <td class="right ${x.type==='income'?'good':'bad'}">${x.type==='income'?'+':'-'}${x.amount}</td>
+        <td class="right"><button class="btn small danger" onclick="window.delTx('${x.id}')">X</button></td>
+      </tr>
+    `).join("");
 
-    renderBudgets(state);
+    const totalIn = filtered.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+    const totalOut = filtered.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+    
+    kpisWrap.innerHTML = `
+      <div class="kpi"><div class="t">Entrate</div><div class="v good">${euro(totalIn)}</div></div>
+      <div class="kpi"><div class="t">Uscite</div><div class="v bad">${euro(totalOut)}</div></div>
+      <div class="kpi"><div class="t">Saldo</div><div class="v">${euro(totalIn-totalOut)}</div></div>
+      <div class="kpi"><div class="t">Budget</div><div class="v warn">${state.budgets.length} attivi</div></div>
+    `;
+
+    budgetsBody.innerHTML = state.budgets.map(b => `
+      <tr>
+        <td>${b.category}</td>
+        <td class="right">${euro(b.monthly)}</td>
+        <td class="right"><button class="btn small danger" onclick="window.delBudget('${b.id}')">X</button></td>
+      </tr>
+    `).join("");
+
     renderCharts(state);
   }
 
-  // ---------------------------
-  // Actions
-  // ---------------------------
   let state = loadState();
-
-  // Init date default
   txDate.value = todayISO();
 
-  // Initial month filter population depends on txs
-  refreshMonthFilter(state);
-  refreshCategorySelects(state);
-
-  // Ensure filterCategory options exist
-  refreshCategorySelects(state);
-
-  // Render everything
-  renderAll(state);
-
-  // Add transaction
-  btnAdd.addEventListener("click", () => {
-    const type = txType.value;
-    const date = txDate.value;
-    const amount = Number(txAmount.value);
-    const category = txCategory.value;
-    const method = txMethod.value;
-    const tag = txTag.value.trim();
-    const note = txNote.value.trim();
-
-    if(!date){
-      showToast("Seleziona una data.");
-      return;
-    }
-    if(!Number.isFinite(amount) || amount <= 0){
-      showToast("Inserisci un importo valido (> 0).");
-      return;
-    }
-    if(!category){
-      showToast("Seleziona una categoria.");
-      return;
-    }
-
-    const tx = { id: uid(), type, date, amount: Number(amount.toFixed(2)), category, method, tag, note };
-    state.txs.push(tx);
+  btnAdd.onclick = () => {
+    if(!txAmount.value || txAmount.value <= 0) return showToast("Inserisci importo");
+    state.txs.push({
+      id: uid(), type: txType.value, date: txDate.value, 
+      amount: parseFloat(txAmount.value), category: txCategory.value, 
+      method: txMethod.value, tag: txTag.value 
+    });
     saveState(state);
-
-    // reset amount/note quickly
-    txAmount.value = "";
-    txTag.value = "";
-    txNote.value = "";
-    showToast("Movimento aggiunto.");
-
-    // refresh UI (month list may change)
+    txAmount.value = ""; txTag.value = "";
+    showToast("Salvato!");
     renderAll(state);
-  });
+  };
 
-  // Table actions (edit/delete)
-  $("txTable").addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if(!btn) return;
-    const act = btn.dataset.act;
-    const id = btn.dataset.id;
-    if(!act || !id) return;
-
-    const idx = state.txs.findIndex(t => t.id === id);
-    if(idx < 0) return;
-
-    if(act === "del"){
-      state.txs.splice(idx, 1);
-      saveState(state);
-      showToast("Movimento eliminato.");
-      renderAll(state);
-      return;
-    }
-
-    if(act === "edit"){
-      const t = state.txs[idx];
-
-      // Minimal inline editor via prompt (semplice ma efficace)
-      const newAmount = prompt("Nuovo importo (numero):", String(t.amount));
-      if(newAmount === null) return;
-      const amt = Number(newAmount);
-      if(!Number.isFinite(amt) || amt <= 0){
-        showToast("Importo non valido.");
-        return;
-      }
-
-      const newDate = prompt("Nuova data (YYYY-MM-DD):", t.date);
-      if(newDate === null) return;
-
-      const newCat = prompt("Nuova categoria:", t.category);
-      if(newCat === null) return;
-
-      const newNote = prompt("Note:", t.note || "") ?? (t.note || "");
-
-      t.amount = Number(amt.toFixed(2));
-      t.date = newDate;
-      t.category = newCat;
-      t.note = newNote;
-
-      // If category doesn't exist, add it
-      if(!state.categories.includes(newCat)){
-        state.categories.push(newCat);
-      }
-
-      saveState(state);
-      showToast("Movimento aggiornato.");
-      renderAll(state);
-    }
-  });
-
-  // Filters re-render
-  [filterMonth, filterText, filterType, filterCategory].forEach(el => {
-    el.addEventListener("input", () => renderAll(state));
-    el.addEventListener("change", () => renderAll(state));
-  });
-
-  // Add category
-  btnAddCategory.addEventListener("click", () => {
-    const c = newCategory.value.trim();
-    if(!c){ showToast("Inserisci un nome categoria."); return; }
-    if(state.categories.includes(c)){ showToast("Categoria già presente."); return; }
-    state.categories.push(c);
+  $("btnAddCategory").onclick = () => {
+    if(!newCategory.value) return;
+    state.categories.push(newCategory.value);
     newCategory.value = "";
     saveState(state);
-    showToast("Categoria aggiunta.");
     renderAll(state);
-  });
+  };
 
-  // Budgets actions
-  btnAddBudget.addEventListener("click", () => {
-    const category = prompt("Categoria per il budget:", state.categories[0] || "Spesa");
-    if(category === null) return;
-    const monthly = prompt("Budget mensile (€):", "300");
-    if(monthly === null) return;
-
-    const m = Number(monthly);
-    if(!Number.isFinite(m) || m < 0){
-      showToast("Budget non valido.");
-      return;
-    }
-
-    // upsert by category
-    const existing = state.budgets.find(b => b.category === category);
-    if(existing){
-      existing.monthly = Number(m.toFixed(2));
-    }else{
-      state.budgets.push({ id: uid(), category, monthly: Number(m.toFixed(2)) });
-    }
-
-    // ensure category exists
-    if(!state.categories.includes(category)){
-      state.categories.push(category);
-    }
-
-    saveState(state);
-    showToast("Budget salvato.");
-    renderAll(state);
-  });
-
-  $("budgetsTable").addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if(!btn) return;
-    const act = btn.dataset.act;
-    const id = btn.dataset.id;
-    if(!act || !id) return;
-
-    const idx = state.budgets.findIndex(b => b.id === id);
-    if(idx < 0) return;
-
-    if(act === "delBudget"){
-      state.budgets.splice(idx, 1);
+  $("btnAddBudget").onclick = () => {
+    const cat = prompt("Categoria?", state.categories[0]);
+    const amt = prompt("Importo mensile?", "500");
+    if(cat && amt) {
+      state.budgets.push({ id: uid(), category: cat, monthly: parseFloat(amt) });
       saveState(state);
-      showToast("Budget eliminato.");
-      renderAll(state);
-      return;
-    }
-
-    if(act === "editBudget"){
-      const b = state.budgets[idx];
-      const monthly = prompt("Nuovo budget mensile (€):", String(b.monthly));
-      if(monthly === null) return;
-      const m = Number(monthly);
-      if(!Number.isFinite(m) || m < 0){
-        showToast("Budget non valido.");
-        return;
-      }
-      b.monthly = Number(m.toFixed(2));
-      saveState(state);
-      showToast("Budget aggiornato.");
       renderAll(state);
     }
-  });
+  };
 
-  // Reset all
-  btnReset.addEventListener("click", () => {
-    const ok = confirm("Vuoi davvero cancellare TUTTI i dati locali?");
-    if(!ok) return;
-    localStorage.removeItem(LS_KEY);
-    state = loadState();
-    txDate.value = todayISO();
-    showToast("Dati resettati.");
-    renderAll(state);
-  });
+  window.delTx = (id) => { state.txs = state.txs.filter(t=>t.id!==id); saveState(state); renderAll(state); };
+  window.delBudget = (id) => { state.budgets = state.budgets.filter(b=>b.id!==id); saveState(state); renderAll(state); };
+  filterMonth.onchange = () => renderAll(state);
 
-  // Export JSON
-  btnExportJson.addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `SimpleBudgetPersonalHome_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
+  $("btnReset").onclick = () => { if(confirm("Resetta tutto?")) { localStorage.clear(); location.reload(); } };
+  $("btnExportJson").onclick = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const a = document.createElement('a'); a.href = dataStr; a.download = 'budget_backup.json'; a.click();
+  };
 
-  // Import JSON
-  btnImportJson.addEventListener("click", () => {
-    const inp = document.createElement("input");
-    inp.type = "file";
-    inp.accept = "application/json";
-    inp.onchange = async () => {
-      const f = inp.files && inp.files[0];
-      if(!f) return;
-      try{
-        const txt = await f.text();
-        const parsed = JSON.parse(txt);
-
-        // minimal validation
-        const next = {
-          categories: Array.isArray(parsed.categories) ? parsed.categories : [...defaultCategories],
-          txs: Array.isArray(parsed.txs) ? parsed.txs : [],
-          budgets: Array.isArray(parsed.budgets) ? parsed.budgets : []
-        };
-
-        state = next;
-        saveState(state);
-        showToast("Import completato.");
-        renderAll(state);
-      }catch{
-        showToast("File JSON non valido.");
-      }
-    };
-    inp.click();
-  });
-
-  // Export CSV (movimenti)
-  btnExportCsv.addEventListener("click", () => {
-    const header = ["id","type","date","amount","category","method","tag","note"];
-    const lines = [header.join(",")];
-
-    for(const t of state.txs){
-      const row = [
-        t.id, t.type, t.date, String(t.amount),
-        t.category, t.method, t.tag || "", t.note || ""
-      ].map(csvEscape);
-      lines.push(row.join(","));
-    }
-
-    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `SimpleBudgetPersonalHome_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-
-    function csvEscape(v){
-      const s = String(v ?? "");
-      if(/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
-      return s;
-    }
-  });
-
+  renderAll(state);
 })();
 </script>
 </body>
