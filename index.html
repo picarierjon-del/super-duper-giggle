@@ -24,10 +24,10 @@
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    
+
     body {
       margin: 0;
-      font-family: -apple-system, "SF Pro Display", sans-serif;
+      font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       padding-top: env(safe-area-inset-top);
@@ -78,7 +78,6 @@
     .btn.secondary { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); }
     .btn.danger { background: rgba(239, 68, 68, 0.15); color: var(--bad); }
 
-    /* Navigazione */
     nav {
       position: fixed;
       bottom: 25px; left: 20px; right: 20px;
@@ -95,183 +94,237 @@
     .nav-item i { font-style: normal; font-size: 22px; margin-bottom: 2px; opacity: 0.5; }
     .nav-item.active i { opacity: 1; }
 
-    /* List Item Modern */
     .tx-card {
       display: flex;
       align-items: center;
       padding: 16px 0;
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
-    .tx-info { flex: 1; }
+    .tx-info { flex: 1; cursor: pointer; }
     .tx-info b { display: block; font-size: 15px; margin-bottom: 2px; }
     .tx-info span { font-size: 12px; color: var(--text-dim); }
     .tx-right { text-align: right; display: flex; align-items: center; gap: 12px; }
     .tx-amt { font-weight: 800; font-size: 15px; }
-    .tx-del { background: rgba(239, 68, 68, 0.1); border: none; color: var(--bad); padding: 8px; border-radius: 12px; font-size: 12px; }
+    .tx-del { background: rgba(239, 68, 68, 0.1); border: none; color: var(--bad); padding: 8px; border-radius: 12px; font-size: 12px; cursor:pointer; }
 
     .toast {
       position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
       background: white; color: black; padding: 12px 24px;
       border-radius: 50px; font-weight: 700; display: none; z-index: 2000;
+      max-width: calc(100vw - 40px);
+      text-align: center;
     }
   </style>
 </head>
+
 <body>
+  <div id="toast" class="toast"></div>
 
-<div id="toast" class="toast"></div>
+  <div id="view-cassa" class="view active">
+    <header><h1>Cassa</h1></header>
+    <div class="card">
+      <div style="display:flex; background:rgba(0,0,0,0.3); border-radius:20px; padding:5px; margin-bottom:20px">
+        <button id="type-exp" style="flex:1; border:none; padding:12px; border-radius:16px; background:var(--accent); color:white; font-weight:700" onclick="setType('expense')">Spesa</button>
+        <button id="type-inc" style="flex:1; border:none; padding:12px; border-radius:16px; background:transparent; color:var(--text-dim); font-weight:700" onclick="setType('income')">Entrata</button>
+      </div>
 
-<div id="view-cassa" class="view active">
-  <header><h1>Cassa</h1></header>
-  <div class="card">
-    <div style="display:flex; background:rgba(0,0,0,0.3); border-radius:20px; padding:5px; margin-bottom:20px">
-      <button id="type-exp" style="flex:1; border:none; padding:12px; border-radius:16px; background:var(--accent); color:white; font-weight:700" onclick="setType('expense')">Spesa</button>
-      <button id="type-inc" style="flex:1; border:none; padding:12px; border-radius:16px; background:transparent; color:var(--text-dim); font-weight:700" onclick="setType('income')">Entrata</button>
-    </div>
+      <label>Importo</label>
+      <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00"
+        style="font-size: 32px; text-align: center; color: var(--accent); background:transparent; border:none">
 
-    <label>Importo</label>
-    <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00" style="font-size: 32px; text-align: center; color: var(--accent); background:transparent; border:none">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+        <div><label>Categoria</label><select id="txCategory"></select></div>
+        <div><label>Data</label><input type="date" id="txDate"></div>
+      </div>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
-      <div><label>Categoria</label><select id="txCategory"></select></div>
-      <div><label>Data</label><input type="date" id="txDate"></div>
-    </div>
+      <label>Descrizione</label>
+      <input type="text" id="txTag" placeholder="Esempio: Cena fuori">
 
-    <label>Descrizione</label>
-    <input type="text" id="txTag" placeholder="Esempio: Cena fuori">
-
-    <button class="btn" onclick="saveTx()">Salva Movimento</button>
-  </div>
-</div>
-
-<div id="view-analisi" class="view">
-  <header style="display:flex; justify-content:space-between; align-items:center">
-    <h1>Report</h1>
-    <select id="filterMonth" style="width:auto; margin:0; padding:8px; border-radius:12px; background:var(--card)"></select>
-  </header>
-
-  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin: 20px 0">
-    <div class="card" style="margin:0; padding:15px; text-align:center">
-      <div style="font-size:11px; color:var(--text-dim)">ENTRATE</div>
-      <div id="kpi-inc" style="color:var(--good); font-weight:800; font-size:18px">+0€</div>
-    </div>
-    <div class="card" style="margin:0; padding:15px; text-align:center">
-      <div style="font-size:11px; color:var(--text-dim)">USCITE</div>
-      <div id="kpi-exp" style="color:var(--bad); font-weight:800; font-size:18px">-0€</div>
+      <button class="btn" onclick="saveTx()">Salva Movimento</button>
     </div>
   </div>
 
-  <div class="card">
-    <h2>Categorie</h2>
-    <canvas id="chartCats" height="200"></canvas>
-  </div>
+  <div id="view-analisi" class="view">
+    <header style="display:flex; justify-content:space-between; align-items:center">
+      <h1>Report</h1>
+      <select id="filterMonth" style="width:auto; margin:0; padding:8px; border-radius:12px; background:var(--card)"></select>
+    </header>
 
-  <div class="card" style="padding-bottom:100px">
-    <h2>Cronologia</h2>
-    <div id="txList"></div>
-  </div>
-</div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin: 20px 0">
+      <div class="card" style="margin:0; padding:15px; text-align:center">
+        <div style="font-size:11px; color:var(--text-dim)">ENTRATE</div>
+        <div id="kpi-inc" style="color:var(--good); font-weight:800; font-size:18px">+0€</div>
+      </div>
+      <div class="card" style="margin:0; padding:15px; text-align:center">
+        <div style="font-size:11px; color:var(--text-dim)">USCITE</div>
+        <div id="kpi-exp" style="color:var(--bad); font-weight:800; font-size:18px">-0€</div>
+      </div>
+    </div>
 
-<div id="view-setup" class="view">
-  <header><h1>Setup</h1></header>
-  <div class="card">
-    <h2>Categorie</h2>
-    <div style="display:flex; gap:10px">
-      <input type="text" id="newCategory" placeholder="Nuova..." style="margin:0">
-      <button class="btn" onclick="addCategory()" style="width:60px; padding:0">+</button>
+    <div class="card">
+      <h2>Categorie</h2>
+      <canvas id="chartCats" height="200"></canvas>
+    </div>
+
+    <div class="card" style="padding-bottom:100px">
+      <h2>Cronologia</h2>
+      <div id="txList"></div>
     </div>
   </div>
 
-  <div class="card">
-    <h2 style="color:var(--bad)">Manutenzione</h2>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px">
-      <input type="date" id="cleanFrom" style="margin:0">
-      <input type="date" id="cleanTo" style="margin:0">
+  <div id="view-setup" class="view">
+    <header><h1>Setup</h1></header>
+    <div class="card">
+      <h2>Categorie</h2>
+      <div style="display:flex; gap:10px">
+        <input type="text" id="newCategory" placeholder="Nuova..." style="margin:0">
+        <button class="btn" onclick="addCategory()" style="width:60px; padding:0">+</button>
+      </div>
     </div>
-    <button class="btn danger" onclick="cleanRange()">Cancella Intervallo</button>
+
+    <div class="card">
+      <h2 style="color:var(--bad)">Manutenzione</h2>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px">
+        <input type="date" id="cleanFrom" style="margin:0">
+        <input type="date" id="cleanTo" style="margin:0">
+      </div>
+      <button class="btn danger" onclick="cleanRange()">Cancella Intervallo</button>
+    </div>
+
+    <div class="card">
+      <h2>Dati</h2>
+      <button class="btn secondary" onclick="exportData()" style="margin-bottom:10px">Esporta JSON</button>
+      <button class="btn secondary" onclick="importData()">Importa JSON</button>
+      <button class="btn danger" onclick="resetAll()" style="margin-top:20px; border:none; background:transparent">Reset Totale</button>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>Dati</h2>
-    <button class="btn secondary" onclick="exportData()" style="margin-bottom:10px">Esporta JSON</button>
-    <button class="btn secondary" onclick="importData()">Importa JSON</button>
-    <button class="btn danger" onclick="resetAll()" style="margin-top:20px; border:none; background:transparent">Reset Totale</button>
-  </div>
-</div>
-
-<nav>
-  <a href="#" class="nav-item active" onclick="showView('cassa', this)"><i>💰</i><span>CASSA</span></a>
-  <a href="#" class="nav-item" onclick="showView('analisi', this)"><i>📊</i><span>ANALISI</span></a>
-  <a href="#" class="nav-item" onclick="showView('setup', this)"><i>⚙️</i><span>SETUP</span></a>
-</nav>
+  <nav>
+    <a href="#" class="nav-item active" onclick="showView('cassa', this); return false;"><i>💰</i><span>CASSA</span></a>
+    <a href="#" class="nav-item" onclick="showView('analisi', this); return false;"><i>📊</i><span>ANALISI</span></a>
+    <a href="#" class="nav-item" onclick="showView('setup', this); return false;"><i>⚙️</i><span>SETUP</span></a>
+  </nav>
 
 <script>
   let state = {
     categories: ["🛒 Spesa", "🏠 Casa", "🚗 Viaggi", "🍕 Svago", "🏥 Salute", "📦 Altro"],
     txs: [],
-    currentType: 'expense',
+    currentType: "expense",
     editingId: null
   };
 
   const LS_KEY = "SmartBudget_V4_Final";
 
+  function safeUUID(){
+    try{
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+    }catch{}
+    return "tx-" + Date.now().toString(16) + "-" + Math.random().toString(16).slice(2);
+  }
+
+  function todayISO(){
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function saveState(){
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  }
+
   function init() {
     const saved = localStorage.getItem(LS_KEY);
-    if(saved) state = JSON.parse(saved);
-    document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // hardening minimo
+        if (parsed && Array.isArray(parsed.categories) && Array.isArray(parsed.txs)) {
+          state = {
+            categories: parsed.categories,
+            txs: parsed.txs,
+            currentType: parsed.currentType || "expense",
+            editingId: null
+          };
+        }
+      } catch {}
+    }
+
+    document.getElementById("txDate").value = todayISO();
+    setType(state.currentType);
     renderAll();
   }
 
   function showView(viewId, el) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('view-' + viewId).classList.add('active');
-    el.classList.add('active');
-    if(viewId === 'analisi') renderAll();
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+
+    const target = document.getElementById("view-" + viewId);
+    if (target) target.classList.add("active");
+    if (el) el.classList.add("active");
+
+    if (viewId === "analisi") renderAll();
   }
 
   function setType(type) {
     state.currentType = type;
-    const isExp = type === 'expense';
-    document.getElementById('type-exp').style.background = isExp ? 'var(--accent)' : 'transparent';
-    document.getElementById('type-inc').style.background = !isExp ? 'var(--accent)' : 'transparent';
+    const isExp = type === "expense";
+
+    const btnExp = document.getElementById("type-exp");
+    const btnInc = document.getElementById("type-inc");
+
+    btnExp.style.background = isExp ? "var(--accent)" : "transparent";
+    btnInc.style.background = !isExp ? "var(--accent)" : "transparent";
+
+    btnExp.style.color = isExp ? "white" : "var(--text-dim)";
+    btnInc.style.color = !isExp ? "white" : "var(--text-dim)";
   }
 
   function saveTx() {
-    const amt = document.getElementById('txAmount').value;
-    if(!amt) return notify("Inserisci importo");
-    
+    const amtRaw = document.getElementById("txAmount").value;
+    const amt = Number(amtRaw);
+
+    if (!amtRaw || !Number.isFinite(amt) || amt <= 0) return notify("Inserisci importo valido");
+
+    const category = document.getElementById("txCategory").value;
+    const date = document.getElementById("txDate").value || todayISO();
+    const tag = (document.getElementById("txTag").value || "").trim() || "Senza titolo";
+
     const newTx = {
-      id: state.editingId || Date.now(),
+      id: state.editingId || safeUUID(),
       type: state.currentType,
-      amount: parseFloat(amt),
-      category: document.getElementById('txCategory').value,
-      tag: document.getElementById('txTag').value || "Senza titolo",
-      date: document.getElementById('txDate').value
+      amount: Math.round(amt * 100) / 100,
+      category,
+      tag,
+      date
     };
 
-    if(state.editingId) {
+    if (state.editingId) {
       state.txs = state.txs.map(t => t.id === state.editingId ? newTx : t);
       state.editingId = null;
     } else {
       state.txs.push(newTx);
     }
 
-    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    saveState();
     resetForm();
     notify("Salvato!");
     renderAll();
   }
 
   function resetForm() {
-    document.getElementById('txAmount').value = "";
-    document.getElementById('txTag').value = "";
+    document.getElementById("txAmount").value = "";
+    document.getElementById("txTag").value = "";
     state.editingId = null;
+    // resta nella tipologia scelta e data corrente
   }
 
-  function deleteTx(id) {
-    if(confirm("Eliminare questo movimento?")) {
+  function deleteTx(id, ev) {
+    if (ev) ev.stopPropagation();
+    if (confirm("Eliminare questo movimento?")) {
       state.txs = state.txs.filter(t => t.id !== id);
-      localStorage.setItem(LS_KEY, JSON.stringify(state));
+      saveState();
       renderAll();
       notify("Eliminato");
     }
@@ -279,122 +332,212 @@
 
   function editTx(id) {
     const tx = state.txs.find(t => t.id === id);
-    if(!tx) return;
+    if (!tx) return;
+
     state.editingId = id;
     setType(tx.type);
-    document.getElementById('txAmount').value = tx.amount;
-    document.getElementById('txCategory').value = tx.category;
-    document.getElementById('txTag').value = tx.tag;
-    document.getElementById('txDate').value = tx.date;
-    showView('cassa', document.querySelector('.nav-item'));
+    document.getElementById("txAmount").value = tx.amount;
+    document.getElementById("txCategory").value = tx.category;
+    document.getElementById("txTag").value = tx.tag;
+    document.getElementById("txDate").value = tx.date;
+
+    // attiva tab cassa (prima nav-item è CASSA)
+    showView("cassa", document.querySelectorAll(".nav-item")[0]);
     notify("Modalità modifica");
   }
 
   function renderAll() {
-    document.getElementById('txCategory').innerHTML = state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-    
-    const months = Array.from(new Set(state.txs.map(t => t.date.slice(0,7)))).sort().reverse();
-    const filterM = document.getElementById('filterMonth');
-    const currM = filterM.value || (months.length ? months[0] : new Date().toISOString().slice(0,7));
-    filterM.innerHTML = (months.length ? months : [currM]).map(m => `<option value="${m}" ${m===currM?'selected':''}>${m}</option>`).join('');
+    // select categorie (sia cassa che altre future)
+    const sel = document.getElementById("txCategory");
+    sel.innerHTML = state.categories.map(c => `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join("");
 
-    const filtered = state.txs.filter(t => t.date.startsWith(currM));
-    const inc = filtered.filter(t => t.type === 'income').reduce((s,t) => s+t.amount, 0);
-    const exp = filtered.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
+    // mesi disponibili
+    const months = Array.from(new Set(state.txs.map(t => (t.date || "").slice(0,7)).filter(Boolean))).sort().reverse();
+    const filterM = document.getElementById("filterMonth");
 
-    document.getElementById('kpi-inc').textContent = "+" + inc.toFixed(2) + "€";
-    document.getElementById('kpi-exp').textContent = "-" + exp.toFixed(2) + "€";
+    const fallback = todayISO().slice(0,7);
+    const currM = filterM.value || (months.length ? months[0] : fallback);
 
-    document.getElementById('txList').innerHTML = filtered.sort((a,b) => b.id - a.id).map(t => `
+    filterM.innerHTML = (months.length ? months : [currM])
+      .map(m => `<option value="${escapeAttr(m)}" ${m===currM ? "selected" : ""}>${escapeHtml(m)}</option>`)
+      .join("");
+
+    const filtered = state.txs.filter(t => (t.date || "").startsWith(currM));
+    const inc = filtered.filter(t => t.type === "income").reduce((s,t) => s + Number(t.amount || 0), 0);
+    const exp = filtered.filter(t => t.type === "expense").reduce((s,t) => s + Number(t.amount || 0), 0);
+
+    document.getElementById("kpi-inc").textContent = "+" + inc.toFixed(2) + "€";
+    document.getElementById("kpi-exp").textContent = "-" + exp.toFixed(2) + "€";
+
+    // lista movimenti
+    const list = document.getElementById("txList");
+    const sorted = filtered.slice().sort((a,b) => {
+      // ordina per data e poi inserimento
+      if ((a.date||"") === (b.date||"")) return String(b.id).localeCompare(String(a.id));
+      return (b.date||"").localeCompare(a.date||"");
+    });
+
+    list.innerHTML = sorted.map(t => `
       <div class="tx-card">
-        <div class="tx-info" onclick="editTx(${t.id})">
-          <b>${t.tag}</b>
-          <span>${t.category} • ${t.date}</span>
+        <div class="tx-info" onclick="editTx('${escapeAttr(t.id)}')">
+          <b>${escapeHtml(t.tag)}</b>
+          <span>${escapeHtml(t.category)} • ${escapeHtml(t.date)}</span>
         </div>
         <div class="tx-right">
           <div class="tx-amt" style="color:${t.type==='income'?'var(--good)':'white'}">
-            ${t.type==='income'?'+':'-'}${t.amount.toFixed(2)}€
+            ${t.type==='income'?'+':'-'}${Number(t.amount||0).toFixed(2)}€
           </div>
-          <button class="tx-del" onclick="deleteTx(${t.id})">🗑️</button>
+          <button class="tx-del" onclick="deleteTx('${escapeAttr(t.id)}', event)">🗑️</button>
         </div>
       </div>
-    `).join('') || '<p style="text-align:center; color:var(--text-dim); padding:20px;">Vuoto</p>';
+    `).join("") || '<p style="text-align:center; color:var(--text-dim); padding:20px;">Vuoto</p>';
 
     renderChart(filtered);
   }
 
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+  function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
+
   let myChart = null;
   function renderChart(data) {
-    const ctx = document.getElementById('chartCats').getContext('2d');
-    const expenses = data.filter(t => t.type === 'expense');
+    const canvas = document.getElementById("chartCats");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    const expenses = data.filter(t => t.type === "expense");
     const totals = {};
-    expenses.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
-    if(myChart) myChart.destroy();
+    for (const e of expenses) totals[e.category] = (totals[e.category] || 0) + Number(e.amount || 0);
+
+    const labels = Object.keys(totals);
+    const values = Object.values(totals).map(v => Math.round(v*100)/100);
+
+    if (myChart) myChart.destroy();
+
+    if (!labels.length) {
+      // grafico “placeholder”
+      myChart = new Chart(ctx, {
+        type: "doughnut",
+        data: { labels: ["Nessuna spesa"], datasets: [{ data: [1], borderWidth: 0 }] },
+        options: { cutout: "85%", plugins: { legend: { display: false } } }
+      });
+      return;
+    }
+
     myChart = new Chart(ctx, {
-      type: 'doughnut',
+      type: "doughnut",
       data: {
-        labels: Object.keys(totals),
+        labels,
         datasets: [{
-          data: Object.values(totals),
-          backgroundColor: ['#6366f1', '#10b981', '#fbbf24', '#f87171', '#a78bfa'],
-          borderWidth: 0, spacing: 5
+          data: values,
+          backgroundColor: ["#6366f1", "#10b981", "#fbbf24", "#f87171", "#a78bfa", "#22c55e", "#38bdf8", "#fb7185"],
+          borderWidth: 0,
+          spacing: 5
         }]
       },
-      options: { cutout: '85%', plugins: { legend: { display: false } } }
+      options: { cutout: "85%", plugins: { legend: { display: false } } }
     });
   }
 
   function cleanRange() {
-    const from = document.getElementById('cleanFrom').value, to = document.getElementById('cleanTo').value;
-    if(!from || !to) return notify("Scegli le date");
-    if(confirm("Eliminare movimenti selezionati?")) {
-      state.txs = state.txs.filter(t => t.date < from || t.date > to);
-      localStorage.setItem(LS_KEY, JSON.stringify(state));
+    const from = document.getElementById("cleanFrom").value;
+    const to = document.getElementById("cleanTo").value;
+
+    if (!from || !to) return notify("Scegli le date");
+    if (from > to) return notify("Intervallo non valido");
+
+    if (confirm("Eliminare movimenti selezionati?")) {
+      state.txs = state.txs.filter(t => (t.date || "") < from || (t.date || "") > to);
+      saveState();
       renderAll();
       notify("Pulizia completata");
     }
   }
 
   function addCategory() {
-    const val = document.getElementById('newCategory').value;
-    if(val) {
-      state.categories.push(val);
-      localStorage.setItem(LS_KEY, JSON.stringify(state));
-      document.getElementById('newCategory').value = "";
-      renderAll();
-      notify("Aggiunta");
+    const input = document.getElementById("newCategory");
+    const val = (input.value || "").trim();
+    if (!val) return;
+
+    if (state.categories.includes(val)) {
+      notify("Categoria già presente");
+      input.value = "";
+      return;
     }
+
+    state.categories.push(val);
+    saveState();
+    input.value = "";
+    renderAll();
+    notify("Aggiunta");
   }
 
   function notify(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.style.display = 'block';
-    setTimeout(() => t.style.display = 'none', 2000);
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(notify._t);
+    notify._t = setTimeout(() => t.style.display = "none", 2000);
   }
 
   function exportData() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-    const a = document.createElement('a'); a.href = dataStr; a.download = 'backup.json'; a.click();
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "smartbudget_backup.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
   function importData() {
-    const inp = document.createElement('input'); inp.type = 'file';
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.accept = "application/json";
     inp.onchange = e => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+
       const reader = new FileReader();
       reader.onload = r => {
-        state = JSON.parse(r.target.result);
-        localStorage.setItem(LS_KEY, JSON.stringify(state));
-        renderAll(); notify("Backup caricato");
+        try {
+          const parsed = JSON.parse(r.target.result);
+
+          if (!parsed || !Array.isArray(parsed.categories) || !Array.isArray(parsed.txs)) {
+            notify("Backup non valido");
+            return;
+          }
+
+          state = {
+            categories: parsed.categories,
+            txs: parsed.txs,
+            currentType: parsed.currentType || "expense",
+            editingId: null
+          };
+
+          saveState();
+          renderAll();
+          notify("Backup caricato");
+        } catch {
+          notify("JSON non valido");
+        }
       };
-      reader.readAsText(e.target.files[0]);
+      reader.readAsText(f);
     };
     inp.click();
   }
 
-  function resetAll() { if(confirm("Cancellare tutto?")) { localStorage.clear(); location.reload(); } }
+  function resetAll() {
+    if (confirm("Cancellare tutto?")) {
+      localStorage.removeItem(LS_KEY); // non tocca altre chiavi del dominio
+      location.reload();
+    }
+  }
 
-  document.getElementById('filterMonth').onchange = renderAll;
-  window.onload = init;
+  document.getElementById("filterMonth").addEventListener("change", renderAll);
+  window.addEventListener("load", init);
 </script>
 </body>
 </html>
