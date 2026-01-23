@@ -13,14 +13,15 @@
   <!-- Manifest -->
   <link rel="manifest" href="./manifest.webmanifest" />
 
-  <!-- Icons (metti questi file nella stessa cartella) -->
+  <!-- Icons -->
   <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
 
   <title>PicariHome🏡</title>
 
-  <!-- Chart.js (verrà cachato dal Service Worker per uso offline dopo la prima apertura) -->
+  <!-- Chart.js (cachato dal SW dopo primo avvio) -->
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
@@ -28,7 +29,6 @@
       --bg0:#070A12;
       --bg1:#0B1020;
       --card:rgba(255,255,255,.06);
-      --line:rgba(255,255,255,.10);
       --text:#EAF0FF;
       --muted:#A7B1CC;
       --accent:#7C5CFF;
@@ -38,8 +38,7 @@
       --radius:22px;
       --shadow: 0 20px 50px rgba(0,0,0,.45);
     }
-
-    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{height:100%}
     body{
       margin:0;
@@ -53,20 +52,30 @@
       overflow-x:hidden;
     }
 
-    .view{display:none; padding:18px 18px 120px; animation:in .28s ease-out}
+    .view{display:none; padding:18px 18px 140px; animation:in .28s ease-out}
     .view.active{display:block}
     @keyframes in{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
 
     .topbar{
       display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
-      padding: 18px 18px 6px;
+      padding: 18px 18px 8px;
       position: sticky; top: 0; z-index: 10;
       backdrop-filter: blur(14px);
       background: linear-gradient(180deg, rgba(7,10,18,.78), rgba(7,10,18,.25));
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
-    .title h1{margin:0; font-size:26px; letter-spacing:-.6px}
+    .title{display:flex; align-items:flex-end; gap:10px}
+    .title h1{margin:0; font-size:24px; letter-spacing:-.6px}
     .title .sub{margin-top:3px; font-size:12px; color:var(--muted)}
+    .appMark{
+      width:34px; height:34px; border-radius:12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
     .chip{
       display:inline-flex; align-items:center; gap:8px;
       padding:10px 12px;
@@ -74,7 +83,7 @@
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
       color: var(--text);
-      font-weight:800;
+      font-weight:900;
       font-size:12px;
       cursor:pointer;
       user-select:none;
@@ -84,7 +93,7 @@
     .chip select{
       appearance:none; -webkit-appearance:none;
       background:transparent; border:none; color:var(--text);
-      font-weight:900; font-size:12px;
+      font-weight:950; font-size:12px;
       padding:0; margin:0;
       outline:none;
       cursor:pointer;
@@ -110,7 +119,10 @@
       color: var(--muted);
     }
 
-    label{display:block; font-size:11px; font-weight:900; color:var(--muted); margin: 0 0 6px 6px}
+    label{display:block; font-size:11px; font-weight:950; color:var(--muted); margin: 0 0 6px 6px}
+    input, select, button{
+      font-family: inherit;
+    }
     input, select{
       width:100%;
       background: rgba(255,255,255,.04);
@@ -123,8 +135,9 @@
     }
     input:focus, select:focus{border-color: rgba(124,92,255,.55)}
     .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .muted{color:var(--muted)}
+    .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
     .hint{font-size:12px; color:var(--muted); line-height:1.35}
+    .divider{height:1px; background: rgba(255,255,255,.08); margin: 14px 0}
 
     .seg{
       display:flex;
@@ -139,7 +152,7 @@
       border:none;
       border-radius: 14px;
       padding: 12px;
-      font-weight:950;
+      font-weight:990;
       color: var(--muted);
       background: transparent;
       cursor:pointer;
@@ -158,7 +171,7 @@
       border-radius: 18px;
       padding: 14px 16px;
       font-size: 15px;
-      font-weight: 950;
+      font-weight: 990;
       cursor:pointer;
       transition: transform .06s ease, opacity .2s ease;
       user-select:none;
@@ -193,7 +206,6 @@
       width: 100%;
     }
     .amountBox input::placeholder{color: rgba(46,229,157,.35)}
-    .divider{height:1px; background: rgba(255,255,255,.08); margin: 14px 0}
 
     .kpis{display:grid; grid-template-columns:1fr 1fr; gap:12px}
     .kpi{
@@ -203,7 +215,7 @@
       background: rgba(255,255,255,.04);
     }
     .kpi .t{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
-    .kpi .v{margin-top:6px; font-size:18px; font-weight:990}
+    .kpi .v{margin-top:6px; font-size:18px; font-weight:1000}
     .v.good{color:var(--good)}
     .v.bad{color:var(--bad)}
     .v.warn{color:var(--warn)}
@@ -226,7 +238,7 @@
     .tx-info b{display:block; font-size:15px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .tx-info span{font-size:12px; color:var(--muted)}
     .tx-right{display:flex; align-items:center; gap:10px}
-    .tx-amt{font-weight:990; font-size:14px; white-space:nowrap}
+    .tx-amt{font-weight:1000; font-size:14px; white-space:nowrap}
     .tx-del{
       border:none;
       background: rgba(255,77,109,.10);
@@ -277,7 +289,7 @@
       background: rgba(255,193,74,.08);
       color: rgba(255,193,74,.95);
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 950;
       line-height: 1.35;
     }
 
@@ -305,7 +317,7 @@
       color: var(--muted);
       text-decoration:none;
       border-radius: 20px;
-      font-weight: 950;
+      font-weight: 990;
       font-size: 10px;
       letter-spacing: .08em;
       text-transform: uppercase;
@@ -328,7 +340,7 @@
       color: #0B1020;
       padding: 12px 16px;
       border-radius: 999px;
-      font-weight: 990;
+      font-weight: 1000;
       display:none;
       z-index: 2000;
       max-width: calc(100vw - 32px);
@@ -336,7 +348,6 @@
       box-shadow: 0 20px 60px rgba(0,0,0,.35);
     }
 
-    /* Small offline badge */
     .netBadge{
       display:inline-flex; align-items:center; gap:6px;
       padding: 8px 10px;
@@ -344,12 +355,32 @@
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
       color: var(--muted);
-      font-weight:900;
+      font-weight:950;
       font-size: 11px;
       white-space: nowrap;
     }
     .netBadge.on{ color: rgba(46,229,157,.95); border-color: rgba(46,229,157,.25); background: rgba(46,229,157,.08); }
     .netBadge.off{ color: rgba(255,193,74,.95); border-color: rgba(255,193,74,.25); background: rgba(255,193,74,.08); }
+
+    /* Report filters */
+    .pillRow{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .pill{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 950;
+      font-size: 12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pill.on{
+      border-color: rgba(124,92,255,.35);
+      background: rgba(124,92,255,.14);
+    }
   </style>
 </head>
 
@@ -360,8 +391,14 @@
   <div id="view-cassa" class="view active">
     <div class="topbar">
       <div class="title">
-        <h1>PicariHome🏡</h1>
-        <div class="sub">Aggiungi movimenti in 3 tocchi</div>
+        <div class="appMark" aria-hidden="true">
+          <!-- inline tiny icon preview -->
+          <img src="./icon.svg" alt="" style="width:26px;height:26px;opacity:.95">
+        </div>
+        <div>
+          <h1>PicariHome🏡</h1>
+          <div class="sub">Aggiungi movimenti in 3 tocchi</div>
+        </div>
       </div>
       <div style="display:flex; align-items:center; gap:10px">
         <div id="netBadge" class="netBadge">● online</div>
@@ -374,7 +411,7 @@
     <div class="card">
       <div class="hd">
         <h2>Tipo movimento</h2>
-        <div class="muted" id="modeHint" style="font-size:12px; font-weight:900"></div>
+        <div class="hint" id="modeHint" style="font-weight:950"></div>
       </div>
 
       <div id="typeSeg" class="seg">
@@ -403,10 +440,8 @@
       <label>Descrizione</label>
       <input type="text" id="txTag" placeholder="Esempio: Cena fuori">
 
-      <button class="btn primary" id="btnSave" onclick="saveTx()">Salva</button>
-      <div class="hint" style="margin-top:10px">
-        Tip: tocca una riga nel report per modificarla.
-      </div>
+      <button class="btn primary" onclick="saveTx()">Salva</button>
+      <div class="hint" style="margin-top:10px">Tip: nel report tocca una riga per modificarla.</div>
     </div>
   </div>
 
@@ -414,20 +449,51 @@
   <div id="view-analisi" class="view">
     <div class="topbar">
       <div class="title">
-        <h1>Report</h1>
-        <div class="sub">Riepilogo, stipendio e categorie del mese</div>
+        <div class="appMark" aria-hidden="true">
+          <img src="./icon.svg" alt="" style="width:26px;height:26px;opacity:.95">
+        </div>
+        <div>
+          <h1>Report</h1>
+          <div class="sub">Filtri rapidi + ricerca date</div>
+        </div>
       </div>
+
       <div class="chip">
         📅
-        <select id="filterMonth" aria-label="Seleziona mese"></select>
+        <select id="filterPreset" aria-label="Filtro rapido">
+          <option value="this_week">Questa settimana</option>
+          <option value="last_week">Settimana scorsa</option>
+          <option value="this_month" selected>Questo mese</option>
+          <option value="last_month">Mese scorso</option>
+          <option value="custom">Personalizzato</option>
+        </select>
       </div>
     </div>
 
     <div class="card">
       <div class="hd">
-        <h2>Riepilogo</h2>
-        <div class="muted" id="monthLabel" style="font-size:12px; font-weight:900"></div>
+        <h2>Intervallo</h2>
+        <div class="hint" id="rangeLabel" style="font-weight:950"></div>
       </div>
+
+      <div class="grid2">
+        <div>
+          <label>Dal</label>
+          <input type="date" id="rangeFrom">
+        </div>
+        <div>
+          <label>Al</label>
+          <input type="date" id="rangeTo">
+        </div>
+      </div>
+
+      <div class="grid3" style="margin-top:10px">
+        <button class="btn secondary" onclick="applyPreset('this_week')">Questa sett.</button>
+        <button class="btn secondary" onclick="applyPreset('this_month')">Questo mese</button>
+        <button class="btn secondary" onclick="applyPreset('custom')">Usa date</button>
+      </div>
+
+      <div class="divider"></div>
 
       <div class="kpis" id="kpis"></div>
 
@@ -437,8 +503,8 @@
 
     <div class="card">
       <div class="hd">
-        <h2>Categorie</h2>
-        <div class="muted" id="catHint" style="font-size:12px; font-weight:900"></div>
+        <h2>Categorie (uscite)</h2>
+        <div class="hint" id="catHint" style="font-weight:950"></div>
       </div>
       <canvas id="chartCats" height="210"></canvas>
       <div id="emptyChartNote" class="hint" style="display:none; margin-top:10px"></div>
@@ -447,7 +513,7 @@
     <div class="card">
       <div class="hd">
         <h2>Cronologia</h2>
-        <div class="muted" id="txCount" style="font-size:12px; font-weight:900"></div>
+        <div class="hint" id="txCount" style="font-weight:950"></div>
       </div>
       <div id="txList"></div>
     </div>
@@ -457,8 +523,13 @@
   <div id="view-setup" class="view">
     <div class="topbar">
       <div class="title">
-        <h1>Setup</h1>
-        <div class="sub">Modalità + stipendio mensile</div>
+        <div class="appMark" aria-hidden="true">
+          <img src="./icon.svg" alt="" style="width:26px;height:26px;opacity:.95">
+        </div>
+        <div>
+          <h1>Setup</h1>
+          <div class="sub">Modalità + stipendio + storage</div>
+        </div>
       </div>
       <div class="chip" onclick="showView('cassa', document.querySelectorAll('.nav-item')[0]); return false;">
         💰 <span style="opacity:.85">Cassa</span>
@@ -468,7 +539,7 @@
     <div class="card">
       <div class="hd">
         <h2>Stipendio fisso</h2>
-        <div class="muted" style="font-size:12px; font-weight:900">Entrata mensile</div>
+        <div class="hint" style="font-weight:950">Virtuale (per saldo)</div>
       </div>
 
       <label>Importo stipendio (€)</label>
@@ -476,26 +547,23 @@
 
       <div class="grid2">
         <div>
-          <label>Giorno di accredito</label>
+          <label>Giorno accredito</label>
           <input type="number" id="salaryDay" min="1" max="28" inputmode="numeric" placeholder="1-28">
         </div>
         <div>
-          <label>Nome (opz.)</label>
-          <input type="text" id="salaryName" placeholder="Es. Stipendio">
+          <label>Nome</label>
+          <input type="text" id="salaryName" placeholder="Stipendio">
         </div>
       </div>
 
       <button class="btn secondary" onclick="saveSalary()">Salva stipendio</button>
-
-      <div class="hint" style="margin-top:10px">
-        Lo stipendio è “virtuale”: non crea movimenti, ma serve per saldo e risparmio nel Report.
-      </div>
+      <div class="hint" style="margin-top:10px">Lo stipendio non crea movimenti, serve per KPI e saldo.</div>
     </div>
 
     <div class="card">
       <div class="hd">
         <h2>Modalità</h2>
-        <div class="muted" style="font-size:12px; font-weight:900">Attiva/Disattiva</div>
+        <div class="hint" style="font-weight:950">Attiva/disattiva</div>
       </div>
 
       <div class="toggleRow">
@@ -522,7 +590,7 @@
     <div class="card">
       <div class="hd">
         <h2>Categorie</h2>
-        <div class="muted" style="font-size:12px; font-weight:900">Aggiungi nuove</div>
+        <div class="hint" style="font-weight:950">Aggiungi nuove</div>
       </div>
       <div class="grid2">
         <input type="text" id="newCategory" placeholder="Nuova categoria..." style="margin:0">
@@ -532,32 +600,36 @@
 
     <div class="card">
       <div class="hd">
+        <h2>Storage</h2>
+        <div class="hint" style="font-weight:950" id="storageHint">—</div>
+      </div>
+      <div class="hint">
+        PicariHome usa <b>IndexedDB</b> come storage principale e mantiene un <b>snapshot</b> in localStorage come fallback.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">
         <h2 style="color:rgba(255,77,109,.95)">Manutenzione</h2>
-        <div class="muted" style="font-size:12px; font-weight:900">Pulizia intervallo</div>
+        <div class="hint" style="font-weight:950">Pulizia intervallo</div>
       </div>
       <div class="grid2" style="margin-bottom:10px">
         <input type="date" id="cleanFrom" style="margin:0">
         <input type="date" id="cleanTo" style="margin:0">
       </div>
       <button class="btn danger" onclick="cleanRange()">Cancella intervallo</button>
-      <div class="hint" style="margin-top:10px">
-        Cancella movimenti compresi tra le date (estremi inclusi).
-      </div>
     </div>
 
     <div class="card">
       <div class="hd">
         <h2>Dati</h2>
-        <div class="muted" style="font-size:12px; font-weight:900">Backup</div>
+        <div class="hint" style="font-weight:950">Backup</div>
       </div>
       <button class="btn secondary" onclick="exportData()">Esporta JSON</button>
       <div style="height:10px"></div>
       <button class="btn secondary" onclick="importData()">Importa JSON</button>
       <div class="divider"></div>
       <button class="btn danger" onclick="resetAll()">Reset totale</button>
-      <div class="hint" style="margin-top:10px">
-        Reset elimina solo i dati di PicariHome🏡 su questo dispositivo.
-      </div>
     </div>
   </div>
 
@@ -571,21 +643,19 @@
   </nav>
 
 <script>
-  // -----------------------------
+  // -----------------------------------------
   // PWA: register Service Worker
-  // -----------------------------
+  // -----------------------------------------
   (function registerSW(){
     if (!("serviceWorker" in navigator)) return;
     window.addEventListener("load", async () => {
-      try {
-        await navigator.serviceWorker.register("./sw.js", { scope: "./" });
-      } catch (e) {
-        // ignore
-      }
+      try { await navigator.serviceWorker.register("./sw.js", { scope: "./" }); } catch {}
     });
   })();
 
-  // Online/offline badge
+  // -----------------------------------------
+  // Net badge
+  // -----------------------------------------
   function updateNetBadge(){
     const b = document.getElementById("netBadge");
     if(!b) return;
@@ -597,9 +667,72 @@
   window.addEventListener("online", updateNetBadge);
   window.addEventListener("offline", updateNetBadge);
 
-  // -----------------------------
-  // State
-  // -----------------------------
+  // -----------------------------------------
+  // IndexedDB + localStorage (dual persistence)
+  // -----------------------------------------
+  const DB_NAME = "PicariHomeDB";
+  const DB_VERSION = 1;
+  const STORE = "kv";
+  const KV_KEY = "state";
+  const LS_KEY = "PicariHome_Snapshot_V2";
+
+  function openDB(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if(!db.objectStoreNames.contains(STORE)){
+          db.createObjectStore(STORE);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function idbGet(key){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readonly");
+      const st = tx.objectStore(STORE);
+      const req = st.get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+      tx.oncomplete = () => db.close();
+    });
+  }
+
+  async function idbSet(key, value){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      const st = tx.objectStore(STORE);
+      const req = st.put(value, key);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+      tx.oncomplete = () => db.close();
+    });
+  }
+
+  async function idbClear(){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      const st = tx.objectStore(STORE);
+      const req = st.clear();
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+      tx.oncomplete = () => db.close();
+    });
+  }
+
+  function safeJSONParse(s){
+    try { return JSON.parse(s); } catch { return null; }
+  }
+
+  // -----------------------------------------
+  // App state
+  // -----------------------------------------
   let state = {
     categories: ["🛒 Spesa", "🏠 Casa", "🚗 Viaggi", "🍕 Svago", "🏥 Salute", "📦 Altro"],
     txs: [],
@@ -609,8 +742,10 @@
     salary: { amount: 0, day: 1, name: "Stipendio" }
   };
 
-  const LS_KEY = "PicariHome_V1";
-
+  function clampInt(v, min, max){
+    v = Math.floor(Number.isFinite(v) ? v : min);
+    return Math.min(max, Math.max(min, v));
+  }
   function safeUUID(){
     try{ if (crypto && crypto.randomUUID) return crypto.randomUUID(); }catch{}
     return "tx-" + Date.now().toString(16) + "-" + Math.random().toString(16).slice(2);
@@ -626,53 +761,6 @@
     const v = Number(n || 0);
     return v.toLocaleString("it-IT", { style:"currency", currency:"EUR" });
   }
-  function ymFromDate(iso){ return (iso || "").slice(0,7); }
-
-  function clampInt(v, min, max){
-    v = Math.floor(Number.isFinite(v) ? v : min);
-    return Math.min(max, Math.max(min, v));
-  }
-
-  function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
-
-  function loadState(){
-    const saved = localStorage.getItem(LS_KEY);
-    if(!saved) return;
-    try{
-      const parsed = JSON.parse(saved);
-      if(!parsed || !Array.isArray(parsed.categories) || !Array.isArray(parsed.txs)) return;
-
-      const s = parsed.settings || {};
-      const sal = parsed.salary || {};
-
-      state = {
-        categories: parsed.categories,
-        txs: parsed.txs,
-        currentType: parsed.currentType || "expense",
-        editingId: null,
-        settings: {
-          enableExpenses: s.enableExpenses !== false,
-          enableIncome: s.enableIncome !== false
-        },
-        salary: {
-          amount: Number(sal.amount || 0),
-          day: clampInt(Number(sal.day || 1), 1, 28),
-          name: (sal.name || "Stipendio").toString().slice(0, 40)
-        }
-      };
-    }catch{}
-  }
-
-  // -----------------------------
-  // UI helpers
-  // -----------------------------
-  function notify(msg){
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.style.display = "block";
-    clearTimeout(notify._t);
-    notify._t = setTimeout(()=> t.style.display="none", 2000);
-  }
   function escapeHtml(s){
     return String(s ?? "").replace(/[&<>"']/g, c => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -680,6 +768,90 @@
   }
   function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
 
+  function notify(msg){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(notify._t);
+    notify._t = setTimeout(()=> t.style.display="none", 2000);
+  }
+
+  // -----------------------------------------
+  // Load / Save (IDB primary + LS snapshot)
+  // -----------------------------------------
+  async function loadState(){
+    // 1) try IndexedDB
+    try{
+      const v = await idbGet(KV_KEY);
+      if(v && typeof v === "object" && Array.isArray(v.categories) && Array.isArray(v.txs)){
+        state = normalizeState(v);
+        return { source: "IndexedDB" };
+      }
+    }catch{}
+
+    // 2) fallback localStorage snapshot
+    const snap = safeJSONParse(localStorage.getItem(LS_KEY) || "");
+    if(snap && Array.isArray(snap.categories) && Array.isArray(snap.txs)){
+      state = normalizeState(snap);
+      // best-effort migrate back to IDB
+      try { await idbSet(KV_KEY, state); } catch {}
+      return { source: "localStorage" };
+    }
+
+    return { source: "default" };
+  }
+
+  function normalizeState(s){
+    const settings = s.settings || {};
+    const salary = s.salary || {};
+    return {
+      categories: Array.isArray(s.categories) ? s.categories : state.categories,
+      txs: Array.isArray(s.txs) ? s.txs : [],
+      currentType: (s.currentType === "income" || s.currentType === "expense") ? s.currentType : "expense",
+      editingId: null,
+      settings: {
+        enableExpenses: settings.enableExpenses !== false,
+        enableIncome: settings.enableIncome !== false
+      },
+      salary: {
+        amount: Number(salary.amount || 0),
+        day: clampInt(Number(salary.day || 1), 1, 28),
+        name: (salary.name || "Stipendio").toString().slice(0, 40)
+      }
+    };
+  }
+
+  let saveTimer = null;
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveState, 120);
+  }
+
+  async function saveState(){
+    // snapshot LS (small + fast fallback)
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {}
+
+    // IDB primary
+    try { await idbSet(KV_KEY, state); } catch {}
+    updateStorageHint();
+  }
+
+  async function resetStorage(){
+    try { localStorage.removeItem(LS_KEY); } catch {}
+    try { await idbClear(); } catch {}
+  }
+
+  async function updateStorageHint(){
+    const el = document.getElementById("storageHint");
+    if(!el) return;
+    let idbOk = false;
+    try { await idbSet("__ping__", { t: Date.now() }); idbOk = true; } catch {}
+    el.textContent = idbOk ? "IndexedDB attivo ✅ (snapshot LS attivo)" : "IndexedDB NON disponibile (solo localStorage)";
+  }
+
+  // -----------------------------------------
+  // Views
+  // -----------------------------------------
   function showView(viewId, el){
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
     document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
@@ -689,38 +861,13 @@
     if(viewId === "analisi" || viewId === "setup") renderAll();
   }
 
-  // -----------------------------
-  // Salary
-  // -----------------------------
-  function saveSalary(){
-    const amt = Number(document.getElementById("salaryAmount").value || 0);
-    const day = clampInt(Number(document.getElementById("salaryDay").value || 1), 1, 28);
-    const name = (document.getElementById("salaryName").value || "Stipendio").trim() || "Stipendio";
-    if(amt < 0 || !Number.isFinite(amt)) return notify("Importo stipendio non valido");
-
-    state.salary.amount = Math.round(amt * 100) / 100;
-    state.salary.day = day;
-    state.salary.name = name.slice(0, 40);
-
-    saveState();
-    renderAll();
-    notify("Stipendio salvato");
-  }
-  function getSalaryForMonth(){
-    const amount = Number(state.salary.amount || 0);
-    if(!Number.isFinite(amount) || amount <= 0) return 0;
-    return amount;
-  }
-
-  // -----------------------------
-  // Enable/disable types
-  // -----------------------------
+  // -----------------------------------------
+  // Type enable/disable
+  // -----------------------------------------
   function syncSettingsUI(){
     document.getElementById("swExpenses").classList.toggle("on", !!state.settings.enableExpenses);
     document.getElementById("swIncome").classList.toggle("on", !!state.settings.enableIncome);
-
-    const bothOff = !state.settings.enableExpenses && !state.settings.enableIncome;
-    document.getElementById("modeWarn").style.display = bothOff ? "block" : "none";
+    document.getElementById("modeWarn").style.display = (!state.settings.enableExpenses && !state.settings.enableIncome) ? "block" : "none";
 
     document.getElementById("salaryAmount").value = state.salary.amount || "";
     document.getElementById("salaryDay").value = state.salary.day || 1;
@@ -746,7 +893,7 @@
     if(state.currentType === "expense" && !state.settings.enableExpenses) state.currentType = "income";
     if(state.currentType === "income" && !state.settings.enableIncome) state.currentType = "expense";
 
-    saveState();
+    scheduleSave();
     syncSettingsUI();
     applyTypeAvailability();
     renderAll();
@@ -755,7 +902,6 @@
   function applyTypeAvailability(){
     const seg = document.getElementById("typeSeg");
     const hint = document.getElementById("modeHint");
-
     const expOn = !!state.settings.enableExpenses;
     const incOn = !!state.settings.enableIncome;
 
@@ -787,20 +933,63 @@
     }
 
     state.currentType = type;
-
     const btnExp = document.getElementById("type-exp");
     const btnInc = document.getElementById("type-inc");
-    btnExp.classList.toggle("on", type === "expense");
-    btnInc.classList.toggle("on", type === "income");
+    if(btnExp && btnInc){
+      btnExp.classList.toggle("on", type === "expense");
+      btnInc.classList.toggle("on", type === "income");
+    }
 
     const amt = document.getElementById("txAmount");
     amt.style.color = (type === "income") ? "var(--good)" : "var(--bad)";
-    saveState();
+    scheduleSave();
   }
 
-  // -----------------------------
+  // -----------------------------------------
+  // Salary
+  // -----------------------------------------
+  function saveSalary(){
+    const amt = Number(document.getElementById("salaryAmount").value || 0);
+    const day = clampInt(Number(document.getElementById("salaryDay").value || 1), 1, 28);
+    const name = (document.getElementById("salaryName").value || "Stipendio").trim() || "Stipendio";
+    if(amt < 0 || !Number.isFinite(amt)) return notify("Importo stipendio non valido");
+    state.salary.amount = Math.round(amt * 100) / 100;
+    state.salary.day = day;
+    state.salary.name = name.slice(0, 40);
+    scheduleSave();
+    renderAll();
+    notify("Stipendio salvato");
+  }
+
+  function getSalaryForRange(fromISO, toISO){
+    const amount = Number(state.salary.amount || 0);
+    if(!Number.isFinite(amount) || amount <= 0) return 0;
+
+    // Logica: considera lo stipendio 1 volta per ogni mese incluso nell’intervallo
+    // (così funziona bene con “questo mese” e range lunghi)
+    const months = monthsBetween(fromISO, toISO);
+    return amount * months.length;
+  }
+
+  function monthsBetween(fromISO, toISO){
+    const a = new Date(fromISO + "T00:00:00");
+    const b = new Date(toISO + "T00:00:00");
+    if (isNaN(a) || isNaN(b) || a > b) return [];
+    const out = [];
+    const cur = new Date(a.getFullYear(), a.getMonth(), 1);
+    const end = new Date(b.getFullYear(), b.getMonth(), 1);
+    while(cur <= end){
+      const y = cur.getFullYear();
+      const m = String(cur.getMonth()+1).padStart(2,"0");
+      out.push(`${y}-${m}`);
+      cur.setMonth(cur.getMonth()+1);
+    }
+    return out;
+  }
+
+  // -----------------------------------------
   // Transactions
-  // -----------------------------
+  // -----------------------------------------
   function saveTx(){
     const amtRaw = document.getElementById("txAmount").value;
     const amt = Number(amtRaw);
@@ -825,11 +1014,11 @@
     if(state.editingId){
       state.txs = state.txs.map(t => t.id === state.editingId ? tx : t);
       state.editingId = null;
-    }else{
+    } else {
       state.txs.push(tx);
     }
 
-    saveState();
+    scheduleSave();
     document.getElementById("txAmount").value = "";
     document.getElementById("txTag").value = "";
     notify("Salvato!");
@@ -839,7 +1028,6 @@
   function editTx(id){
     const tx = state.txs.find(t => t.id === id);
     if(!tx) return;
-
     state.editingId = id;
     setType(tx.type, true);
 
@@ -856,15 +1044,95 @@
     if(ev) ev.stopPropagation();
     if(confirm("Eliminare questo movimento?")){
       state.txs = state.txs.filter(t => t.id !== id);
-      saveState();
+      scheduleSave();
       renderAll();
       notify("Eliminato");
     }
   }
 
-  // -----------------------------
+  // -----------------------------------------
+  // Report filters (preset + custom range)
+  // -----------------------------------------
+  function startOfWeek(d){
+    // ISO week start: Monday
+    const x = new Date(d);
+    const day = x.getDay(); // 0=Sun..6=Sat
+    const diff = (day === 0 ? -6 : 1 - day);
+    x.setDate(x.getDate() + diff);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+  function endOfWeek(d){
+    const s = startOfWeek(d);
+    const e = new Date(s);
+    e.setDate(e.getDate() + 6);
+    e.setHours(0,0,0,0);
+    return e;
+  }
+  function startOfMonth(d){
+    const x = new Date(d.getFullYear(), d.getMonth(), 1);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+  function endOfMonth(d){
+    const x = new Date(d.getFullYear(), d.getMonth()+1, 0);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+  function toISODate(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function applyPreset(preset){
+    const now = new Date();
+    let from, to;
+
+    if(preset === "this_week"){
+      from = startOfWeek(now);
+      to = endOfWeek(now);
+    } else if(preset === "last_week"){
+      const x = new Date(now);
+      x.setDate(x.getDate() - 7);
+      from = startOfWeek(x);
+      to = endOfWeek(x);
+    } else if(preset === "this_month"){
+      from = startOfMonth(now);
+      to = endOfMonth(now);
+    } else if(preset === "last_month"){
+      const x = new Date(now.getFullYear(), now.getMonth()-1, 1);
+      from = startOfMonth(x);
+      to = endOfMonth(x);
+    } else {
+      // custom: keep current inputs
+      preset = "custom";
+      from = new Date((document.getElementById("rangeFrom").value || todayISO()) + "T00:00:00");
+      to = new Date((document.getElementById("rangeTo").value || todayISO()) + "T00:00:00");
+    }
+
+    document.getElementById("filterPreset").value = preset;
+    document.getElementById("rangeFrom").value = toISODate(from);
+    document.getElementById("rangeTo").value = toISODate(to);
+
+    renderAll();
+  }
+
+  function getActiveRange(){
+    const from = document.getElementById("rangeFrom").value || todayISO();
+    const to = document.getElementById("rangeTo").value || todayISO();
+    if(from > to) return { from: to, to: from };
+    return { from, to };
+  }
+
+  function inRange(dateISO, fromISO, toISO){
+    return dateISO >= fromISO && dateISO <= toISO;
+  }
+
+  // -----------------------------------------
   // Render
-  // -----------------------------
+  // -----------------------------------------
   let myChart = null;
 
   function renderAll(){
@@ -872,40 +1140,38 @@
     syncSettingsUI();
     applyTypeAvailability();
 
+    // Category select
     const sel = document.getElementById("txCategory");
     sel.innerHTML = state.categories.map(c => `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join("");
 
-    const months = Array.from(new Set(state.txs.map(t => ymFromDate(t.date)).filter(Boolean))).sort().reverse();
-    const filterM = document.getElementById("filterMonth");
-    const fallback = ymFromDate(todayISO());
-    const currM = filterM.value || (months.length ? months[0] : fallback);
+    // Range
+    const { from, to } = getActiveRange();
+    document.getElementById("rangeLabel").textContent = `${from} → ${to}`;
 
-    filterM.innerHTML = (months.length ? months : [currM])
-      .map(m => `<option value="${escapeAttr(m)}" ${m===currM ? "selected" : ""}>${escapeHtml(m)}</option>`)
-      .join("");
+    // Filter txs by range + enabled types
+    let filtered = state.txs.filter(t => t.date && inRange(t.date, from, to));
+    if(!state.settings.enableExpenses) filtered = filtered.filter(t => t.type !== "expense");
+    if(!state.settings.enableIncome) filtered = filtered.filter(t => t.type !== "income");
 
-    document.getElementById("monthLabel").textContent = currM;
+    // Totals from txs
+    const realInc = filtered.filter(t => t.type === "income").reduce((s,t)=>s+Number(t.amount||0), 0);
+    const realExp = filtered.filter(t => t.type === "expense").reduce((s,t)=>s+Number(t.amount||0), 0);
 
-    let monthTxs = state.txs.filter(t => ymFromDate(t.date) === currM);
-    if(!state.settings.enableExpenses) monthTxs = monthTxs.filter(t => t.type !== "expense");
-    if(!state.settings.enableIncome) monthTxs = monthTxs.filter(t => t.type !== "income");
-
-    const realInc = monthTxs.filter(t => t.type === "income").reduce((s,t)=>s+Number(t.amount||0), 0);
-    const realExp = monthTxs.filter(t => t.type === "expense").reduce((s,t)=>s+Number(t.amount||0), 0);
-
-    const salary = getSalaryForMonth();
-    const effectiveInc = (state.settings.enableIncome ? realInc : 0) + salary;
+    // Salary virtual (per mesi inclusi nel range)
+    const salaryTotal = getSalaryForRange(from, to);
+    const effectiveInc = (state.settings.enableIncome ? realInc : 0) + salaryTotal;
 
     const saldo = effectiveInc - realExp;
     const rate = effectiveInc > 0 ? (saldo / effectiveInc) : 0;
 
+    // KPI
+    const incShown = (state.settings.enableIncome ? realInc : 0) + salaryTotal;
     const kpis = [
-      { t: state.settings.enableIncome ? "Entrate" : "Entrate (fisse)", v: euro((state.settings.enableIncome ? realInc : 0) + salary), cls: ((state.settings.enableIncome ? realInc : 0) + salary) > 0 ? "good" : "warn" },
+      { t: state.settings.enableIncome ? "Entrate" : "Entrate (fisse)", v: euro(incShown), cls: incShown > 0 ? "good":"warn" },
       { t: "Uscite", v: euro(realExp), cls:"bad" },
-      { t: "Saldo", v: euro(saldo), cls: saldo >= 0 ? "good" : "bad" },
-      { t: "Risparmio %", v: (rate*100).toFixed(1) + "%", cls: rate >= 0 ? "good" : "bad" }
+      { t: "Saldo", v: euro(saldo), cls: saldo >= 0 ? "good":"bad" },
+      { t: "Risparmio %", v: (rate*100).toFixed(1) + "%", cls: rate >= 0 ? "good":"bad" }
     ];
-
     document.getElementById("kpis").innerHTML = kpis.map(k => `
       <div class="kpi">
         <div class="t">${escapeHtml(k.t)}</div>
@@ -913,20 +1179,24 @@
       </div>
     `).join("");
 
+    // Salary hint
     const salaryHint = document.getElementById("salaryHint");
-    if(salary > 0){
+    if(Number(state.salary.amount||0) > 0){
+      const months = monthsBetween(from, to).length;
       salaryHint.innerHTML =
-        `Stipendio fisso: <b style="color:var(--good)">${escapeHtml(state.salary.name)} ${escapeHtml(euro(salary))}</b> (giorno ${escapeHtml(String(state.salary.day))}).`;
+        `Stipendio fisso: <b style="color:var(--good)">${escapeHtml(state.salary.name)} ${escapeHtml(euro(state.salary.amount))}</b> × ${months} mese/i = <b style="color:var(--good)">${escapeHtml(euro(salaryTotal))}</b>.`;
     } else {
       salaryHint.textContent = "Stipendio fisso non impostato (Setup → Stipendio fisso).";
     }
 
-    const sorted = monthTxs.slice().sort((a,b)=>{
+    // List
+    const sorted = filtered.slice().sort((a,b)=>{
       if((a.date||"") === (b.date||"")) return String(b.id).localeCompare(String(a.id));
       return (b.date||"").localeCompare(a.date||"");
     });
 
-    document.getElementById("txCount").textContent = sorted.length ? `${sorted.length} movimenti` : "Nessun movimento";
+    document.getElementById("txCount").textContent =
+      sorted.length ? `${sorted.length} movimenti` : "Nessun movimento";
 
     document.getElementById("txList").innerHTML = sorted.map(t => `
       <div class="tx-card">
@@ -944,18 +1214,18 @@
       </div>
     `).join("") || `<div class="hint" style="text-align:center; padding:18px 6px">Vuoto</div>`;
 
-    renderChart(monthTxs, currM);
+    // Chart (expenses by category within range)
+    renderChart(filtered, from, to);
+
+    // Report hint label
+    document.getElementById("catHint").textContent = `${from} → ${to}`;
   }
 
-  function renderChart(monthData, currM){
+  function renderChart(data, from, to){
     const canvas = document.getElementById("chartCats");
     const note = document.getElementById("emptyChartNote");
-    const hint = document.getElementById("catHint");
     if(!canvas) return;
 
-    hint.textContent = currM;
-
-    // Chart.js might not be available before it loads (first paint)
     if(typeof Chart === "undefined"){
       note.style.display = "block";
       note.textContent = "Caricamento grafico… (se sei offline al primo avvio, apri una volta online).";
@@ -976,7 +1246,7 @@
       return;
     }
 
-    const expenses = monthData.filter(t => t.type === "expense");
+    const expenses = data.filter(t => t.type === "expense");
     const totals = {};
     for(const e of expenses){
       totals[e.category] = (totals[e.category] || 0) + Number(e.amount || 0);
@@ -987,7 +1257,7 @@
 
     if(!labels.length){
       note.style.display = "block";
-      note.textContent = "Nessuna uscita nel mese selezionato.";
+      note.textContent = "Nessuna uscita nell’intervallo selezionato.";
       myChart = new Chart(ctx, {
         type: "doughnut",
         data: { labels: ["Nessuna spesa"], datasets: [{ data: [1], borderWidth: 0 }] },
@@ -997,7 +1267,6 @@
     }
 
     note.style.display = "none";
-
     myChart = new Chart(ctx, {
       type: "doughnut",
       data: {
@@ -1022,17 +1291,17 @@
     });
   }
 
-  // -----------------------------
+  // -----------------------------------------
   // Setup actions
-  // -----------------------------
+  // -----------------------------------------
   function addCategory(){
     const input = document.getElementById("newCategory");
     const val = (input.value || "").trim();
     if(!val) return notify("Scrivi una categoria");
-    if(state.categories.includes(val)){ input.value = ""; return notify("Categoria già presente"); }
+    if(state.categories.includes(val)){ input.value=""; return notify("Categoria già presente"); }
     state.categories.push(val);
     input.value = "";
-    saveState();
+    scheduleSave();
     renderAll();
     notify("Categoria aggiunta");
   }
@@ -1044,7 +1313,7 @@
     if(from > to) return notify("Intervallo non valido");
     if(confirm("Eliminare movimenti selezionati?")){
       state.txs = state.txs.filter(t => (t.date || "") < from || (t.date || "") > to);
-      saveState();
+      scheduleSave();
       renderAll();
       notify("Pulizia completata");
     }
@@ -1067,31 +1336,15 @@
       const f = e.target.files && e.target.files[0];
       if(!f) return;
       const reader = new FileReader();
-      reader.onload = r => {
+      reader.onload = async r => {
         try{
           const parsed = JSON.parse(r.target.result);
           if(!parsed || !Array.isArray(parsed.categories) || !Array.isArray(parsed.txs)){
             return notify("Backup non valido");
           }
-          const s = parsed.settings || {};
-          const sal = parsed.salary || {};
-          state = {
-            categories: parsed.categories,
-            txs: parsed.txs,
-            currentType: parsed.currentType || "expense",
-            editingId: null,
-            settings: {
-              enableExpenses: s.enableExpenses !== false,
-              enableIncome: s.enableIncome !== false
-            },
-            salary: {
-              amount: Number(sal.amount || 0),
-              day: clampInt(Number(sal.day || 1), 1, 28),
-              name: (sal.name || "Stipendio").toString().slice(0, 40)
-            }
-          };
+          state = normalizeState(parsed);
           if(!state.settings.enableExpenses && !state.settings.enableIncome) state.settings.enableExpenses = true;
-          saveState();
+          await saveState();
           renderAll();
           notify("Backup caricato");
         }catch{
@@ -1103,21 +1356,47 @@
     inp.click();
   }
 
-  function resetAll(){
+  async function resetAll(){
     if(confirm("Cancellare tutto?")){
-      localStorage.removeItem(LS_KEY);
+      await resetStorage();
       location.reload();
     }
   }
 
-  // -----------------------------
+  // -----------------------------------------
   // Init
-  // -----------------------------
-  function init(){
-    loadState();
+  // -----------------------------------------
+  async function init(){
     updateNetBadge();
 
+    const res = await loadState();
+    await updateStorageHint();
+
     document.getElementById("txDate").value = todayISO();
+
+    // init report default to "this_month"
+    applyPreset("this_month");
+
+    // preset selector
+    document.getElementById("filterPreset").addEventListener("change", (e)=>{
+      const v = e.target.value;
+      applyPreset(v);
+    });
+
+    // custom dates change => set preset to custom
+    document.getElementById("rangeFrom").addEventListener("change", ()=>{
+      document.getElementById("filterPreset").value = "custom";
+      renderAll();
+    });
+    document.getElementById("rangeTo").addEventListener("change", ()=>{
+      document.getElementById("filterPreset").value = "custom";
+      renderAll();
+    });
+
+    const salaryDay = document.getElementById("salaryDay");
+    salaryDay.addEventListener("blur", () => {
+      salaryDay.value = clampInt(Number(salaryDay.value || 1), 1, 28);
+    });
 
     if(!state.settings.enableExpenses && !state.settings.enableIncome){
       state.settings.enableExpenses = true;
@@ -1125,17 +1404,13 @@
     if(state.currentType === "expense" && !state.settings.enableExpenses) state.currentType = "income";
     if(state.currentType === "income" && !state.settings.enableIncome) state.currentType = "expense";
 
-    document.getElementById("filterMonth").addEventListener("change", renderAll);
-
-    const salaryDay = document.getElementById("salaryDay");
-    salaryDay.addEventListener("blur", () => {
-      salaryDay.value = clampInt(Number(salaryDay.value || 1), 1, 28);
-    });
-
-    // setType + render
     setType(state.currentType, true);
     syncSettingsUI();
+    applyTypeAvailability();
     renderAll();
+
+    // show where we loaded from (silent useful debug)
+    // notify("Dati: " + res.source);
   }
 
   window.addEventListener("load", init);
