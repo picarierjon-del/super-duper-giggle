@@ -7,96 +7,108 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SmartBudget" />
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10433/10433048.png">
-  <title>SmartBudget</title>
+  <title>SmartBudget Ultra</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --accent: #38bdf8;
-      --good: #4ade80;
-      --bad: #f87171;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --nav-bg: rgba(30, 41, 59, 0.8);
+      --bg: #060b13;
+      --card: #151c2a;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --good: #10b981;
+      --bad: #ef4444;
+      --text: #f1f5f9;
+      --text-muted: #64748b;
+      --nav-bg: rgba(21, 28, 42, 0.85);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
     
     body {
       margin: 0;
-      font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, system-ui, "SF Pro Display", "Helvetica Neue", sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      padding-bottom: 100px; /* Spazio per la nav bar */
+      padding-bottom: env(safe-area-inset-bottom);
       overflow-x: hidden;
     }
 
     /* Layout Strutturale */
-    .view { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
+    .view { display: none; padding: 20px; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .view.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     header {
-      padding: 40px 20px 20px;
-      background: linear-gradient(to bottom, rgba(56, 189, 248, 0.1), transparent);
+      padding: 60px 20px 30px;
+      background: radial-gradient(circle at top left, var(--accent-glow), transparent 70%);
     }
 
-    h1 { margin: 0; font-size: 24px; font-weight: 800; }
+    h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 18px; margin-bottom: 15px; font-weight: 700; color: var(--text); }
 
-    /* Cards */
+    /* Cards Modern */
     .card {
       background: var(--card);
-      border-radius: 24px;
-      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 28px;
+      padding: 24px;
       margin-bottom: 20px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
 
-    /* Form Smart */
-    label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; margin-left: 4px; }
-    input, select, textarea {
+    /* Form Design */
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 4px; }
+    input, select {
       width: 100%;
-      background: #334155;
-      border: none;
-      border-radius: 16px;
-      padding: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 16px;
       color: white;
       font-size: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      transition: all 0.2s;
     }
+    input:focus { border-color: var(--accent); background: rgba(255,255,255,0.07); }
 
     .btn {
       background: var(--accent);
-      color: var(--bg);
+      color: white;
       border: none;
-      border-radius: 18px;
-      padding: 16px;
+      border-radius: 20px;
+      padding: 18px;
       width: 100%;
       font-weight: 700;
       font-size: 16px;
       cursor: pointer;
-      transition: transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
     }
-    .btn:active { transform: scale(0.97); }
-    .btn.outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
-    .btn.danger { background: rgba(248, 113, 113, 0.1); color: var(--bad); border: 1px solid var(--bad); }
+    .btn:active { transform: scale(0.96); opacity: 0.9; }
+    .btn.secondary { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
+    .btn.danger { background: rgba(239, 68, 68, 0.15); color: var(--bad); }
 
     /* Bottom Nav Bar */
     nav {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 25px;
+      left: 20px;
+      right: 20px;
       background: var(--nav-bg);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       display: flex;
       justify-content: space-around;
-      padding: 15px 10px calc(15px + env(safe-area-inset-bottom));
-      border-top: 1px solid rgba(255,255,255,0.1);
-      z-index: 100;
+      padding: 12px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      z-index: 1000;
     }
 
     .nav-item {
@@ -106,35 +118,41 @@
       color: var(--text-muted);
       text-decoration: none;
       font-size: 10px;
-      font-weight: 600;
-      transition: 0.2s;
+      font-weight: 700;
+      width: 33%;
     }
+    .nav-item i { font-style: normal; font-size: 22px; margin-bottom: 4px; filter: grayscale(1); transition: 0.3s; }
+    .nav-item.active { color: var(--text); }
+    .nav-item.active i { filter: grayscale(0); transform: translateY(-2px); }
 
-    .nav-item.active { color: var(--accent); }
-    .nav-item i { font-size: 20px; margin-bottom: 4px; }
+    /* KPI Display */
+    .balance-main { text-align: center; margin-bottom: 30px; }
+    .balance-main .label { color: var(--text-muted); font-size: 14px; }
+    .balance-main .amt { font-size: 42px; font-weight: 800; margin: 5px 0; }
 
-    /* Analisi & KPI */
-    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .kpi { background: var(--card); padding: 15px; border-radius: 20px; text-align: center; }
-    .kpi .label { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
-    .kpi .val { font-size: 16px; font-weight: 700; }
+    .kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .kpi-mini { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.05); }
+    .kpi-mini .l { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+    .kpi-mini .v { font-size: 16px; font-weight: 700; margin-top: 5px; }
 
-    /* Tabelle Movimenti */
-    .tx-row {
+    /* Transaction List */
+    .tx-item {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
     }
-    .tx-info div:first-child { font-weight: 600; font-size: 14px; }
-    .tx-info div:last-child { font-size: 11px; color: var(--text-muted); }
-    .tx-amt { font-family: monospace; font-weight: 700; }
+    .tx-icon { width: 45px; height: 45px; border-radius: 15px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 20px; }
+    .tx-content { flex: 1; }
+    .tx-title { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+    .tx-sub { font-size: 12px; color: var(--text-muted); }
+    .tx-amount { font-weight: 700; font-size: 15px; }
 
     .toast {
-      position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
-      background: var(--accent); color: var(--bg); padding: 10px 25px;
-      border-radius: 50px; font-weight: 600; display: none; z-index: 1000;
+      position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+      background: var(--text); color: var(--bg); padding: 12px 25px;
+      border-radius: 50px; font-weight: 700; font-size: 14px; display: none; z-index: 2000;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
   </style>
 </head>
@@ -144,94 +162,131 @@
 
 <div id="view-cassa" class="view active">
   <header>
-    <h1>Cassa</h1>
-    <p style="color:var(--text-muted)">Inserimento rapido</p>
+    <p style="color:var(--text-muted); margin:0">Bentornato,</p>
+    <h1>Nuova Spesa</h1>
   </header>
   
   <div class="card">
-    <label>Tipo Movimento</label>
-    <div style="display:flex; gap:10px; margin-bottom:15px">
-      <button class="btn" id="type-exp" style="flex:1" onclick="setType('expense')">Uscita</button>
-      <button class="btn outline" id="type-inc" style="flex:1" onclick="setType('income')">Entrata</button>
+    <div style="display:flex; background:rgba(0,0,0,0.2); border-radius:20px; padding:5px; margin-bottom:25px">
+      <button id="type-exp" style="flex:1; border:none; padding:12px; border-radius:16px; background:var(--accent); color:white; font-weight:700" onclick="setType('expense')">Uscita</button>
+      <button id="type-inc" style="flex:1; border:none; padding:12px; border-radius:16px; background:transparent; color:var(--text-muted); font-weight:700" onclick="setType('income')">Entrata</button>
     </div>
 
-    <label>Importo (€)</label>
-    <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00">
+    <label>Quanto hai speso? (€)</label>
+    <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00" style="font-size: 24px; text-align: center; font-weight: 800; color:var(--accent)">
 
-    <label>Categoria</label>
-    <select id="txCategory"></select>
+    <div class="kpi-row">
+      <div style="flex:1">
+        <label>Categoria</label>
+        <select id="txCategory"></select>
+      </div>
+      <div style="flex:1">
+        <label>Data</label>
+        <input type="date" id="txDate">
+      </div>
+    </div>
 
-    <label>Nota / Tag</label>
-    <input type="text" id="txTag" placeholder="Esempio: Pizza con amici">
+    <label>Descrizione / Note</label>
+    <input type="text" id="txTag" placeholder="Esempio: Spesa settimanale">
 
-    <label>Data</label>
-    <input type="date" id="txDate">
-
-    <button class="btn" onclick="saveTx()" style="background:var(--good); color:var(--bg)">REGISTRA</button>
+    <button class="btn" onclick="saveTx()">
+      <i>✨</i> REGISTRA MOVIMENTO
+    </button>
   </div>
 </div>
 
 <div id="view-analisi" class="view">
   <header>
-    <h1>Analisi</h1>
-    <select id="filterMonth" style="margin-top:10px; padding:8px; border-radius:10px; width:auto"></select>
+    <div style="display:flex; justify-content:space-between; align-items:center">
+      <h1>Report</h1>
+      <select id="filterMonth" style="width:auto; margin:0; padding:8px 15px; font-size:13px; border-radius:12px"></select>
+    </div>
   </header>
 
-  <div class="kpi-grid" id="kpis"></div>
+  <div class="balance-main">
+    <div class="label">Il tuo risparmio nel mese</div>
+    <div class="amt" id="totalBalance">0.00€</div>
+  </div>
 
-  <div class="card">
-    <canvas id="chartCats" height="200"></canvas>
+  <div class="kpi-row" style="margin-bottom:25px">
+    <div class="kpi-mini">
+      <div class="l">Entrate</div>
+      <div class="v" id="kpi-inc" style="color:var(--good)">+0€</div>
+    </div>
+    <div class="kpi-mini">
+      <div class="l">Uscite</div>
+      <div class="v" id="kpi-exp" style="color:var(--bad)">-0€</div>
+    </div>
   </div>
 
   <div class="card">
-    <h3 style="margin-top:0">Ultimi Movimenti</h3>
+    <h2>Distribuzione</h2>
+    <canvas id="chartCats" height="220"></canvas>
+  </div>
+
+  <div class="card" style="padding: 24px 24px 80px 24px">
+    <h2>Movimenti</h2>
     <div id="txList"></div>
   </div>
 </div>
 
 <div id="view-setup" class="view">
   <header>
-    <h1>Setup</h1>
+    <h1>Impostazioni</h1>
   </header>
 
   <div class="card">
-    <h3>Gestione Categorie</h3>
+    <h2>Aggiungi Categoria</h2>
     <div style="display:flex; gap:10px">
-      <input type="text" id="newCategory" placeholder="Nome categoria..." style="margin-bottom:0">
-      <button class="btn" onclick="addCategory()" style="width:80px; padding:0">+</button>
+      <input type="text" id="newCategory" placeholder="es. Palestra..." style="margin:0">
+      <button class="btn" onclick="addCategory()" style="width:60px; padding:0">+</button>
     </div>
   </div>
 
   <div class="card">
-    <h3>Dati e Backup</h3>
-    <button class="btn outline" onclick="exportData()" style="margin-bottom:10px">Esporta Dati (JSON)</button>
-    <button class="btn outline" onclick="importData()" style="margin-bottom:20px">Importa Dati</button>
-    <button class="btn danger" onclick="resetAll()">Resetta Tutto</button>
+    <h2 style="color:var(--bad)">Manutenzione Dati</h2>
+    <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px">Elimina tutti i movimenti compresi tra due date:</p>
+    <div class="kpi-row">
+      <div>
+        <label>Dal</label>
+        <input type="date" id="cleanFrom">
+      </div>
+      <div>
+        <label>Al</label>
+        <input type="date" id="cleanTo">
+      </div>
+    </div>
+    <button class="btn danger" onclick="cleanRange()">PULISCI RANGE DATE</button>
   </div>
-  
-  <p style="text-align:center; color:var(--text-muted); font-size:12px">SimpleBudget v2.0 - Local Storage</p>
+
+  <div class="card">
+    <h2>Backup & Sicurezza</h2>
+    <button class="btn secondary" onclick="exportData()" style="margin-bottom:12px">Esporta JSON</button>
+    <button class="btn secondary" onclick="importData()" style="margin-bottom:12px">Importa JSON</button>
+    <button class="btn danger" onclick="resetAll()" style="margin-top:10px; border:none; background:transparent">Formatta App</button>
+  </div>
 </div>
 
 <nav>
-  <a href="javascript:void(0)" class="nav-item active" onclick="showView('cassa', this)">
-    <i>💰</i><span>CASSA</span>
+  <a href="#" class="nav-item active" onclick="showView('cassa', this)">
+    <i>🪙</i><span>CASSA</span>
   </a>
-  <a href="javascript:void(0)" class="nav-item" onclick="showView('analisi', this)">
+  <a href="#" class="nav-item" onclick="showView('analisi', this)">
     <i>📊</i><span>ANALISI</span>
   </a>
-  <a href="javascript:void(0)" class="nav-item" onclick="showView('setup', this)">
-    <i>⚙️</i><span>SETUP</span>
+  <a href="#" class="nav-item" onclick="showView('setup', this)">
+    <i>🛠️</i><span>SETUP</span>
   </a>
 </nav>
 
 <script>
   let state = {
-    categories: ["Spesa", "Casa", "Trasporti", "Svago", "Altro"],
+    categories: ["🛒 Spesa", "🏠 Casa", "🚗 Trasporti", "🍕 Svago", "🏥 Salute", "📦 Altro"],
     txs: [],
     currentType: 'expense'
   };
 
-  const LS_KEY = "SmartBudget_V2";
+  const LS_KEY = "SmartBudget_Ultra_V1";
 
   function init() {
     const saved = localStorage.getItem(LS_KEY);
@@ -245,25 +300,31 @@
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('view-' + viewId).classList.add('active');
     el.classList.add('active');
-    renderAll();
+    if(viewId === 'analisi') renderAll();
   }
 
   function setType(type) {
     state.currentType = type;
-    document.getElementById('type-exp').className = type === 'expense' ? 'btn' : 'btn outline';
-    document.getElementById('type-inc').className = type === 'income' ? 'btn' : 'btn outline';
+    const isExp = type === 'expense';
+    const bExp = document.getElementById('type-exp');
+    const bInc = document.getElementById('type-inc');
+    
+    bExp.style.background = isExp ? 'var(--accent)' : 'transparent';
+    bExp.style.color = isExp ? 'white' : 'var(--text-muted)';
+    bInc.style.background = !isExp ? 'var(--accent)' : 'transparent';
+    bInc.style.color = !isExp ? 'white' : 'var(--text-muted)';
   }
 
   function saveTx() {
     const amt = document.getElementById('txAmount').value;
-    if(!amt) return notify("Inserisci importo!");
+    if(!amt || amt <= 0) return notify("Inserisci un importo!");
     
     const tx = {
       id: Date.now(),
       type: state.currentType,
       amount: parseFloat(amt),
       category: document.getElementById('txCategory').value,
-      tag: document.getElementById('txTag').value,
+      tag: document.getElementById('txTag').value || "Senza titolo",
       date: document.getElementById('txDate').value
     };
 
@@ -271,43 +332,42 @@
     localStorage.setItem(LS_KEY, JSON.stringify(state));
     document.getElementById('txAmount').value = "";
     document.getElementById('txTag').value = "";
-    notify("Registrato!");
+    notify("Registrato con successo!");
   }
 
   function renderAll() {
-    // Populate Categories
-    const catSel = document.getElementById('txCategory');
-    catSel.innerHTML = state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+    // Categories
+    document.getElementById('txCategory').innerHTML = state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
 
-    // Populate Months
+    // Months Filter
     const months = Array.from(new Set(state.txs.map(t => t.date.slice(0,7)))).sort().reverse();
-    if(months.length === 0) months.push(new Date().toISOString().slice(0,7));
+    const currM = months.length > 0 ? months[0] : new Date().toISOString().slice(0,7);
     const filterM = document.getElementById('filterMonth');
-    const selectedMonth = filterM.value || months[0];
-    filterM.innerHTML = months.map(m => `<option value="${m}" ${m===selectedMonth?'selected':''}>${m}</option>`).join('');
+    if(!filterM.value) filterM.innerHTML = (months.length ? months : [currM]).map(m => `<option value="${m}">${m}</option>`).join('');
 
-    // Analisi Logic
-    const filtered = state.txs.filter(t => t.date.startsWith(selectedMonth));
+    const activeMonth = filterM.value || currM;
+    const filtered = state.txs.filter(t => t.date.startsWith(activeMonth));
+    
     const inc = filtered.filter(t => t.type === 'income').reduce((s,t) => s+t.amount, 0);
     const exp = filtered.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
 
-    document.getElementById('kpis').innerHTML = `
-      <div class="kpi"><div class="label">Entrate</div><div class="val" style="color:var(--good)">+${inc.toFixed(2)}€</div></div>
-      <div class="kpi"><div class="label">Uscite</div><div class="val" style="color:var(--bad)">-${exp.toFixed(2)}€</div></div>
-      <div class="kpi" style="grid-column: span 2"><div class="label">Risparmio</div><div class="val">${(inc-exp).toFixed(2)}€</div></div>
-    `;
+    document.getElementById('totalBalance').textContent = (inc - exp).toFixed(2) + "€";
+    document.getElementById('kpi-inc').textContent = "+" + inc.toFixed(2) + "€";
+    document.getElementById('kpi-exp').textContent = "-" + exp.toFixed(2) + "€";
 
-    document.getElementById('txList').innerHTML = filtered.sort((a,b)=>b.id-a.id).map(t => `
-      <div class="tx-row">
-        <div class="tx-info">
-          <div>${t.tag || t.category}</div>
-          <div>${t.date} • ${t.category}</div>
+    // Transaction List
+    document.getElementById('txList').innerHTML = filtered.sort((a,b) => b.id - a.id).map(t => `
+      <div class="tx-item">
+        <div class="tx-icon">${t.type === 'income' ? '📈' : '📉'}</div>
+        <div class="tx-content">
+          <div class="tx-title">${t.tag}</div>
+          <div class="tx-sub">${t.category} • ${t.date}</div>
         </div>
-        <div class="tx-amt" style="color:${t.type==='income'?'var(--good)':'var(--bad)'}">
-          ${t.type==='income'?'+':'-'}${t.amount.toFixed(2)}
+        <div class="tx-amount" style="color:${t.type==='income'?'var(--good)':'var(--bad)'}">
+          ${t.type==='income'?'+':'-'}${t.amount.toFixed(2)}€
         </div>
       </div>
-    `).join('');
+    `).join('') || '<p style="text-align:center; color:var(--text-muted)">Nessun movimento</p>';
 
     renderChart(filtered);
   }
@@ -320,17 +380,39 @@
     expenses.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
 
     if(myChart) myChart.destroy();
+    if(expenses.length === 0) return;
+
     myChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: Object.keys(totals),
         datasets: [{
           data: Object.values(totals),
-          backgroundColor: ['#38bdf8', '#4ade80', '#fbbf24', '#f87171', '#a78bfa']
+          backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+          borderWidth: 0,
+          hoverOffset: 20
         }]
       },
-      options: { plugins: { legend: { position: 'bottom', labels: { color: 'white' } } } }
+      options: { 
+        cutout: '75%',
+        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { size: 12 } } } } 
+      }
     });
+  }
+
+  function cleanRange() {
+    const from = document.getElementById('cleanFrom').value;
+    const to = document.getElementById('cleanTo').value;
+    if(!from || !to) return notify("Seleziona entrambe le date!");
+    
+    if(confirm("Eliminare i movimenti in questo periodo?")) {
+      const initialCount = state.txs.length;
+      state.txs = state.txs.filter(t => t.date < from || t.date > to);
+      const deleted = initialCount - state.txs.length;
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
+      renderAll();
+      notify(`Eliminati ${deleted} movimenti`);
+    }
   }
 
   function addCategory() {
@@ -339,7 +421,7 @@
       state.categories.push(val);
       localStorage.setItem(LS_KEY, JSON.stringify(state));
       document.getElementById('newCategory').value = "";
-      notify("Categoria aggiunta");
+      notify("Categoria salvata");
       renderAll();
     }
   }
@@ -348,40 +430,38 @@
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.style.display = 'block';
-    setTimeout(() => t.style.display = 'none', 2000);
+    setTimeout(() => t.style.display = 'none', 2500);
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify(state)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'budget_backup.json'; a.click();
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const a = document.createElement('a'); a.href = dataStr; a.download = 'backup_budget.json'; a.click();
   }
 
   function importData() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = e => {
-      const file = e.target.files[0];
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.onchange = e => {
       const reader = new FileReader();
-      reader.onload = () => {
-        state = JSON.parse(reader.result);
+      reader.onload = r => {
+        state = JSON.parse(r.target.result);
         localStorage.setItem(LS_KEY, JSON.stringify(state));
         renderAll();
-        notify("Dati importati!");
+        notify("Dati ripristinati!");
       };
-      reader.readAsText(file);
+      reader.readAsText(e.target.files[0]);
     };
-    input.click();
+    inp.click();
   }
 
   function resetAll() {
-    if(confirm("Cancellare tutto definitivamente?")) {
+    if(confirm("ATTENZIONE: Questo cancellerà ogni dato dall'app. Continuare?")) {
       localStorage.clear();
       location.reload();
     }
   }
 
+  document.getElementById('filterMonth').onchange = renderAll;
   window.onload = init;
 </script>
 </body>
