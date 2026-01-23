@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SmartBudget" />
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10433/10433048.png">
-  <title>SmartBudget SuperTop</title>
+  <title>SmartBudget Pro</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
@@ -16,7 +16,6 @@
       --bg: #05070a;
       --card: #11141b;
       --accent: #6366f1;
-      --accent-soft: rgba(99, 102, 241, 0.15);
       --good: #10b981;
       --bad: #ef4444;
       --text: #ffffff;
@@ -35,123 +34,85 @@
       overflow-x: hidden;
     }
 
-    /* Animazioni Fluide */
-    .view { display: none; padding: 20px; animation: viewIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .view { display: none; padding: 20px; animation: viewIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .view.active { display: block; }
-    @keyframes viewIn { from { opacity: 0; transform: scale(0.98) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    header { padding: 40px 20px 20px; }
+    header { padding: 40px 20px 10px; }
     h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -1px; }
-    h2 { font-size: 16px; margin: 0 0 15px 0; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+    h2 { font-size: 14px; margin: 0 0 15px 0; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
 
-    /* Cards Ultra Premium */
     .card {
       background: var(--card);
       border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 32px;
+      border-radius: 30px;
       padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
     }
 
-    /* Inputs Eleganti */
-    label { display: block; font-size: 11px; font-weight: 700; color: var(--text-dim); margin: 0 0 10px 6px; }
+    label { display: block; font-size: 11px; font-weight: 700; color: var(--text-dim); margin: 0 0 8px 6px; }
     input, select {
       width: 100%;
       background: var(--glass);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 18px;
+      border-radius: 18px;
+      padding: 16px;
       color: white;
       font-size: 16px;
-      margin-bottom: 20px;
-      -webkit-appearance: none;
+      margin-bottom: 18px;
     }
-    input:focus { border-color: var(--accent); background: rgba(99, 102, 241, 0.05); }
 
-    /* Button "Smart" */
     .btn {
       background: var(--accent);
       color: white;
       border: none;
-      border-radius: 22px;
-      padding: 20px;
+      border-radius: 20px;
+      padding: 18px;
       width: 100%;
       font-weight: 700;
-      font-size: 17px;
-      box-shadow: 0 10px 25px var(--accent-soft);
+      font-size: 16px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: 0.2s;
     }
-    .btn:active { transform: scale(0.95); opacity: 0.9; }
-    .btn.secondary { background: var(--glass); box-shadow: none; border: 1px solid rgba(255,255,255,0.1); }
-    .btn.danger { background: rgba(239, 68, 68, 0.1); color: var(--bad); }
+    .btn:active { transform: scale(0.96); }
+    .btn.secondary { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); }
+    .btn.danger { background: rgba(239, 68, 68, 0.15); color: var(--bad); }
 
-    /* Floating Navigation */
+    /* Navigazione */
     nav {
       position: fixed;
-      bottom: 30px;
-      left: 20px;
-      right: 20px;
+      bottom: 25px; left: 20px; right: 20px;
       background: rgba(25, 28, 35, 0.85);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
+      backdrop-filter: blur(20px);
       display: flex;
-      padding: 10px;
-      border-radius: 35px;
+      padding: 8px;
+      border-radius: 30px;
       border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
       z-index: 1000;
     }
-    .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 10px 0;
-    }
-    .nav-item i { font-style: normal; font-size: 24px; margin-bottom: 4px; opacity: 0.4; transition: 0.3s; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text-dim); text-decoration: none; font-size: 10px; font-weight: 700; padding: 8px 0; }
     .nav-item.active { color: var(--accent); }
-    .nav-item.active i { opacity: 1; transform: scale(1.1); }
+    .nav-item i { font-style: normal; font-size: 22px; margin-bottom: 2px; opacity: 0.5; }
+    .nav-item.active i { opacity: 1; }
 
-    /* Stats Display */
-    .hero-balance { text-align: center; padding: 40px 0; }
-    .hero-balance div { color: var(--text-dim); font-size: 15px; font-weight: 500; }
-    .hero-balance h3 { font-size: 52px; margin: 10px 0; font-weight: 800; letter-spacing: -2px; }
-
-    .stat-pill {
-      background: var(--glass);
-      padding: 16px;
-      border-radius: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .stat-pill .l { font-size: 11px; color: var(--text-dim); font-weight: 700; }
-    .stat-pill .v { font-size: 17px; font-weight: 800; }
-
-    /* List Design */
+    /* List Item Modern */
     .tx-card {
       display: flex;
       align-items: center;
-      padding: 18px 0;
+      padding: 16px 0;
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
-    .tx-icon { width: 48px; height: 48px; border-radius: 18px; background: var(--glass); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 16px; }
-    .tx-data { flex: 1; }
-    .tx-data b { display: block; font-size: 16px; font-weight: 600; margin-bottom: 2px; }
-    .tx-data span { font-size: 12px; color: var(--text-dim); }
-    .tx-price { text-align: right; font-weight: 800; font-size: 16px; }
+    .tx-info { flex: 1; }
+    .tx-info b { display: block; font-size: 15px; margin-bottom: 2px; }
+    .tx-info span { font-size: 12px; color: var(--text-dim); }
+    .tx-right { text-align: right; display: flex; align-items: center; gap: 12px; }
+    .tx-amt { font-weight: 800; font-size: 15px; }
+    .tx-del { background: rgba(239, 68, 68, 0.1); border: none; color: var(--bad); padding: 8px; border-radius: 12px; font-size: 12px; }
 
     .toast {
-      position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
-      background: white; color: black; padding: 14px 28px;
-      border-radius: 50px; font-weight: 700; font-size: 14px; display: none; z-index: 2000;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: white; color: black; padding: 12px 24px;
+      border-radius: 50px; font-weight: 700; display: none; z-index: 2000;
     }
   </style>
 </head>
@@ -160,65 +121,51 @@
 <div id="toast" class="toast"></div>
 
 <div id="view-cassa" class="view active">
-  <header>
-    <h1>Cassa</h1>
-  </header>
-  
+  <header><h1>Cassa</h1></header>
   <div class="card">
-    <div style="display:flex; background:rgba(0,0,0,0.3); border-radius:24px; padding:6px; margin-bottom:30px">
-      <button id="type-exp" style="flex:1; border:none; padding:14px; border-radius:20px; background:var(--accent); color:white; font-weight:700" onclick="setType('expense')">Spesa</button>
-      <button id="type-inc" style="flex:1; border:none; padding:14px; border-radius:20px; background:transparent; color:var(--text-dim); font-weight:700" onclick="setType('income')">Entrata</button>
+    <div style="display:flex; background:rgba(0,0,0,0.3); border-radius:20px; padding:5px; margin-bottom:20px">
+      <button id="type-exp" style="flex:1; border:none; padding:12px; border-radius:16px; background:var(--accent); color:white; font-weight:700" onclick="setType('expense')">Spesa</button>
+      <button id="type-inc" style="flex:1; border:none; padding:12px; border-radius:16px; background:transparent; color:var(--text-dim); font-weight:700" onclick="setType('income')">Entrata</button>
     </div>
 
     <label>Importo</label>
-    <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00" style="font-size: 32px; text-align: center; font-weight: 800; border:none; background:transparent; margin-bottom: 30px; color: var(--accent)">
+    <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00" style="font-size: 32px; text-align: center; color: var(--accent); background:transparent; border:none">
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
-      <div>
-        <label>Categoria</label>
-        <select id="txCategory"></select>
-      </div>
-      <div>
-        <label>Data</label>
-        <input type="date" id="txDate">
-      </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+      <div><label>Categoria</label><select id="txCategory"></select></div>
+      <div><label>Data</label><input type="date" id="txDate"></div>
     </div>
 
     <label>Descrizione</label>
-    <input type="text" id="txTag" placeholder="Per cosa?">
+    <input type="text" id="txTag" placeholder="Esempio: Cena fuori">
 
-    <button class="btn" onclick="saveTx()">Registra Ora</button>
+    <button class="btn" onclick="saveTx()">Salva Movimento</button>
   </div>
 </div>
 
 <div id="view-analisi" class="view">
   <header style="display:flex; justify-content:space-between; align-items:center">
-    <h1>Analisi</h1>
-    <select id="filterMonth" style="width:auto; margin:0; padding:10px 15px; border-radius:15px; background:var(--card)"></select>
+    <h1>Report</h1>
+    <select id="filterMonth" style="width:auto; margin:0; padding:8px; border-radius:12px; background:var(--card)"></select>
   </header>
 
-  <div class="hero-balance">
-    <div>Risparmio Mensile</div>
-    <h3 id="totalBalance">0.00€</h3>
-  </div>
-
-  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:30px">
-    <div class="stat-pill">
-      <div class="l">Entrate</div>
-      <div class="v" id="kpi-inc" style="color:var(--good)">+0€</div>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin: 20px 0">
+    <div class="card" style="margin:0; padding:15px; text-align:center">
+      <div style="font-size:11px; color:var(--text-dim)">ENTRATE</div>
+      <div id="kpi-inc" style="color:var(--good); font-weight:800; font-size:18px">+0€</div>
     </div>
-    <div class="stat-pill">
-      <div class="l">Uscite</div>
-      <div class="v" id="kpi-exp" style="color:var(--bad)">-0€</div>
+    <div class="card" style="margin:0; padding:15px; text-align:center">
+      <div style="font-size:11px; color:var(--text-dim)">USCITE</div>
+      <div id="kpi-exp" style="color:var(--bad); font-weight:800; font-size:18px">-0€</div>
     </div>
   </div>
 
   <div class="card">
-    <h2>Andamento</h2>
-    <canvas id="chartCats" height="240"></canvas>
+    <h2>Categorie</h2>
+    <canvas id="chartCats" height="200"></canvas>
   </div>
 
-  <div class="card" style="padding-bottom: 100px;">
+  <div class="card" style="padding-bottom:100px">
     <h2>Cronologia</h2>
     <div id="txList"></div>
   </div>
@@ -226,46 +173,46 @@
 
 <div id="view-setup" class="view">
   <header><h1>Setup</h1></header>
-
   <div class="card">
-    <h2>Nuova Categoria</h2>
-    <div style="display:flex; gap:12px">
-      <input type="text" id="newCategory" placeholder="es. Viaggi" style="margin:0">
-      <button class="btn" onclick="addCategory()" style="width:65px; padding:0">+</button>
+    <h2>Categorie</h2>
+    <div style="display:flex; gap:10px">
+      <input type="text" id="newCategory" placeholder="Nuova..." style="margin:0">
+      <button class="btn" onclick="addCategory()" style="width:60px; padding:0">+</button>
     </div>
   </div>
 
   <div class="card">
-    <h2 style="color:var(--bad)">Pulizia Dati</h2>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
+    <h2 style="color:var(--bad)">Manutenzione</h2>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px">
       <input type="date" id="cleanFrom" style="margin:0">
       <input type="date" id="cleanTo" style="margin:0">
     </div>
-    <button class="btn danger" onclick="cleanRange()">Elimina Intervallo</button>
+    <button class="btn danger" onclick="cleanRange()">Cancella Intervallo</button>
   </div>
 
   <div class="card">
-    <h2>Archivio</h2>
-    <button class="btn secondary" onclick="exportData()" style="margin-bottom:12px">Esporta Backup</button>
-    <button class="btn secondary" onclick="importData()">Importa Backup</button>
-    <button class="btn danger" onclick="resetAll()" style="margin-top:20px; border:none; background:transparent">Reset Fabbrica</button>
+    <h2>Dati</h2>
+    <button class="btn secondary" onclick="exportData()" style="margin-bottom:10px">Esporta JSON</button>
+    <button class="btn secondary" onclick="importData()">Importa JSON</button>
+    <button class="btn danger" onclick="resetAll()" style="margin-top:20px; border:none; background:transparent">Reset Totale</button>
   </div>
 </div>
 
 <nav>
-  <a href="#" class="nav-item active" onclick="showView('cassa', this)"><i>💸</i><span>CASSA</span></a>
+  <a href="#" class="nav-item active" onclick="showView('cassa', this)"><i>💰</i><span>CASSA</span></a>
   <a href="#" class="nav-item" onclick="showView('analisi', this)"><i>📊</i><span>ANALISI</span></a>
   <a href="#" class="nav-item" onclick="showView('setup', this)"><i>⚙️</i><span>SETUP</span></a>
 </nav>
 
 <script>
   let state = {
-    categories: ["🛒 Spesa", "🏠 Casa", "🚗 Mobilità", "🎮 Svago", "🏥 Salute", "📦 Altro"],
+    categories: ["🛒 Spesa", "🏠 Casa", "🚗 Viaggi", "🍕 Svago", "🏥 Salute", "📦 Altro"],
     txs: [],
-    currentType: 'expense'
+    currentType: 'expense',
+    editingId: null
   };
 
-  const LS_KEY = "SmartBudget_Top_V3";
+  const LS_KEY = "SmartBudget_V4_Final";
 
   function init() {
     const saved = localStorage.getItem(LS_KEY);
@@ -285,28 +232,62 @@
   function setType(type) {
     state.currentType = type;
     const isExp = type === 'expense';
-    const bExp = document.getElementById('type-exp'), bInc = document.getElementById('type-inc');
-    bExp.style.background = isExp ? 'var(--accent)' : 'transparent';
-    bExp.style.color = isExp ? 'white' : 'var(--text-dim)';
-    bInc.style.background = !isExp ? 'var(--accent)' : 'transparent';
-    bInc.style.color = !isExp ? 'white' : 'var(--text-dim)';
+    document.getElementById('type-exp').style.background = isExp ? 'var(--accent)' : 'transparent';
+    document.getElementById('type-inc').style.background = !isExp ? 'var(--accent)' : 'transparent';
   }
 
   function saveTx() {
     const amt = document.getElementById('txAmount').value;
-    if(!amt || amt <= 0) return notify("Cifra non valida");
-    state.txs.push({
-      id: Date.now(),
+    if(!amt) return notify("Inserisci importo");
+    
+    const newTx = {
+      id: state.editingId || Date.now(),
       type: state.currentType,
       amount: parseFloat(amt),
       category: document.getElementById('txCategory').value,
       tag: document.getElementById('txTag').value || "Senza titolo",
       date: document.getElementById('txDate').value
-    });
+    };
+
+    if(state.editingId) {
+      state.txs = state.txs.map(t => t.id === state.editingId ? newTx : t);
+      state.editingId = null;
+    } else {
+      state.txs.push(newTx);
+    }
+
     localStorage.setItem(LS_KEY, JSON.stringify(state));
-    document.getElementById('txAmount').value = ""; document.getElementById('txTag').value = "";
-    notify("Movimento registrato ✨");
+    resetForm();
+    notify("Salvato!");
     renderAll();
+  }
+
+  function resetForm() {
+    document.getElementById('txAmount').value = "";
+    document.getElementById('txTag').value = "";
+    state.editingId = null;
+  }
+
+  function deleteTx(id) {
+    if(confirm("Eliminare questo movimento?")) {
+      state.txs = state.txs.filter(t => t.id !== id);
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
+      renderAll();
+      notify("Eliminato");
+    }
+  }
+
+  function editTx(id) {
+    const tx = state.txs.find(t => t.id === id);
+    if(!tx) return;
+    state.editingId = id;
+    setType(tx.type);
+    document.getElementById('txAmount').value = tx.amount;
+    document.getElementById('txCategory').value = tx.category;
+    document.getElementById('txTag').value = tx.tag;
+    document.getElementById('txDate').value = tx.date;
+    showView('cassa', document.querySelector('.nav-item'));
+    notify("Modalità modifica");
   }
 
   function renderAll() {
@@ -321,22 +302,23 @@
     const inc = filtered.filter(t => t.type === 'income').reduce((s,t) => s+t.amount, 0);
     const exp = filtered.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
 
-    document.getElementById('totalBalance').textContent = (inc - exp).toFixed(2) + "€";
     document.getElementById('kpi-inc').textContent = "+" + inc.toFixed(2) + "€";
     document.getElementById('kpi-exp').textContent = "-" + exp.toFixed(2) + "€";
 
     document.getElementById('txList').innerHTML = filtered.sort((a,b) => b.id - a.id).map(t => `
       <div class="tx-card">
-        <div class="tx-icon">${t.type === 'income' ? '⚡' : '🔥'}</div>
-        <div class="tx-data">
+        <div class="tx-info" onclick="editTx(${t.id})">
           <b>${t.tag}</b>
-          <span>${t.category}</span>
+          <span>${t.category} • ${t.date}</span>
         </div>
-        <div class="tx-price" style="color:${t.type==='income'?'var(--good)':'var(--text)'}">
-          ${t.type==='income'?'+':'-'}${t.amount.toFixed(2)}€
+        <div class="tx-right">
+          <div class="tx-amt" style="color:${t.type==='income'?'var(--good)':'white'}">
+            ${t.type==='income'?'+':'-'}${t.amount.toFixed(2)}€
+          </div>
+          <button class="tx-del" onclick="deleteTx(${t.id})">🗑️</button>
         </div>
       </div>
-    `).join('') || '<p style="text-align:center; color:var(--text-dim); padding:20px;">Nessun dato per questo mese</p>';
+    `).join('') || '<p style="text-align:center; color:var(--text-dim); padding:20px;">Vuoto</p>';
 
     renderChart(filtered);
   }
@@ -348,52 +330,51 @@
     const totals = {};
     expenses.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
     if(myChart) myChart.destroy();
-    if(expenses.length === 0) return;
     myChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: Object.keys(totals),
         datasets: [{
           data: Object.values(totals),
-          backgroundColor: ['#6366f1', '#10b981', '#fbbf24', '#f87171', '#a78bfa', '#06b6d4'],
-          borderWidth: 0,
-          spacing: 8
+          backgroundColor: ['#6366f1', '#10b981', '#fbbf24', '#f87171', '#a78bfa'],
+          borderWidth: 0, spacing: 5
         }]
       },
-      options: { cutout: '82%', plugins: { legend: { display: false } } }
+      options: { cutout: '85%', plugins: { legend: { display: false } } }
     });
   }
 
   function cleanRange() {
     const from = document.getElementById('cleanFrom').value, to = document.getElementById('cleanTo').value;
-    if(!from || !to) return notify("Seleziona date");
-    if(confirm("Eliminare movimenti in questo periodo?")) {
+    if(!from || !to) return notify("Scegli le date");
+    if(confirm("Eliminare movimenti selezionati?")) {
       state.txs = state.txs.filter(t => t.date < from || t.date > to);
       localStorage.setItem(LS_KEY, JSON.stringify(state));
       renderAll();
-      notify("Intervallo pulito");
+      notify("Pulizia completata");
     }
   }
 
   function addCategory() {
     const val = document.getElementById('newCategory').value;
-    if(!val) return;
-    state.categories.push(val);
-    localStorage.setItem(LS_KEY, JSON.stringify(state));
-    document.getElementById('newCategory').value = "";
-    renderAll();
-    notify("Categoria aggiunta");
+    if(val) {
+      state.categories.push(val);
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
+      document.getElementById('newCategory').value = "";
+      renderAll();
+      notify("Aggiunta");
+    }
   }
 
   function notify(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.style.display = 'block';
-    setTimeout(() => t.style.display = 'none', 2500);
+    setTimeout(() => t.style.display = 'none', 2000);
   }
 
   function exportData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-    const a = document.createElement('a'); a.href = dataStr; a.download = 'budget.json'; a.click();
+    const a = document.createElement('a'); a.href = dataStr; a.download = 'backup.json'; a.click();
   }
 
   function importData() {
@@ -403,7 +384,7 @@
       reader.onload = r => {
         state = JSON.parse(r.target.result);
         localStorage.setItem(LS_KEY, JSON.stringify(state));
-        renderAll(); notify("Backup importato");
+        renderAll(); notify("Backup caricato");
       };
       reader.readAsText(e.target.files[0]);
     };
