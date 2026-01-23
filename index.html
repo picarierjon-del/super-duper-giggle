@@ -1,1103 +1,248 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="SmartBudget" />
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10433/10433048.png">
-  <title>SmartBudget Pro</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <style>
-    :root{
-      --bg0:#070A12;
-      --bg1:#0B1020;
-      --card:rgba(255,255,255,.06);
-      --card2:rgba(255,255,255,.045);
-      --line:rgba(255,255,255,.10);
-      --text:#EAF0FF;
-      --muted:#A7B1CC;
-      --accent:#7C5CFF;
-      --accent2:#2EE59D;
-      --bad:#FF4D6D;
-      --good:#2EE59D;
-      --warn:#FFC14A;
-
-      --radius:22px;
-      --shadow: 0 20px 50px rgba(0,0,0,.45);
-    }
-
-    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, -apple-system, system-ui, "SF Pro Display", Segoe UI, Roboto, Helvetica, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 15% -10%, rgba(124,92,255,.40), transparent 60%),
-        radial-gradient(900px 600px at 85% 0%, rgba(46,229,157,.20), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      padding-top: env(safe-area-inset-top);
-      overflow-x:hidden;
-    }
-
-    /* Views */
-    .view{display:none; padding:18px 18px 120px; animation:in .28s ease-out}
-    .view.active{display:block}
-    @keyframes in{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
-
-    /* Top header */
-    .topbar{
-      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
-      padding: 18px 18px 6px;
-      position: sticky; top: 0; z-index: 10;
-      backdrop-filter: blur(14px);
-      background: linear-gradient(180deg, rgba(7,10,18,.78), rgba(7,10,18,.25));
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .title h1{margin:0; font-size:26px; letter-spacing:-.6px}
-    .title .sub{margin-top:3px; font-size:12px; color:var(--muted)}
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-weight:700;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-      box-shadow: 0 10px 30px rgba(0,0,0,.15);
-    }
-    .chip select{
-      appearance:none; -webkit-appearance:none;
-      background:transparent; border:none; color:var(--text);
-      font-weight:800; font-size:12px;
-      padding:0; margin:0;
-      outline:none;
-      cursor:pointer;
-    }
-
-    /* Cards */
-    .card{
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      margin: 14px 0;
-    }
-    .card .hd{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 12px;
-    }
-    .card h2{
-      margin:0;
-      font-size:12px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color: var(--muted);
-    }
-
-    /* Inputs */
-    label{display:block; font-size:11px; font-weight:800; color:var(--muted); margin: 0 0 6px 6px}
-    input, select{
-      width:100%;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--text);
-      border-radius: 18px;
-      padding: 14px 14px;
-      font-size: 16px;
-      outline:none;
-    }
-    input:focus, select:focus{border-color: rgba(124,92,255,.55)}
-    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .muted{color:var(--muted)}
-    .hint{font-size:12px; color:var(--muted); line-height:1.35}
-
-    /* Segmented */
-    .seg{
-      display:flex;
-      background: rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius: 18px;
-      padding:6px;
-      gap:6px;
-    }
-    .seg button{
-      flex:1;
-      border:none;
-      border-radius: 14px;
-      padding: 12px;
-      font-weight:900;
-      color: var(--muted);
-      background: transparent;
-      cursor:pointer;
-      transition: transform .06s ease, background .2s ease, color .2s ease;
-    }
-    .seg button:active{transform:scale(.98)}
-    .seg button.on{
-      color: var(--text);
-      background: linear-gradient(135deg, rgba(124,92,255,.75), rgba(124,92,255,.30));
-      box-shadow: 0 14px 30px rgba(124,92,255,.15);
-    }
-
-    /* Primary button */
-    .btn{
-      width:100%;
-      border:none;
-      border-radius: 18px;
-      padding: 14px 16px;
-      font-size: 15px;
-      font-weight: 900;
-      cursor:pointer;
-      transition: transform .06s ease, opacity .2s ease;
-      user-select:none;
-    }
-    .btn:active{transform:scale(.985)}
-    .btn.primary{
-      color: #0b1020;
-      background: linear-gradient(135deg, rgba(46,229,157,1), rgba(46,229,157,.65));
-      box-shadow: 0 20px 50px rgba(46,229,157,.18);
-    }
-    .btn.secondary{
-      color: var(--text);
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .btn.danger{
-      color: var(--bad);
-      background: rgba(255,77,109,.10);
-      border: 1px solid rgba(255,77,109,.22);
-    }
-    .btn:disabled{
-      opacity:.45; cursor:not-allowed;
-    }
-
-    /* Big amount */
-    .amountBox{
-      display:flex; align-items:center; justify-content:center;
-      padding: 6px 0 4px;
-    }
-    .amountBox input{
-      font-size: 38px;
-      text-align:center;
-      border:none;
-      background: transparent;
-      color: var(--accent2);
-      padding: 8px 0;
-      margin: 0;
-      width: 100%;
-    }
-    .amountBox input::placeholder{color: rgba(46,229,157,.35)}
-    .divider{height:1px; background: rgba(255,255,255,.08); margin: 14px 0}
-
-    /* KPIs */
-    .kpis{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .kpi{
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-    }
-    .kpi .t{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
-    .kpi .v{margin-top:6px; font-size:18px; font-weight:950}
-    .v.good{color:var(--good)}
-    .v.bad{color:var(--bad)}
-    .v.warn{color:var(--warn)}
-
-    /* List */
-    .tx-card{
-      display:flex; gap:12px; align-items:center;
-      padding: 12px 6px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .tx-card:last-child{border-bottom:none}
-    .tx-dot{
-      width:10px; height:10px; border-radius:99px;
-      background: rgba(255,255,255,.22);
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 4px rgba(255,255,255,.04);
-    }
-    .tx-dot.income{background: rgba(46,229,157,.9); box-shadow: 0 0 0 4px rgba(46,229,157,.12)}
-    .tx-dot.expense{background: rgba(255,77,109,.9); box-shadow: 0 0 0 4px rgba(255,77,109,.12)}
-    .tx-info{flex:1; min-width:0; cursor:pointer}
-    .tx-info b{display:block; font-size:15px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .tx-info span{font-size:12px; color:var(--muted)}
-    .tx-right{display:flex; align-items:center; gap:10px}
-    .tx-amt{font-weight:950; font-size:14px; white-space:nowrap}
-    .tx-del{
-      border:none;
-      background: rgba(255,77,109,.10);
-      color: var(--bad);
-      border-radius: 14px;
-      padding: 8px 10px;
-      font-size: 12px;
-      cursor:pointer;
-      border: 1px solid rgba(255,77,109,.20);
-    }
-
-    /* Toggle */
-    .toggleRow{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding: 12px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      margin-top: 10px;
-    }
-    .toggleRow .txt b{display:block; font-size:14px; margin-bottom:2px}
-    .toggleRow .txt span{display:block; font-size:12px; color:var(--muted)}
-    .switch{
-      width: 52px; height: 30px; border-radius: 999px;
-      background: rgba(255,255,255,.14);
-      border: 1px solid rgba(255,255,255,.12);
-      position: relative;
-      cursor:pointer;
-      flex: 0 0 auto;
-      transition: background .2s ease, border-color .2s ease;
-    }
-    .switch::after{
-      content:"";
-      position:absolute; top: 3px; left: 3px;
-      width: 24px; height: 24px; border-radius: 999px;
-      background: #fff;
-      transition: transform .2s ease;
-    }
-    .switch.on{
-      background: rgba(46,229,157,.25);
-      border-color: rgba(46,229,157,.35);
-    }
-    .switch.on::after{transform: translateX(22px)}
-    .warnBox{
-      margin-top:10px;
-      padding: 12px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,193,74,.22);
-      background: rgba(255,193,74,.08);
-      color: rgba(255,193,74,.95);
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.35;
-    }
-
-    /* Nav */
-    nav{
-      position: fixed;
-      left: 14px; right: 14px;
-      bottom: 16px;
-      padding-bottom: env(safe-area-inset-bottom);
-      z-index: 1000;
-    }
-    .navBar{
-      display:flex;
-      background: rgba(11,16,32,.72);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 26px;
-      padding: 8px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
-    }
-    .nav-item{
-      flex:1;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap: 2px;
-      padding: 10px 0;
-      color: var(--muted);
-      text-decoration:none;
-      border-radius: 20px;
-      font-weight: 900;
-      font-size: 10px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      transition: background .2s ease, color .2s ease;
-      user-select:none;
-    }
-    .nav-item i{font-style:normal; font-size: 18px; opacity:.85}
-    .nav-item.active{
-      color: var(--text);
-      background: rgba(124,92,255,.18);
-      border: 1px solid rgba(124,92,255,.25);
-    }
-
-    /* Toast */
-    .toast{
-      position: fixed;
-      bottom: 98px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,.92);
-      color: #0B1020;
-      padding: 12px 16px;
-      border-radius: 999px;
-      font-weight: 950;
-      display:none;
-      z-index: 2000;
-      max-width: calc(100vw - 32px);
-      text-align:center;
-      box-shadow: 0 20px 60px rgba(0,0,0,.35);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Budget Pro - IndexedDB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden-item { display: none; }
+    </style>
 </head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
 
-<body>
-  <div id="toast" class="toast"></div>
-
-  <!-- CASSA -->
-  <div id="view-cassa" class="view active">
-    <div class="topbar">
-      <div class="title">
-        <h1>Cassa</h1>
-        <div class="sub">Aggiungi movimenti in 3 tocchi</div>
-      </div>
-      <div class="chip" onclick="showView('analisi', document.querySelectorAll('.nav-item')[1]); return false;">
-        📊 <span style="opacity:.85">Report</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Tipo movimento</h2>
-        <div class="muted" id="modeHint" style="font-size:12px; font-weight:800"></div>
-      </div>
-
-      <div id="typeSeg" class="seg">
-        <button id="type-exp" class="on" onclick="setType('expense')">Uscita</button>
-        <button id="type-inc" onclick="setType('income')">Entrata</button>
-      </div>
-
-      <div class="divider"></div>
-
-      <label>Importo</label>
-      <div class="amountBox">
-        <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00">
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>Categoria</label>
-          <select id="txCategory"></select>
+    <div class="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+        <div class="bg-slate-800 text-white p-6">
+            <h1 class="text-2xl font-bold mb-4">🏠 Contabilità Domestica Avanzata</h1>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-700 p-4 rounded-lg">
+                    <p class="text-sm text-slate-400">Entrate Totali</p>
+                    <p id="total-in" class="text-2xl font-semibold text-green-400">€ 0.00</p>
+                </div>
+                <div class="bg-slate-700 p-4 rounded-lg">
+                    <p class="text-sm text-slate-400">Uscite Totali</p>
+                    <p id="total-out" class="text-2xl font-semibold text-red-400">€ 0.00</p>
+                </div>
+                <div class="bg-slate-700 p-4 rounded-lg">
+                    <p class="text-sm text-slate-400">Saldo Attuale</p>
+                    <p id="total-balance" class="text-2xl font-bold text-white">€ 0.00</p>
+                </div>
+            </div>
         </div>
-        <div>
-          <label>Data</label>
-          <input type="date" id="txDate">
+
+        <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="space-y-4">
+                <h2 class="text-lg font-bold border-b pb-2">Aggiungi Movimento</h2>
+                <input type="date" id="date" class="w-full p-2 border rounded">
+                <input type="text" id="desc" placeholder="Descrizione (es. Affitto, Stipendio)" class="w-full p-2 border rounded">
+                <input type="number" id="amount" placeholder="Importo €" class="w-full p-2 border rounded">
+                <select id="type" class="w-full p-2 border rounded">
+                    <option value="entrata">Entrata (+)</option>
+                    <option value="uscita">Uscita (-)</option>
+                </select>
+                <button onclick="addData()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Salva Movimento</button>
+                
+                <hr class="my-6">
+                
+                <h2 class="text-lg font-bold border-b pb-2">Filtri e Opzioni</h2>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="show-in" checked onchange="renderUI()"> <label>Mostra Entrate</label>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="show-out" checked onchange="renderUI()"> <label>Mostra Uscite</label>
+                </div>
+                
+                <div class="pt-4 space-y-2">
+                    <label class="text-sm">Filtra per data (Dal / Al):</label>
+                    <input type="date" id="filter-from" class="w-full p-2 border rounded text-sm">
+                    <input type="date" id="filter-to" class="w-full p-2 border rounded text-sm">
+                    <button onclick="renderUI()" class="w-full bg-gray-200 py-1 rounded text-sm">Applica Filtro</button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold">Registro Movimenti</h2>
+                    <div class="space-x-2">
+                        <button onclick="exportData()" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Export JSON</button>
+                        <button onclick="document.getElementById('importFile').click()" class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">Import</button>
+                        <input type="file" id="importFile" class="hidden" onchange="importData(event)">
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b">
+                                <th class="p-2">Data</th>
+                                <th class="p-2">Descrizione</th>
+                                <th class="p-2 text-right">Importo</th>
+                                <th class="p-2">Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-lg">
+                    <p class="text-xs font-bold text-red-600 mb-2">ZONA PERICOLO: Pulizia per data</p>
+                    <div class="flex gap-2">
+                        <button onclick="clearByRange()" class="bg-red-600 text-white text-xs px-3 py-2 rounded">Elimina dati nel range selezionato</button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <label>Descrizione</label>
-      <input type="text" id="txTag" placeholder="Esempio: Cena fuori">
-
-      <button class="btn primary" id="btnSave" onclick="saveTx()">Salva</button>
-      <div class="hint" style="margin-top:10px">
-        Tip: tocca una riga nel report per modificarla.
-      </div>
-    </div>
-  </div>
-
-  <!-- ANALISI -->
-  <div id="view-analisi" class="view">
-    <div class="topbar">
-      <div class="title">
-        <h1>Report</h1>
-        <div class="sub">Riepilogo e categorie del mese</div>
-      </div>
-      <div class="chip">
-        📅
-        <select id="filterMonth" aria-label="Seleziona mese"></select>
-      </div>
     </div>
 
-    <div class="card">
-      <div class="hd">
-        <h2>Riepilogo</h2>
-        <div class="muted" id="monthLabel" style="font-size:12px; font-weight:800"></div>
-      </div>
-
-      <div class="kpis" id="kpis"></div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Categorie</h2>
-        <div class="muted" id="catHint" style="font-size:12px; font-weight:800"></div>
-      </div>
-      <canvas id="chartCats" height="210"></canvas>
-      <div id="emptyChartNote" class="hint" style="display:none; margin-top:10px">
-        Nessuna uscita nel mese selezionato.
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Cronologia</h2>
-        <div class="muted" id="txCount" style="font-size:12px; font-weight:800"></div>
-      </div>
-      <div id="txList"></div>
-    </div>
-  </div>
-
-  <!-- SETUP -->
-  <div id="view-setup" class="view">
-    <div class="topbar">
-      <div class="title">
-        <h1>Setup</h1>
-        <div class="sub">Personalizza come vuoi usare l’app</div>
-      </div>
-      <div class="chip" onclick="showView('cassa', document.querySelectorAll('.nav-item')[0]); return false;">
-        💰 <span style="opacity:.85">Cassa</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Modalità</h2>
-        <div class="muted" style="font-size:12px; font-weight:800">Attiva/Disattiva tipi</div>
-      </div>
-
-      <div class="toggleRow">
-        <div class="txt">
-          <b>Abilita Uscite</b>
-          <span>Usa l’app solo per spese se vuoi</span>
-        </div>
-        <div id="swExpenses" class="switch on" onclick="toggleType('expense')"></div>
-      </div>
-
-      <div class="toggleRow">
-        <div class="txt">
-          <b>Abilita Entrate</b>
-          <span>Usa l’app solo per incassi se vuoi</span>
-        </div>
-        <div id="swIncome" class="switch on" onclick="toggleType('income')"></div>
-      </div>
-
-      <div id="modeWarn" class="warnBox" style="display:none">
-        Devi lasciare attivo almeno uno tra Entrate o Uscite.
-      </div>
-
-      <div class="hint" style="margin-top:10px">
-        La scelta influisce su: pulsanti in Cassa, KPI e grafici nel Report.
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Categorie</h2>
-        <div class="muted" style="font-size:12px; font-weight:800">Aggiungi nuove</div>
-      </div>
-      <div class="grid2">
-        <input type="text" id="newCategory" placeholder="Nuova categoria..." style="margin:0">
-        <button class="btn secondary" onclick="addCategory()" style="margin:0">Aggiungi</button>
-      </div>
-      <div class="hint" style="margin-top:10px">
-        Le categorie valgono sia per entrate che per uscite.
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2 style="color:rgba(255,77,109,.95)">Manutenzione</h2>
-        <div class="muted" style="font-size:12px; font-weight:800">Pulizia intervallo</div>
-      </div>
-      <div class="grid2" style="margin-bottom:10px">
-        <input type="date" id="cleanFrom" style="margin:0">
-        <input type="date" id="cleanTo" style="margin:0">
-      </div>
-      <button class="btn danger" onclick="cleanRange()">Cancella intervallo</button>
-      <div class="hint" style="margin-top:10px">
-        Cancella movimenti compresi tra le date (estremi inclusi).
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Dati</h2>
-        <div class="muted" style="font-size:12px; font-weight:800">Backup</div>
-      </div>
-      <button class="btn secondary" onclick="exportData()">Esporta JSON</button>
-      <div style="height:10px"></div>
-      <button class="btn secondary" onclick="importData()">Importa JSON</button>
-      <div class="divider"></div>
-      <button class="btn danger" onclick="resetAll()">Reset totale</button>
-      <div class="hint" style="margin-top:10px">
-        Reset elimina solo i dati di SmartBudget su questo dispositivo.
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom nav -->
-  <nav>
-    <div class="navBar">
-      <a href="#" class="nav-item active" onclick="showView('cassa', this); return false;"><i>💰</i><span>Cassa</span></a>
-      <a href="#" class="nav-item" onclick="showView('analisi', this); return false;"><i>📊</i><span>Report</span></a>
-      <a href="#" class="nav-item" onclick="showView('setup', this); return false;"><i>⚙️</i><span>Setup</span></a>
-    </div>
-  </nav>
-
-<script>
-  // -----------------------------
-  // State
-  // -----------------------------
-  let state = {
-    categories: ["🛒 Spesa", "🏠 Casa", "🚗 Viaggi", "🍕 Svago", "🏥 Salute", "📦 Altro"],
-    txs: [],
-    currentType: "expense",
-    editingId: null,
-    settings: {
-      enableExpenses: true,
-      enableIncome: true
-    }
-  };
-
-  const LS_KEY = "SmartBudget_V5_UI";
-
-  function safeUUID(){
-    try{ if (crypto && crypto.randomUUID) return crypto.randomUUID(); }catch{}
-    return "tx-" + Date.now().toString(16) + "-" + Math.random().toString(16).slice(2);
-  }
-
-  function todayISO(){
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function euro(n){
-    const v = Number(n || 0);
-    return v.toLocaleString("it-IT", { style:"currency", currency:"EUR" });
-  }
-
-  function ymFromDate(iso){ return (iso || "").slice(0,7); }
-
-  function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
-
-  function loadState(){
-    const saved = localStorage.getItem(LS_KEY);
-    if(!saved) return;
-    try{
-      const parsed = JSON.parse(saved);
-      if(!parsed || !Array.isArray(parsed.categories) || !Array.isArray(parsed.txs)) return;
-
-      // merge settings safely
-      const s = parsed.settings || {};
-      state = {
-        categories: parsed.categories,
-        txs: parsed.txs,
-        currentType: parsed.currentType || "expense",
-        editingId: null,
-        settings: {
-          enableExpenses: s.enableExpenses !== false, // default true
-          enableIncome: s.enableIncome !== false      // default true
-        }
-      };
-    }catch{}
-  }
-
-  // -----------------------------
-  // UI helpers
-  // -----------------------------
-  function notify(msg){
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.style.display = "block";
-    clearTimeout(notify._t);
-    notify._t = setTimeout(()=> t.style.display="none", 2000);
-  }
-
-  function escapeHtml(s){
-    return String(s ?? "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-  function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
-
-  function showView(viewId, el){
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-
-    const target = document.getElementById("view-" + viewId);
-    if(target) target.classList.add("active");
-    if(el) el.classList.add("active");
-
-    // refresh when entering report/setup
-    if(viewId === "analisi" || viewId === "setup") renderAll();
-  }
-
-  // -----------------------------
-  // Type enable/disable (Setup)
-  // -----------------------------
-  function syncSettingsUI(){
-    const swExp = document.getElementById("swExpenses");
-    const swInc = document.getElementById("swIncome");
-    swExp.classList.toggle("on", !!state.settings.enableExpenses);
-    swInc.classList.toggle("on", !!state.settings.enableIncome);
-
-    // warning if both off (we prevent this, but keep guard)
-    const bothOff = !state.settings.enableExpenses && !state.settings.enableIncome;
-    document.getElementById("modeWarn").style.display = bothOff ? "block" : "none";
-  }
-
-  function toggleType(which){
-    // compute next
-    let nextExp = state.settings.enableExpenses;
-    let nextInc = state.settings.enableIncome;
-
-    if(which === "expense") nextExp = !nextExp;
-    if(which === "income") nextInc = !nextInc;
-
-    // must keep at least one enabled
-    if(!nextExp && !nextInc){
-      document.getElementById("modeWarn").style.display = "block";
-      notify("Devi lasciare attivo almeno un tipo");
-      return;
-    }
-
-    state.settings.enableExpenses = nextExp;
-    state.settings.enableIncome = nextInc;
-
-    // adjust current type if now disabled
-    if(state.currentType === "expense" && !state.settings.enableExpenses){
-      state.currentType = "income";
-    }
-    if(state.currentType === "income" && !state.settings.enableIncome){
-      state.currentType = "expense";
-    }
-
-    saveState();
-    syncSettingsUI();
-    applyTypeAvailability();
-    renderAll();
-  }
-
-  function applyTypeAvailability(){
-    const seg = document.getElementById("typeSeg");
-    const btnExp = document.getElementById("type-exp");
-    const btnInc = document.getElementById("type-inc");
-    const hint = document.getElementById("modeHint");
-
-    const expOn = !!state.settings.enableExpenses;
-    const incOn = !!state.settings.enableIncome;
-
-    // show/hide segmented control depending on enabled types
-    if(expOn && incOn){
-      seg.style.display = "flex";
-      hint.textContent = "Uscite + Entrate";
-      setType(state.currentType);
-    } else if(expOn && !incOn){
-      seg.style.display = "none";
-      hint.textContent = "Solo Uscite";
-      state.currentType = "expense";
-      setType("expense", true);
-    } else if(!expOn && incOn){
-      seg.style.display = "none";
-      hint.textContent = "Solo Entrate";
-      state.currentType = "income";
-      setType("income", true);
-    }
-
-    // if segmented is visible, still disable a button if needed (extra safety)
-    btnExp.disabled = !expOn;
-    btnInc.disabled = !incOn;
-  }
-
-  function setType(type, silent=false){
-    // prevent selecting disabled type
-    if(type === "expense" && !state.settings.enableExpenses){
-      if(!silent) notify("Uscite disattivate in Setup");
-      type = "income";
-    }
-    if(type === "income" && !state.settings.enableIncome){
-      if(!silent) notify("Entrate disattivate in Setup");
-      type = "expense";
-    }
-
-    state.currentType = type;
-
-    const btnExp = document.getElementById("type-exp");
-    const btnInc = document.getElementById("type-inc");
-
-    btnExp.classList.toggle("on", type === "expense");
-    btnInc.classList.toggle("on", type === "income");
-
-    // color amount depending on type
-    const amt = document.getElementById("txAmount");
-    amt.style.color = (type === "income") ? "var(--good)" : "var(--bad)";
-    amt.placeholder = "0.00";
-
-    saveState();
-  }
-
-  // -----------------------------
-  // Transactions
-  // -----------------------------
-  function saveTx(){
-    const amtRaw = document.getElementById("txAmount").value;
-    const amt = Number(amtRaw);
-    if(!amtRaw || !Number.isFinite(amt) || amt <= 0) return notify("Inserisci importo valido");
-
-    const category = document.getElementById("txCategory").value;
-    const date = document.getElementById("txDate").value || todayISO();
-    const tag = (document.getElementById("txTag").value || "").trim() || "Senza titolo";
-
-    // guard: saving disabled types
-    if(state.currentType === "expense" && !state.settings.enableExpenses) return notify("Uscite disattivate");
-    if(state.currentType === "income" && !state.settings.enableIncome) return notify("Entrate disattivate");
-
-    const tx = {
-      id: state.editingId || safeUUID(),
-      type: state.currentType,
-      amount: Math.round(amt * 100) / 100,
-      category,
-      tag,
-      date
-    };
-
-    if(state.editingId){
-      state.txs = state.txs.map(t => t.id === state.editingId ? tx : t);
-      state.editingId = null;
-    }else{
-      state.txs.push(tx);
-    }
-
-    saveState();
-    resetForm();
-    notify("Salvato!");
-    renderAll();
-  }
-
-  function resetForm(){
-    document.getElementById("txAmount").value = "";
-    document.getElementById("txTag").value = "";
-    state.editingId = null;
-  }
-
-  function editTx(id){
-    const tx = state.txs.find(t => t.id === id);
-    if(!tx) return;
-
-    // if the tx type is currently disabled, temporarily allow edit by switching type (but keep settings)
-    state.editingId = id;
-    setType(tx.type, true);
-
-    document.getElementById("txAmount").value = tx.amount;
-    document.getElementById("txCategory").value = tx.category;
-    document.getElementById("txTag").value = tx.tag;
-    document.getElementById("txDate").value = tx.date;
-
-    showView("cassa", document.querySelectorAll(".nav-item")[0]);
-    notify("Modifica movimento");
-  }
-
-  function deleteTx(id, ev){
-    if(ev) ev.stopPropagation();
-    if(confirm("Eliminare questo movimento?")){
-      state.txs = state.txs.filter(t => t.id !== id);
-      saveState();
-      renderAll();
-      notify("Eliminato");
-    }
-  }
-
-  // -----------------------------
-  // Render
-  // -----------------------------
-  let myChart = null;
-
-  function renderAll(){
-    // Setup toggles
-    syncSettingsUI();
-    applyTypeAvailability();
-
-    // Populate category select
-    const sel = document.getElementById("txCategory");
-    sel.innerHTML = state.categories.map(c => `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join("");
-
-    // Month filter
-    const months = Array.from(new Set(state.txs.map(t => ymFromDate(t.date)).filter(Boolean))).sort().reverse();
-    const filterM = document.getElementById("filterMonth");
-    const fallback = ymFromDate(todayISO());
-    const currM = filterM.value || (months.length ? months[0] : fallback);
-
-    filterM.innerHTML = (months.length ? months : [currM])
-      .map(m => `<option value="${escapeAttr(m)}" ${m===currM ? "selected" : ""}>${escapeHtml(m)}</option>`)
-      .join("");
-
-    // Current month label
-    document.getElementById("monthLabel").textContent = currM;
-
-    // Filtered txs for month
-    let filtered = state.txs.filter(t => ymFromDate(t.date) === currM);
-
-    // If a type is disabled, hide it from report (so it feels consistent)
-    if(!state.settings.enableExpenses) filtered = filtered.filter(t => t.type !== "expense");
-    if(!state.settings.enableIncome) filtered = filtered.filter(t => t.type !== "income");
-
-    // KPI calculations
-    const inc = filtered.filter(t => t.type === "income").reduce((s,t)=>s+Number(t.amount||0), 0);
-    const exp = filtered.filter(t => t.type === "expense").reduce((s,t)=>s+Number(t.amount||0), 0);
-    const saldo = inc - exp;
-
-    const kpis = [];
-
-    if(state.settings.enableIncome){
-      kpis.push({ t:"Entrate", v: euro(inc), cls:"good" });
-    }
-    if(state.settings.enableExpenses){
-      kpis.push({ t:"Uscite", v: euro(exp), cls:"bad" });
-    }
-
-    // Add "Saldo" only when both enabled (otherwise it’s redundant / confusing)
-    if(state.settings.enableIncome && state.settings.enableExpenses){
-      kpis.push({ t:"Saldo", v: euro(saldo), cls: saldo >= 0 ? "good" : "bad" });
-      const rate = inc > 0 ? (saldo / inc) : 0;
-      kpis.push({ t:"Risparmio %", v: (rate*100).toFixed(1) + "%", cls: rate >= 0 ? "good" : "bad" });
-    } else {
-      // If single-mode, show count instead
-      kpis.push({ t:"Movimenti", v: String(filtered.length), cls:"warn" });
-      kpis.push({ t:"Media", v: filtered.length ? euro((state.settings.enableIncome ? inc : exp) / filtered.length) : euro(0), cls:"warn" });
-    }
-
-    // Ensure KPI grid always 2 columns; if odd, add a filler
-    const kpisWrap = document.getElementById("kpis");
-    const fixed = kpis.slice(0,4); // keep it compact
-    if(fixed.length % 2 === 1) fixed.push({ t:"", v:"", cls:"warn" });
-
-    kpisWrap.innerHTML = fixed.map(k => `
-      <div class="kpi">
-        <div class="t">${escapeHtml(k.t || " ")}</div>
-        <div class="v ${k.cls}">${escapeHtml(k.v || " ")}</div>
-      </div>
-    `).join("");
-
-    // List render
-    const list = document.getElementById("txList");
-    const sorted = filtered.slice().sort((a,b)=>{
-      if((a.date||"") === (b.date||"")) return String(b.id).localeCompare(String(a.id));
-      return (b.date||"").localeCompare(a.date||"");
-    });
-
-    document.getElementById("txCount").textContent =
-      sorted.length ? `${sorted.length} movimenti` : "Nessun movimento";
-
-    list.innerHTML = sorted.map(t => `
-      <div class="tx-card">
-        <div class="tx-dot ${t.type}"></div>
-        <div class="tx-info" onclick="editTx('${escapeAttr(t.id)}')">
-          <b>${escapeHtml(t.tag)}</b>
-          <span>${escapeHtml(t.category)} • ${escapeHtml(t.date)} • ${t.type === "income" ? "Entrata" : "Uscita"}</span>
-        </div>
-        <div class="tx-right">
-          <div class="tx-amt" style="color:${t.type === "income" ? "var(--good)" : "var(--bad)"}">
-            ${t.type === "income" ? "+" : "-"}${Number(t.amount||0).toFixed(2)}€
-          </div>
-          <button class="tx-del" onclick="deleteTx('${escapeAttr(t.id)}', event)">🗑️</button>
-        </div>
-      </div>
-    `).join("") || `<div class="hint" style="text-align:center; padding:18px 6px">Vuoto</div>`;
-
-    // Chart render (expenses only makes sense; but if expenses disabled we show placeholder)
-    renderChart(filtered, currM);
-  }
-
-  function renderChart(monthData, currM){
-    const canvas = document.getElementById("chartCats");
-    const note = document.getElementById("emptyChartNote");
-    const hint = document.getElementById("catHint");
-    if(!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if(myChart) myChart.destroy();
-
-    // If expenses are disabled, chart becomes "not applicable"
-    if(!state.settings.enableExpenses){
-      note.style.display = "block";
-      note.textContent = "Grafico categorie: Uscite disattivate in Setup.";
-      hint.textContent = currM;
-      myChart = new Chart(ctx, {
-        type: "doughnut",
-        data: { labels: ["—"], datasets: [{ data: [1], borderWidth: 0 }] },
-        options: { cutout: "78%", plugins: { legend: { display: false } } }
-      });
-      return;
-    }
-
-    const expenses = monthData.filter(t => t.type === "expense");
-    const totals = {};
-    for(const e of expenses){
-      totals[e.category] = (totals[e.category] || 0) + Number(e.amount || 0);
-    }
-
-    const labels = Object.keys(totals);
-    const values = Object.values(totals).map(v => Math.round(v*100)/100);
-
-    hint.textContent = currM;
-
-    if(!labels.length){
-      note.style.display = "block";
-      note.textContent = "Nessuna uscita nel mese selezionato.";
-      myChart = new Chart(ctx, {
-        type: "doughnut",
-        data: { labels: ["Nessuna spesa"], datasets: [{ data: [1], borderWidth: 0 }] },
-        options: { cutout: "78%", plugins: { legend: { display: false } } }
-      });
-      return;
-    }
-
-    note.style.display = "none";
-
-    myChart = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels,
-        datasets: [{
-          data: values,
-          borderWidth: 0,
-          spacing: 4,
-          backgroundColor: [
-            "#7C5CFF", "#2EE59D", "#FFC14A", "#FF4D6D",
-            "#38BDF8", "#A78BFA", "#FB7185", "#22C55E", "#F59E0B"
-          ]
-        }]
-      },
-      options: {
-        cutout: "78%",
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => `${ctx.label}: ${euro(ctx.raw)}`
+    <script>
+        let db;
+        const request = indexedDB.open("HomeBudgetDB", 1);
+
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("transactions")) {
+                db.createObjectStore("transactions", { keyPath: "id", autoIncrement: true });
             }
-          }
+        };
+
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            renderUI();
+        };
+
+        // Aggiunta dati
+        function addData() {
+            const date = document.getElementById('date').value;
+            const desc = document.getElementById('desc').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
+
+            if (!date || !desc || isNaN(amount)) return alert("Compila tutti i campi!");
+
+            const transaction = { date, desc, amount, type };
+            const tx = db.transaction("transactions", "readwrite");
+            tx.objectStore("transactions").add(transaction);
+            tx.oncomplete = () => {
+                resetForm();
+                renderUI();
+            };
         }
-      }
-    });
-  }
 
-  // -----------------------------
-  // Setup actions
-  // -----------------------------
-  function addCategory(){
-    const input = document.getElementById("newCategory");
-    const val = (input.value || "").trim();
-    if(!val) return notify("Scrivi una categoria");
+        function resetForm() {
+            document.getElementById('desc').value = '';
+            document.getElementById('amount').value = '';
+        }
 
-    if(state.categories.includes(val)){
-      input.value = "";
-      return notify("Categoria già presente");
-    }
+        // Renderizzazione con filtri
+        function renderUI() {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
 
-    state.categories.push(val);
-    input.value = "";
-    saveState();
-    renderAll();
-    notify("Categoria aggiunta");
-  }
+            request.onsuccess = () => {
+                let data = request.result;
+                const showIn = document.getElementById('show-in').checked;
+                const showOut = document.getElementById('show-out').checked;
+                const from = document.getElementById('filter-from').value;
+                const to = document.getElementById('filter-to').value;
 
-  function cleanRange(){
-    const from = document.getElementById("cleanFrom").value;
-    const to = document.getElementById("cleanTo").value;
-    if(!from || !to) return notify("Scegli le date");
-    if(from > to) return notify("Intervallo non valido");
+                let tIn = 0, tOut = 0;
+                const tbody = document.getElementById('table-body');
+                tbody.innerHTML = '';
 
-    if(confirm("Eliminare movimenti selezionati?")){
-      state.txs = state.txs.filter(t => (t.date || "") < from || (t.date || "") > to);
-      saveState();
-      renderAll();
-      notify("Pulizia completata");
-    }
-  }
+                data.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  function exportData(){
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "smartbudget_backup.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
+                data.forEach(item => {
+                    // Filtro Tipo
+                    if (!showIn && item.type === 'entrata') return;
+                    if (!showOut && item.type === 'uscita') return;
 
-  function importData(){
-    const inp = document.createElement("input");
-    inp.type = "file";
-    inp.accept = "application/json";
-    inp.onchange = e => {
-      const f = e.target.files && e.target.files[0];
-      if(!f) return;
-      const reader = new FileReader();
-      reader.onload = r => {
-        try{
-          const parsed = JSON.parse(r.target.result);
-          if(!parsed || !Array.isArray(parsed.categories) || !Array.isArray(parsed.txs)){
-            return notify("Backup non valido");
-          }
+                    // Filtro Data
+                    if (from && item.date < from) return;
+                    if (to && item.date > to) return;
 
-          const s = parsed.settings || {};
-          state = {
-            categories: parsed.categories,
-            txs: parsed.txs,
-            currentType: parsed.currentType || "expense",
-            editingId: null,
-            settings: {
-              enableExpenses: s.enableExpenses !== false,
-              enableIncome: s.enableIncome !== false
+                    // Calcolo Totali
+                    if (item.type === 'entrata') tIn += item.amount;
+                    else tOut += item.amount;
+
+                    // Render Riga
+                    const row = `<tr class="border-b hover:bg-gray-50">
+                        <td class="p-2 text-sm">${item.date}</td>
+                        <td class="p-2">${item.desc}</td>
+                        <td class="p-2 text-right font-mono ${item.type === 'entrata' ? 'text-green-600' : 'text-red-600'}">
+                            ${item.type === 'entrata' ? '+' : '-'}${item.amount.toFixed(2)} €
+                        </td>
+                        <td class="p-2 text-center">
+                            <button onclick="deleteItem(${item.id})" class="text-red-400 hover:text-red-600 text-xl">&times;</button>
+                        </td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+
+                document.getElementById('total-in').innerText = `€ ${tIn.toFixed(2)}`;
+                document.getElementById('total-out').innerText = `€ ${tOut.toFixed(2)}`;
+                document.getElementById('total-balance').innerText = `€ ${(tIn - tOut).toFixed(2)}`;
+            };
+        }
+
+        function deleteItem(id) {
+            const tx = db.transaction("transactions", "readwrite");
+            tx.objectStore("transactions").delete(id);
+            tx.oncomplete = renderUI;
+        }
+
+        // Export/Import
+        function exportData() {
+            const tx = db.transaction("transactions", "readonly");
+            tx.objectStore("transactions").getAll().onsuccess = (e) => {
+                const blob = new Blob([JSON.stringify(e.target.result)], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `budget_backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+            };
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const importedData = JSON.parse(e.target.result);
+                const tx = db.transaction("transactions", "readwrite");
+                const store = tx.objectStore("transactions");
+                importedData.forEach(item => {
+                    delete item.id; // Lasciamo che IndexedDB ne generi di nuovi
+                    store.add(item);
+                });
+                tx.oncomplete = () => { alert("Importazione completata!"); renderUI(); };
+            };
+            reader.readAsText(file);
+        }
+
+        // Pulizia per range
+        function clearByRange() {
+            const from = document.getElementById('filter-from').value;
+            const to = document.getElementById('filter-to').value;
+            if(!from || !to) return alert("Seleziona prima un range di date 'Dal' e 'Al'");
+
+            if(confirm(`Sei sicuro di voler eliminare TUTTI i dati dal ${from} al ${to}?`)) {
+                const tx = db.transaction("transactions", "readwrite");
+                const store = tx.objectStore("transactions");
+                store.openCursor().onsuccess = (e) => {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        if (cursor.value.date >= from && cursor.value.date <= to) {
+                            cursor.delete();
+                        }
+                        cursor.continue();
+                    }
+                };
+                tx.oncomplete = renderUI;
             }
-          };
-
-          // ensure at least one enabled
-          if(!state.settings.enableExpenses && !state.settings.enableIncome){
-            state.settings.enableExpenses = true;
-          }
-
-          saveState();
-          renderAll();
-          notify("Backup caricato");
-        }catch{
-          notify("JSON non valido");
         }
-      };
-      reader.readAsText(f);
-    };
-    inp.click();
-  }
-
-  function resetAll(){
-    if(confirm("Cancellare tutto?")){
-      localStorage.removeItem(LS_KEY);
-      location.reload();
-    }
-  }
-
-  // -----------------------------
-  // Init
-  // -----------------------------
-  function init(){
-    loadState();
-    document.getElementById("txDate").value = todayISO();
-
-    // ensure at least one mode enabled
-    if(!state.settings.enableExpenses && !state.settings.enableIncome){
-      state.settings.enableExpenses = true;
-    }
-
-    // default current type based on enabled
-    if(state.currentType === "expense" && !state.settings.enableExpenses) state.currentType = "income";
-    if(state.currentType === "income" && !state.settings.enableIncome) state.currentType = "expense";
-
-    // events
-    document.getElementById("filterMonth").addEventListener("change", renderAll);
-
-    // initial render
-    setType(state.currentType, true);
-    renderAll();
-  }
-
-  window.addEventListener("load", init);
-</script>
+    </script>
 </body>
 </html>
