@@ -372,6 +372,41 @@
             font-size: 14px;
         }
 
+        /* Sezione Gestione Scadenze/Compleanni fissi */
+        .management-section {
+            margin-top: 20px;
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+        
+        .management-header {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sub-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sub-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: var(--bg-color);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
         /* Modale Impostazioni */
         .modal-overlay {
             position: fixed;
@@ -453,9 +488,7 @@
         <!-- Box In Arrivo: Prossimi 7 eventi -->
         <div class="upcoming-box">
             <div class="upcoming-header"><i class="fa-solid fa-bell"></i> In arrivo (Prossimi 7 eventi)</div>
-            <div class="upcoming-list" id="upcomingList">
-                <!-- Inserito via JS -->
-            </div>
+            <div class="upcoming-list" id="upcomingList"></div>
         </div>
 
         <!-- Card Inserimento Avanzato -->
@@ -481,27 +514,35 @@
         </div>
 
         <div class="section-title">
-            <span>Lista Impegni & Scadenze</span>
+            <span>Impegni del Giorno</span>
             <span class="badge-count" id="taskCount">0</span>
         </div>
         
-        <!-- Lista Impegni -->
+        <!-- Lista Impegni Odierni -->
         <div class="tasks-list" id="tasksList"></div>
         
         <div class="empty-state" id="emptyState" style="display: none;">
             <i class="fa-regular fa-face-smile" style="font-size: 36px; margin-bottom: 8px;"></i>
-            <p>Nessun elemento in programma.</p>
+            <p>Nessun impegno in programma per oggi.</p>
+        </div>
+
+        <!-- Sezione Gestione Scadenze e Compleanni Fissi -->
+        <div class="management-section">
+            <div class="management-header"><i class="fa-solid fa-calendar-days"></i> Gestione Scadenze & Compleanni</div>
+            <div class="sub-list" id="permanentList">
+                <!-- Elenco fisso per eliminare o monitorare -->
+            </div>
         </div>
     </div>
 
     <!-- Modale Impostazioni -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-card">
-            <h3>Impostazioni e Dati</h3>
-            <p>Le routine giornaliere non completate slittano automaticamente alla giornata odierna. Le scadenze e i compleanni vengono monitorati dal sistema. Da qui puoi ripulire completamente la memoria.</p>
+            <h3>Impostazioni e Pulizia</h3>
+            <p>La pulizia intelligente rimuove soltanto i vecchi dati giornalieri passati o completati, lasciando intatti tutti i compleanni e gli eventi futuri programmati.</p>
             <div class="modal-buttons">
                 <button class="btn-modal btn-cancel" id="closeModal">Chiudi</button>
-                <button class="btn-modal btn-danger" id="clearDataBtn">Pulisci Tutti i Dati</button>
+                <button class="btn-modal btn-danger" id="clearDataBtn">Pulizia Intelligente</button>
             </div>
         </div>
     </div>
@@ -516,6 +557,7 @@
         
         const tasksList = document.getElementById('tasksList');
         const upcomingList = document.getElementById('upcomingList');
+        const permanentList = document.getElementById('permanentList');
         const emptyState = document.getElementById('emptyState');
         const currentDateEl = document.getElementById('currentDate');
         const taskCount = document.getElementById('taskCount');
@@ -526,14 +568,13 @@
         const clearDataBtn = document.getElementById('clearDataBtn');
 
         const typeButtons = document.querySelectorAll('.type-btn');
-        let currentType = 'routine'; // 'routine', 'deadline', 'birthday'
+        let currentType = 'routine';
 
         const today = new Date();
         const todayString = today.toISOString().split('T')[0];
         const options = { weekday: 'long', day: 'numeric', month: 'long' };
         currentDateEl.textContent = today.toLocaleDateString('it-IT', options);
 
-        // Gestione cambio tipo input
         typeButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 typeButtons.forEach(b => b.classList.remove('active'));
@@ -556,21 +597,20 @@
             });
         });
 
-        // Caricamento Dati Storage
         function loadAppData() {
-            let data = JSON.parse(localStorage.getItem('agenda_advanced_data')) || { lastDate: todayString, tasks: [] };
+            let data = JSON.parse(localStorage.getItem('agenda_advanced_data')) || { lastDate: todayString, tasks: [], hiddenToday: [] };
             if (data.lastDate !== todayString) {
                 data.lastDate = todayString;
+                data.hiddenToday = []; // Reset delle spunte giornaliere per i task fissi al cambio giorno
                 localStorage.setItem('agenda_advanced_data', JSON.stringify(data));
             }
-            return data.tasks;
+            return data;
         }
 
-        let tasks = loadAppData();
+        let appData = loadAppData();
 
         function saveAppData() {
-            const data = { lastDate: todayString, tasks: tasks };
-            localStorage.setItem('agenda_advanced_data', JSON.stringify(data));
+            localStorage.setItem('agenda_advanced_data', JSON.stringify(appData));
             renderApp();
         }
 
@@ -590,43 +630,51 @@
                 return;
             }
 
-            tasks.push(newItem);
+            appData.tasks.push(newItem);
             taskInput.value = '';
             taskDate.value = '';
             saveAppData();
         }
 
-        function completeTask(id) {
+        // Spunta nel giornaliero (nasconde solo per oggi se è scadenza/compleanno)
+        function completeTask(id, type) {
             const taskElement = document.getElementById(`task-${id}`);
             if(taskElement) taskElement.classList.add('completing');
 
             setTimeout(() => {
-                tasks = tasks.filter(task => task.id !== id);
+                if (type === 'routine') {
+                    // I routine si eliminano del tutto
+                    appData.tasks = appData.tasks.filter(t => t.id !== id);
+                } else {
+                    // Scadenze e compleanni si nascondono solo per la giornata odierna
+                    if (!appData.hiddenToday.includes(id)) {
+                        appData.hiddenToday.push(id);
+                    }
+                }
                 saveAppData();
             }, 400);
         }
 
-        function deleteTask(id) {
-            tasks = tasks.filter(task => task.id !== id);
+        // Cancellazione definitiva dalla sezione di gestione
+        function deletePermanentItem(id) {
+            appData.tasks = appData.tasks.filter(t => t.id !== id);
+            appData.hiddenToday = appData.hiddenToday.filter(hiddenId => hiddenId !== id);
             saveAppData();
         }
 
-        // Calcolo dei prossimi eventi in arrivo (massimo 7)
         function updateUpcomingEvents() {
             upcomingList.innerHTML = '';
-            
             let eventsList = [];
             const nowTime = new Date(todayString).getTime();
 
-            tasks.forEach(task => {
+            appData.tasks.forEach(task => {
                 if (task.type === 'deadline' && task.date) {
                     let dTime = new Date(task.date).getTime();
                     let diffDays = Math.ceil((dTime - nowTime) / (1000 * 60 * 60 * 24));
                     if (diffDays >= 0) {
-                        eventsList.push({ title: task.text, days: diffDays, label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`, time: dTime, type: 'Scadenza' });
+                        eventsList.push({ title: task.text, days: diffDays, label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`, type: 'Scadenza' });
                     }
                 } else if (task.type === 'birthday' && task.date) {
-                    // Calcolo prossimo compleanno basato su anno corrente/successivo
                     let bDateParts = task.date.split('-');
                     let bMonth = parseInt(bDateParts[1]);
                     let bDay = parseInt(bDateParts[2]);
@@ -639,18 +687,15 @@
                     let diffDays = Math.ceil((nextBday.getTime() - nowTime) / (1000 * 60 * 60 * 24));
                     let turningYears = nextBday.getFullYear() - bYear;
 
-                    eventsList.push({ title: `🎂 ${task.text} (${turningYears} anni)`, days: diffDays, label: diffDays === 0 ? 'Oggi!' : `Tra ${diffDays}g`, time: nextBday.getTime(), type: 'Compleanno' });
+                    eventsList.push({ title: `🎂 ${task.text} (${turningYears}a)`, days: diffDays, label: diffDays === 0 ? 'Oggi!' : `Tra ${diffDays}g`, type: 'Compleanno' });
                 }
             });
 
-            // Ordina per imminenza
             eventsList.sort((a, b) => a.days - b.days);
-
-            // Prendi i primi 7 eventi
             let top7 = eventsList.slice(0, 7);
 
             if (top7.length === 0) {
-                upcomingList.innerHTML = `<div style="font-size: 13px; opacity: 0.8; text-align: center; padding: 6px;">Nessuna scadenza o compleanno imminente.</div>`;
+                upcomingList.innerHTML = `<div style="font-size: 13px; opacity: 0.8; text-align: center; padding: 6px;">Nessun evento imminente.</div>`;
                 return;
             }
 
@@ -670,15 +715,46 @@
 
         function renderApp() {
             tasksList.innerHTML = '';
-            taskCount.textContent = tasks.length;
+            permanentList.innerHTML = '';
+
+            // Calcola elementi visibili oggi nel giornaliero
+            let todayTasks = [];
+            let permanentItems = [];
+
+            appData.tasks.forEach(task => {
+                if (task.type !== 'routine') {
+                    permanentItems.push(task);
+                }
+
+                // Logica comparsa nel giornaliero
+                if (task.type === 'routine') {
+                    todayTasks.push(task);
+                } else if (task.type === 'deadline' && task.date <= todayString) {
+                    // Se non è stato spuntato per oggi, compari nel giornaliero
+                    if (!appData.hiddenToday.includes(task.id)) {
+                        todayTasks.push(task);
+                    }
+                } else if (task.type === 'birthday' && task.date) {
+                    // Calcola se oggi è il compleanno
+                    let parts = task.date.split('-');
+                    if (`${parts[1]}-${parts[2]}` === `${todayString.split('-')[1]}-${todayString.split('-')[2]}`) {
+                        if (!appData.hiddenToday.includes(task.id)) {
+                            todayTasks.push(task);
+                        }
+                    }
+                }
+            });
+
+            taskCount.textContent = todayTasks.length;
             
-            if (tasks.length === 0) {
+            if (todayTasks.length === 0) {
                 emptyState.style.display = 'block';
             } else {
                 emptyState.style.display = 'none';
             }
 
-            tasks.forEach(task => {
+            // Render Giornaliero
+            todayTasks.forEach(task => {
                 const item = document.createElement('div');
                 item.className = 'task-item';
                 item.id = `task-${task.id}`;
@@ -688,22 +764,16 @@
                 let pillText = '';
 
                 if (task.type === 'routine') {
-                    pillClass = 'routine';
-                    pillText = 'Giornaliero';
-                    metaText = 'Routine attiva';
+                    pillClass = 'routine'; pillText = 'Giornaliero'; metaText = 'Routine';
                 } else if (task.type === 'deadline') {
-                    pillClass = 'deadline';
-                    pillText = 'Scadenza';
-                    metaText = `Entro il: ${task.date.split('-').reverse().join('/')}`;
+                    pillClass = 'deadline'; pillText = 'Scadenza'; metaText = `Scadenza: ${task.date.split('-').reverse().join('/')}`;
                 } else if (task.type === 'birthday') {
-                    pillClass = 'birthday';
-                    pillText = 'Compleanno';
-                    metaText = `Data nascita: ${task.date.split('-').reverse().join('/')}`;
+                    pillClass = 'birthday'; pillText = 'Compleanno'; metaText = 'Oggi compie gli anni!';
                 }
 
                 item.innerHTML = `
                     <div class="task-content">
-                        <div class="checkbox" onclick="completeTask(${task.id})">
+                        <div class="checkbox" onclick="completeTask(${task.id}, '${task.type}')">
                             <i class="fa-solid fa-check" style="opacity: 0; font-size: 12px;"></i>
                         </div>
                         <div class="task-details">
@@ -711,9 +781,6 @@
                             <span class="task-meta">${metaText}</span>
                         </div>
                     </div>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
                 `;
 
                 const checkbox = item.querySelector('.checkbox');
@@ -725,6 +792,26 @@
                 tasksList.appendChild(item);
             });
 
+            // Render Sezione Gestione fissa (per cancellare scadenze/compleanni)
+            if (permanentItems.length === 0) {
+                permanentList.innerHTML = `<div style="font-size: 13px; color: var(--text-secondary); text-align: center; padding: 6px;">Nessuna scadenza o compleanno salvato.</div>`;
+            } else {
+                permanentItems.forEach(task => {
+                    const subItem = document.createElement('div');
+                    subItem.className = 'sub-item';
+                    let pType = task.type === 'deadline' ? 'Scadenza' : 'Compleanno';
+                    subItem.innerHTML = `
+                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <strong>${escapeHtml(task.text)}</strong> <span style="font-size:12px; color:var(--text-secondary);">(${pType}: ${task.date.split('-').reverse().join('/')})</span>
+                        </div>
+                        <button class="delete-btn" onclick="deletePermanentItem(${task.id})" title="Elimina definitivamente">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    `;
+                    permanentList.appendChild(subItem);
+                });
+            }
+
             updateUpcomingEvents();
         }
 
@@ -733,26 +820,23 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // Event Listeners
         addBtn.addEventListener('click', addItem);
         addBtnStd.addEventListener('click', addItem);
-        
-        taskInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') addItem();
-        });
+        taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addItem(); });
 
         settingsBtn.addEventListener('click', () => settingsModal.classList.add('active'));
         closeModal.addEventListener('click', () => settingsModal.classList.remove('active'));
         
         clearDataBtn.addEventListener('click', () => {
-            if (confirm("Vuoi davvero cancellare tutti i dati salvati?")) {
-                tasks = [];
+            if (confirm("Vuoi eseguire la pulizia intelligente? Verranno rimossi solo i vecchi impegni giornalieri, lasciando intatti i compleanni e le scadenze future.")) {
+                // Filtra via solo i routine
+                appData.tasks = appData.tasks.filter(t => t.type !== 'routine');
+                appData.hiddenToday = [];
                 saveAppData();
                 settingsModal.classList.remove('active');
             }
         });
 
-        // Avvio
         renderApp();
     </script>
 </body>
