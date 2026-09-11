@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Agenda Personale</title>
+    <title>Agenda & Compleanni Pro</title>
     <!-- Meta per iOS Web App -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Agenda">
+    <meta name="apple-mobile-web-app-title" content="Agenda Pro">
     
     <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,6 +22,8 @@
             --accent: #007aff;
             --success: #34c759;
             --danger: #ff3b30;
+            --warning: #ff9500;
+            --purple: #af52de;
             --border-color: #e5e5ea;
         }
 
@@ -47,7 +49,8 @@
             max-width: 500px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
+            padding-bottom: 30px;
         }
 
         header {
@@ -58,72 +61,206 @@
         }
 
         header h1 {
-            font-size: 34px;
+            font-size: 32px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.9);
+        }
+
         .date-display {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* Input Card */
+        /* Sezione Box In Arrivo (7 Eventi) */
+        .upcoming-box {
+            background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+            border-radius: 18px;
+            padding: 16px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2);
+        }
+
+        .upcoming-header {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.9;
+        }
+
+        .upcoming-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .upcoming-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 10px 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .upcoming-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .upcoming-badge {
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Form di Inserimento Avanzato */
         .input-card {
             background: var(--card-bg);
             padding: 16px;
-            border-radius: 16px;
+            border-radius: 18px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .type-selector {
+            display: flex;
+            background: var(--bg-color);
+            padding: 3px;
+            border-radius: 10px;
+            gap: 3px;
+        }
+
+        .type-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-btn.active {
+            background: var(--card-bg);
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .form-fields {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
         }
 
         .input-card input {
             flex: 1;
             border: none;
             background: var(--bg-color);
-            padding: 12px 16px;
+            padding: 12px 14px;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             color: var(--text-main);
             outline: none;
-            transition: all 0.3s ease;
+            transition: background 0.3s;
+        }
+
+        .input-card input[type="date"] {
+            color-scheme: light;
         }
 
         .input-card input:focus {
             background: #e3e3e8;
         }
 
-        .input-card button {
+        .input-card button.submit-btn {
             background: var(--accent);
             color: white;
             border: none;
-            width: 46px;
-            height: 46px;
+            padding: 0 18px;
             border-radius: 10px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: opacity 0.2s, transform 0.2s;
         }
 
-        .input-card button:active {
-            transform: scale(0.92);
+        .input-card button.submit-btn:active {
+            transform: scale(0.95);
             opacity: 0.8;
         }
 
-        /* Sezione Lista */
+        /* Sezione Liste Impegni */
         .section-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-secondary);
-            margin-top: 10px;
+            margin-top: 6px;
             padding-left: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-count {
+            background: #d1d1d6;
+            color: var(--text-main);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
         .tasks-list {
@@ -134,7 +271,7 @@
 
         .task-item {
             background: var(--card-bg);
-            padding: 16px;
+            padding: 14px 16px;
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -142,7 +279,6 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
-            overflow: hidden;
         }
 
         .task-item.completed {
@@ -150,20 +286,20 @@
             transform: scale(0.98);
             opacity: 0;
             height: 0;
-            padding-top: 0;
-            padding-bottom: 0;
+            padding: 0;
             margin: 0;
             border: none;
+            overflow: hidden;
         }
 
         .task-content {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             flex: 1;
+            overflow: hidden;
         }
 
-        /* Custom Checkbox */
         .checkbox {
             width: 24px;
             height: 24px;
@@ -183,24 +319,43 @@
             color: white;
         }
 
-        .task-text {
-            font-size: 16px;
-            font-weight: 400;
-            color: var(--text-main);
-            word-break: break-word;
-            transition: color 0.2s;
+        .task-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
         }
 
-        .task-item.completing .task-text {
-            color: var(--success);
-            text-decoration: line-through;
+        .task-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            word-break: break-word;
         }
+
+        .task-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .tag-pill {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .tag-pill.routine { background: rgba(0,122,255,0.1); color: var(--accent); }
+        .tag-pill.deadline { background: rgba(255,149,0,0.1); color: var(--warning); }
+        .tag-pill.birthday { background: rgba(175,82,222,0.1); color: var(--purple); }
 
         .delete-btn {
             background: none;
             border: none;
             color: var(--text-secondary);
-            font-size: 16px;
+            font-size: 15px;
             padding: 8px;
             cursor: pointer;
             transition: color 0.2s;
@@ -213,15 +368,73 @@
         .empty-state {
             text-align: center;
             color: var(--text-secondary);
-            margin-top: 40px;
-            font-size: 15px;
+            margin-top: 20px;
+            font-size: 14px;
         }
 
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 12px;
-            color: #d1d1d6;
+        /* Modale Impostazioni */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
         }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-card h3 { font-size: 20px; font-weight: 600; }
+        .modal-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.4; }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-cancel { background: var(--bg-color); color: var(--text-main); }
+        .btn-danger { background: var(--danger); color: white; }
     </style>
 </head>
 <body>
@@ -230,79 +443,237 @@
         <header>
             <div>
                 <div class="date-display" id="currentDate"></div>
-                <h1>Agenda</h1>
+                <h1>Agenda Pro</h1>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="settingsBtn" title="Impostazioni"><i class="fa-solid fa-gear"></i></button>
             </div>
         </header>
 
-        <!-- Input per nuovo impegno -->
-        <div class="input-card">
-            <input type="text" id="taskInput" placeholder="Nuovo impegno..." autocomplete="off">
-            <button id="addBtn"><i class="fa-solid fa-plus"></i></button>
+        <!-- Box In Arrivo: Prossimi 7 eventi -->
+        <div class="upcoming-box">
+            <div class="upcoming-header"><i class="fa-solid fa-bell"></i> In arrivo (Prossimi 7 eventi)</div>
+            <div class="upcoming-list" id="upcomingList">
+                <!-- Inserito via JS -->
+            </div>
         </div>
 
-        <div class="section-title">I tuoi impegni</div>
-        
-        <!-- Lista Impegni -->
-        <div class="tasks-list" id="tasksList">
-            <!-- Gli elementi verranno inseriti qui via JS -->
+        <!-- Card Inserimento Avanzato -->
+        <div class="input-card">
+            <div class="type-selector">
+                <button class="type-btn active" data-type="routine">Giornaliero</button>
+                <button class="type-btn" data-type="deadline">Con Scadenza</button>
+                <button class="type-btn" data-type="birthday">Compleanno</button>
+            </div>
+            
+            <div class="form-fields">
+                <div class="input-group">
+                    <input type="text" id="taskInput" placeholder="Nome impegno o persona..." autocomplete="off">
+                </div>
+                <div class="input-group" id="dateInputGroup" style="display: none;">
+                    <input type="date" id="taskDate">
+                    <button class="submit-btn" id="addBtn"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div id="standardAddWrapper">
+                    <button class="submit-btn" id="addBtnStd" style="width: 100%; padding: 12px;"><i class="fa-solid fa-plus"></i> Aggiungi</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <span>Lista Impegni & Scadenze</span>
+            <span class="badge-count" id="taskCount">0</span>
         </div>
         
+        <!-- Lista Impegni -->
+        <div class="tasks-list" id="tasksList"></div>
+        
         <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="fa-regular fa-face-smile"></i>
-            <p>Nessun impegno in programma!<br>Aggiungine uno qui sopra.</p>
+            <i class="fa-regular fa-face-smile" style="font-size: 36px; margin-bottom: 8px;"></i>
+            <p>Nessun elemento in programma.</p>
+        </div>
+    </div>
+
+    <!-- Modale Impostazioni -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card">
+            <h3>Impostazioni e Dati</h3>
+            <p>Le routine giornaliere non completate slittano automaticamente alla giornata odierna. Le scadenze e i compleanni vengono monitorati dal sistema. Da qui puoi ripulire completamente la memoria.</p>
+            <div class="modal-buttons">
+                <button class="btn-modal btn-cancel" id="closeModal">Chiudi</button>
+                <button class="btn-modal btn-danger" id="clearDataBtn">Pulisci Tutti i Dati</button>
+            </div>
         </div>
     </div>
 
     <script>
         const taskInput = document.getElementById('taskInput');
+        const taskDate = document.getElementById('taskDate');
         const addBtn = document.getElementById('addBtn');
+        const addBtnStd = document.getElementById('addBtnStd');
+        const dateInputGroup = document.getElementById('dateInputGroup');
+        const standardAddWrapper = document.getElementById('standardAddWrapper');
+        
         const tasksList = document.getElementById('tasksList');
+        const upcomingList = document.getElementById('upcomingList');
         const emptyState = document.getElementById('emptyState');
         const currentDateEl = document.getElementById('currentDate');
+        const taskCount = document.getElementById('taskCount');
+        
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeModal = document.getElementById('closeModal');
+        const clearDataBtn = document.getElementById('clearDataBtn');
 
-        // Mostra la data odierna formattata in italiano
+        const typeButtons = document.querySelectorAll('.type-btn');
+        let currentType = 'routine'; // 'routine', 'deadline', 'birthday'
+
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
         const options = { weekday: 'long', day: 'numeric', month: 'long' };
-        currentDateEl.textContent = new Date().toLocaleDateString('it-IT', options);
+        currentDateEl.textContent = today.toLocaleDateString('it-IT', options);
 
-        // Carica i task dal localStorage
-        let tasks = JSON.parse(localStorage.getItem('my_tasks')) || [];
+        // Gestione cambio tipo input
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentType = btn.getAttribute('data-type');
 
-        function saveAndRender() {
-            localStorage.setItem('my_tasks', JSON.stringify(tasks));
-            renderTasks();
+                if (currentType === 'routine') {
+                    dateInputGroup.style.display = 'none';
+                    standardAddWrapper.style.display = 'block';
+                    taskInput.placeholder = "Nuovo impegno giornaliero...";
+                } else if (currentType === 'deadline') {
+                    dateInputGroup.style.display = 'flex';
+                    standardAddWrapper.style.display = 'none';
+                    taskInput.placeholder = "Descrizione scadenza...";
+                } else if (currentType === 'birthday') {
+                    dateInputGroup.style.display = 'flex';
+                    standardAddWrapper.style.display = 'none';
+                    taskInput.placeholder = "Nome del festeggiato...";
+                }
+            });
+        });
+
+        // Caricamento Dati Storage
+        function loadAppData() {
+            let data = JSON.parse(localStorage.getItem('agenda_advanced_data')) || { lastDate: todayString, tasks: [] };
+            if (data.lastDate !== todayString) {
+                data.lastDate = todayString;
+                localStorage.setItem('agenda_advanced_data', JSON.stringify(data));
+            }
+            return data.tasks;
         }
 
-        function addTask() {
+        let tasks = loadAppData();
+
+        function saveAppData() {
+            const data = { lastDate: todayString, tasks: tasks };
+            localStorage.setItem('agenda_advanced_data', JSON.stringify(data));
+            renderApp();
+        }
+
+        function addItem() {
             const text = taskInput.value.trim();
             if (text === '') return;
 
-            tasks.push({ id: Date.now(), text: text });
+            let newItem = {
+                id: Date.now(),
+                text: text,
+                type: currentType,
+                date: (currentType === 'deadline' || currentType === 'birthday') ? taskDate.value : null
+            };
+
+            if ((currentType === 'deadline' || currentType === 'birthday') && !newItem.date) {
+                alert("Seleziona una data valida!");
+                return;
+            }
+
+            tasks.push(newItem);
             taskInput.value = '';
-            saveAndRender();
+            taskDate.value = '';
+            saveAppData();
         }
 
         function completeTask(id) {
             const taskElement = document.getElementById(`task-${id}`);
-            taskElement.classList.add('completing');
+            if(taskElement) taskElement.classList.add('completing');
 
-            // Aspetta la fine dell'animazione prima di rimuovere l'elemento dall'array
             setTimeout(() => {
                 tasks = tasks.filter(task => task.id !== id);
-                saveAndRender();
+                saveAppData();
             }, 400);
         }
 
         function deleteTask(id) {
             tasks = tasks.filter(task => task.id !== id);
-            saveAndRender();
+            saveAppData();
         }
 
-        function renderTasks() {
+        // Calcolo dei prossimi eventi in arrivo (massimo 7)
+        function updateUpcomingEvents() {
+            upcomingList.innerHTML = '';
+            
+            let eventsList = [];
+            const nowTime = new Date(todayString).getTime();
+
+            tasks.forEach(task => {
+                if (task.type === 'deadline' && task.date) {
+                    let dTime = new Date(task.date).getTime();
+                    let diffDays = Math.ceil((dTime - nowTime) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 0) {
+                        eventsList.push({ title: task.text, days: diffDays, label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`, time: dTime, type: 'Scadenza' });
+                    }
+                } else if (task.type === 'birthday' && task.date) {
+                    // Calcolo prossimo compleanno basato su anno corrente/successivo
+                    let bDateParts = task.date.split('-');
+                    let bMonth = parseInt(bDateParts[1]);
+                    let bDay = parseInt(bDateParts[2]);
+                    let bYear = parseInt(bDateParts[0]);
+
+                    let nextBday = new Date(today.getFullYear(), bMonth - 1, bDay);
+                    if (nextBday.getTime() < new Date(todayString).getTime()) {
+                        nextBday.setFullYear(today.getFullYear() + 1);
+                    }
+                    let diffDays = Math.ceil((nextBday.getTime() - nowTime) / (1000 * 60 * 60 * 24));
+                    let turningYears = nextBday.getFullYear() - bYear;
+
+                    eventsList.push({ title: `🎂 ${task.text} (${turningYears} anni)`, days: diffDays, label: diffDays === 0 ? 'Oggi!' : `Tra ${diffDays}g`, time: nextBday.getTime(), type: 'Compleanno' });
+                }
+            });
+
+            // Ordina per imminenza
+            eventsList.sort((a, b) => a.days - b.days);
+
+            // Prendi i primi 7 eventi
+            let top7 = eventsList.slice(0, 7);
+
+            if (top7.length === 0) {
+                upcomingList.innerHTML = `<div style="font-size: 13px; opacity: 0.8; text-align: center; padding: 6px;">Nessuna scadenza o compleanno imminente.</div>`;
+                return;
+            }
+
+            top7.forEach(ev => {
+                const el = document.createElement('div');
+                el.className = 'upcoming-item';
+                el.innerHTML = `
+                    <div class="upcoming-info">
+                        <i class="fa-solid fa-calendar-day" style="font-size: 12px; opacity: 0.8;"></i>
+                        <span>${escapeHtml(ev.title)}</span>
+                    </div>
+                    <span class="upcoming-badge">${ev.label}</span>
+                `;
+                upcomingList.appendChild(el);
+            });
+        }
+
+        function renderApp() {
             tasksList.innerHTML = '';
+            taskCount.textContent = tasks.length;
             
             if (tasks.length === 0) {
                 emptyState.style.display = 'block';
-                return;
             } else {
                 emptyState.style.display = 'none';
             }
@@ -312,19 +683,39 @@
                 item.className = 'task-item';
                 item.id = `task-${task.id}`;
 
+                let metaText = '';
+                let pillClass = '';
+                let pillText = '';
+
+                if (task.type === 'routine') {
+                    pillClass = 'routine';
+                    pillText = 'Giornaliero';
+                    metaText = 'Routine attiva';
+                } else if (task.type === 'deadline') {
+                    pillClass = 'deadline';
+                    pillText = 'Scadenza';
+                    metaText = `Entro il: ${task.date.split('-').reverse().join('/')}`;
+                } else if (task.type === 'birthday') {
+                    pillClass = 'birthday';
+                    pillText = 'Compleanno';
+                    metaText = `Data nascita: ${task.date.split('-').reverse().join('/')}`;
+                }
+
                 item.innerHTML = `
                     <div class="task-content">
                         <div class="checkbox" onclick="completeTask(${task.id})">
                             <i class="fa-solid fa-check" style="opacity: 0; font-size: 12px;"></i>
                         </div>
-                        <span class="task-text">${escapeHtml(task.text)}</span>
+                        <div class="task-details">
+                            <span class="task-text"><span class="tag-pill ${pillClass}">${pillText}</span>${escapeHtml(task.text)}</span>
+                            <span class="task-meta">${metaText}</span>
+                        </div>
                     </div>
                     <button class="delete-btn" onclick="deleteTask(${task.id})">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 `;
 
-                // Attiva l'icona di spunta quando si clicca sul cerchio
                 const checkbox = item.querySelector('.checkbox');
                 checkbox.addEventListener('click', function() {
                     const icon = this.querySelector('i');
@@ -333,29 +724,36 @@
 
                 tasksList.appendChild(item);
             });
+
+            updateUpcomingEvents();
         }
 
         function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
         // Event Listeners
-        addBtn.addEventListener('click', addTask);
+        addBtn.addEventListener('click', addItem);
+        addBtnStd.addEventListener('click', addItem);
+        
         taskInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addTask();
+            if (e.key === 'Enter') addItem();
+        });
+
+        settingsBtn.addEventListener('click', () => settingsModal.classList.add('active'));
+        closeModal.addEventListener('click', () => settingsModal.classList.remove('active'));
+        
+        clearDataBtn.addEventListener('click', () => {
+            if (confirm("Vuoi davvero cancellare tutti i dati salvati?")) {
+                tasks = [];
+                saveAppData();
+                settingsModal.classList.remove('active');
             }
         });
 
-        // Primo avvio
-        renderTasks();
+        // Avvio
+        renderApp();
     </script>
 </body>
 </html>
