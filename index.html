@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Agenda & Compleanni Pro</title>
+    <title>Agenda & Compleanni Ultimate</title>
     <!-- Meta per iOS Web App -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Agenda Pro">
+    <meta name="apple-mobile-web-app-title" content="Agenda Ultimate">
     
     <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,6 +25,24 @@
             --warning: #ff9500;
             --purple: #af52de;
             --border-color: #e5e5ea;
+            --input-bg: #f2f2f7;
+        }
+
+        /* Dark Mode automatica basata sul sistema iOS */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --card-bg: #1c1c1e;
+                --text-main: #f2f2f7;
+                --text-secondary: #8e8e93;
+                --accent: #0a84ff;
+                --success: #30d158;
+                --danger: #ff453a;
+                --warning: #ffd60a;
+                --purple: #bf5af2;
+                --border-color: #38383a;
+                --input-bg: #2c2c2e;
+            }
         }
 
         * {
@@ -42,6 +60,7 @@
             display: flex;
             justify-content: center;
             min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
 
         .app-container {
@@ -99,7 +118,31 @@
             letter-spacing: 0.5px;
         }
 
-        /* Sezione Box In Arrivo (7 Eventi) */
+        /* Search Bar */
+        .search-bar {
+            background: var(--card-bg);
+            padding: 10px 14px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 15px;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .search-bar i {
+            color: var(--text-secondary);
+        }
+
+        /* Upcoming Box */
         .upcoming-box {
             background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
             border-radius: 18px;
@@ -124,19 +167,19 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 180px;
+            max-height: 160px;
             overflow-y: auto;
         }
 
         .upcoming-item {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
-            padding: 10px 12px;
+            padding: 8px 12px;
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .upcoming-info {
@@ -157,7 +200,7 @@
             flex-shrink: 0;
         }
 
-        /* Form di Inserimento Avanzato */
+        /* Input Card Avanzata */
         .input-card {
             background: var(--card-bg);
             padding: 16px;
@@ -170,7 +213,7 @@
 
         .type-selector {
             display: flex;
-            background: var(--bg-color);
+            background: var(--input-bg);
             padding: 3px;
             border-radius: 10px;
             gap: 3px;
@@ -206,24 +249,23 @@
             gap: 8px;
         }
 
-        .input-card input {
+        .input-card input, .input-card select {
             flex: 1;
             border: none;
-            background: var(--bg-color);
+            background: var(--input-bg);
             padding: 12px 14px;
             border-radius: 10px;
             font-size: 15px;
             color: var(--text-main);
             outline: none;
-            transition: background 0.3s;
+        }
+
+        .input-card select {
+            max-width: 130px;
         }
 
         .input-card input[type="date"] {
-            color-scheme: light;
-        }
-
-        .input-card input:focus {
-            background: #e3e3e8;
+            color-scheme: dark light;
         }
 
         .input-card button.submit-btn {
@@ -256,7 +298,7 @@
         }
 
         .badge-count {
-            background: #d1d1d6;
+            background: var(--border-color);
             color: var(--text-main);
             font-size: 11px;
             padding: 2px 8px;
@@ -331,6 +373,9 @@
             font-weight: 500;
             color: var(--text-main);
             word-break: break-word;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .task-meta {
@@ -338,14 +383,23 @@
             color: var(--text-secondary);
         }
 
+        /* Priority Indicator Dot */
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .priority-high { background-color: var(--danger); }
+        .priority-medium { background-color: var(--warning); }
+        .priority-low { background-color: var(--success); }
+
         .tag-pill {
             font-size: 10px;
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: 600;
             text-transform: uppercase;
-            display: inline-block;
-            margin-right: 4px;
         }
         .tag-pill.routine { background: rgba(0,122,255,0.1); color: var(--accent); }
         .tag-pill.deadline { background: rgba(255,149,0,0.1); color: var(--warning); }
@@ -372,9 +426,9 @@
             font-size: 14px;
         }
 
-        /* Sezione Gestione Scadenze/Compleanni fissi */
+        /* Sezione Gestione Fissa */
         .management-section {
-            margin-top: 20px;
+            margin-top: 10px;
             background: var(--card-bg);
             border-radius: 18px;
             padding: 16px;
@@ -402,9 +456,9 @@
             justify-content: space-between;
             align-items: center;
             padding: 8px 10px;
-            background: var(--bg-color);
+            background: var(--input-bg);
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         /* Modale Impostazioni */
@@ -414,7 +468,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
@@ -437,7 +491,7 @@
             max-width: 400px;
             border-radius: 20px;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             transform: scale(0.95);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
@@ -450,16 +504,17 @@
         }
 
         .modal-card h3 { font-size: 20px; font-weight: 600; }
-        .modal-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.4; }
+        .modal-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
         
         .modal-buttons {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 8px;
             margin-top: 10px;
         }
 
         .btn-modal {
-            flex: 1;
+            width: 100%;
             padding: 12px;
             border-radius: 12px;
             font-size: 15px;
@@ -468,7 +523,8 @@
             cursor: pointer;
             text-align: center;
         }
-        .btn-cancel { background: var(--bg-color); color: var(--text-main); }
+        .btn-action { background: var(--input-bg); color: var(--text-main); }
+        .btn-primary { background: var(--accent); color: white; }
         .btn-danger { background: var(--danger); color: white; }
     </style>
 </head>
@@ -478,12 +534,18 @@
         <header>
             <div>
                 <div class="date-display" id="currentDate"></div>
-                <h1>Agenda Pro</h1>
+                <h1>Agenda Ultimate</h1>
             </div>
             <div class="header-actions">
                 <button class="icon-btn" id="settingsBtn" title="Impostazioni"><i class="fa-solid fa-gear"></i></button>
             </div>
         </header>
+
+        <!-- Barra di Ricerca -->
+        <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Cerca impegni o compleanni..." autocomplete="off">
+        </div>
 
         <!-- Box In Arrivo: Prossimi 7 eventi -->
         <div class="upcoming-box">
@@ -491,24 +553,29 @@
             <div class="upcoming-list" id="upcomingList"></div>
         </div>
 
-        <!-- Card Inserimento Avanzato -->
+        <!-- Card Inserimento Avanzato con Priorità -->
         <div class="input-card">
             <div class="type-selector">
                 <button class="type-btn active" data-type="routine">Giornaliero</button>
-                <button class="type-btn" data-type="deadline">Con Scadenza</button>
+                <button class="type-btn" data-type="deadline">Scadenza</button>
                 <button class="type-btn" data-type="birthday">Compleanno</button>
             </div>
             
             <div class="form-fields">
                 <div class="input-group">
                     <input type="text" id="taskInput" placeholder="Nome impegno o persona..." autocomplete="off">
+                    <select id="taskPriority">
+                        <option value="low">Priorità Bassa</option>
+                        <option value="medium" selected>Priorità Media</option>
+                        <option value="high">Priorità Alta</option>
+                    </select>
                 </div>
                 <div class="input-group" id="dateInputGroup" style="display: none;">
                     <input type="date" id="taskDate">
                     <button class="submit-btn" id="addBtn"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="standardAddWrapper">
-                    <button class="submit-btn" id="addBtnStd" style="width: 100%; padding: 12px;"><i class="fa-solid fa-plus"></i> Aggiungi</button>
+                    <button class="submit-btn" id="addBtnStd" style="width: 100%; padding: 12px;"><i class="fa-solid fa-plus"></i> Aggiungi Impegno</button>
                 </div>
             </div>
         </div>
@@ -529,20 +596,23 @@
         <!-- Sezione Gestione Scadenze e Compleanni Fissi -->
         <div class="management-section">
             <div class="management-header"><i class="fa-solid fa-calendar-days"></i> Gestione Scadenze & Compleanni</div>
-            <div class="sub-list" id="permanentList">
-                <!-- Elenco fisso per eliminare o monitorare -->
-            </div>
+            <div class="sub-list" id="permanentList"></div>
         </div>
     </div>
 
-    <!-- Modale Impostazioni -->
+    <!-- Modale Impostazioni & Backup -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-card">
-            <h3>Impostazioni e Pulizia</h3>
-            <p>La pulizia intelligente rimuove soltanto i vecchi dati giornalieri passati o completati, lasciando intatti tutti i compleanni e gli eventi futuri programmati.</p>
+            <h3>Impostazioni e Extra</h3>
+            <p>Gestisci le notifiche del mattino, esegui il backup dei dati o effettua la pulizia intelligente dei vecchi impegni passati.</p>
             <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" id="closeModal">Chiudi</button>
-                <button class="btn-modal btn-danger" id="clearDataBtn">Pulizia Intelligente</button>
+                <button class="btn-modal btn-primary" id="notifBtn"><i class="fa-solid fa-bell"></i> Abilita Notifiche Mattutine</button>
+                <button class="btn-modal btn-action" id="exportBtn"><i class="fa-solid fa-download"></i> Esporta Backup (JSON)</button>
+                <label class="btn-modal btn-action" style="display:inline-block; cursor:pointer; text-align:center; line-height: normal; padding-top:14px;">
+                    <i class="fa-solid fa-upload"></i> Importa Backup <input type="file" id="importFile" accept=".json" style="display:none;">
+                </label>
+                <button class="btn-modal btn-danger" id="clearDataBtn">Pulizia Intelligente Vecchi Dati</button>
+                <button class="btn-modal btn-action" id="closeModal" style="margin-top: 6px;">Chiudi</button>
             </div>
         </div>
     </div>
@@ -550,10 +620,12 @@
     <script>
         const taskInput = document.getElementById('taskInput');
         const taskDate = document.getElementById('taskDate');
+        const taskPriority = document.getElementById('taskPriority');
         const addBtn = document.getElementById('addBtn');
         const addBtnStd = document.getElementById('addBtnStd');
         const dateInputGroup = document.getElementById('dateInputGroup');
         const standardAddWrapper = document.getElementById('standardAddWrapper');
+        const searchInput = document.getElementById('searchInput');
         
         const tasksList = document.getElementById('tasksList');
         const upcomingList = document.getElementById('upcomingList');
@@ -566,6 +638,9 @@
         const settingsModal = document.getElementById('settingsModal');
         const closeModal = document.getElementById('closeModal');
         const clearDataBtn = document.getElementById('clearDataBtn');
+        const notifBtn = document.getElementById('notifBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const importFile = document.getElementById('importFile');
 
         const typeButtons = document.querySelectorAll('.type-btn');
         let currentType = 'routine';
@@ -598,11 +673,11 @@
         });
 
         function loadAppData() {
-            let data = JSON.parse(localStorage.getItem('agenda_advanced_data')) || { lastDate: todayString, tasks: [], hiddenToday: [] };
+            let data = JSON.parse(localStorage.getItem('agenda_ultimate_data')) || { lastDate: todayString, tasks: [], hiddenToday: [] };
             if (data.lastDate !== todayString) {
                 data.lastDate = todayString;
-                data.hiddenToday = []; // Reset delle spunte giornaliere per i task fissi al cambio giorno
-                localStorage.setItem('agenda_advanced_data', JSON.stringify(data));
+                data.hiddenToday = [];
+                localStorage.setItem('agenda_ultimate_data', JSON.stringify(data));
             }
             return data;
         }
@@ -610,7 +685,7 @@
         let appData = loadAppData();
 
         function saveAppData() {
-            localStorage.setItem('agenda_advanced_data', JSON.stringify(appData));
+            localStorage.setItem('agenda_ultimate_data', JSON.stringify(appData));
             renderApp();
         }
 
@@ -622,6 +697,7 @@
                 id: Date.now(),
                 text: text,
                 type: currentType,
+                priority: taskPriority.value,
                 date: (currentType === 'deadline' || currentType === 'birthday') ? taskDate.value : null
             };
 
@@ -636,17 +712,14 @@
             saveAppData();
         }
 
-        // Spunta nel giornaliero (nasconde solo per oggi se è scadenza/compleanno)
         function completeTask(id, type) {
             const taskElement = document.getElementById(`task-${id}`);
             if(taskElement) taskElement.classList.add('completing');
 
             setTimeout(() => {
                 if (type === 'routine') {
-                    // I routine si eliminano del tutto
                     appData.tasks = appData.tasks.filter(t => t.id !== id);
                 } else {
-                    // Scadenze e compleanni si nascondono solo per la giornata odierna
                     if (!appData.hiddenToday.includes(id)) {
                         appData.hiddenToday.push(id);
                     }
@@ -655,7 +728,6 @@
             }, 400);
         }
 
-        // Cancellazione definitiva dalla sezione di gestione
         function deletePermanentItem(id) {
             appData.tasks = appData.tasks.filter(t => t.id !== id);
             appData.hiddenToday = appData.hiddenToday.filter(hiddenId => hiddenId !== id);
@@ -717,25 +789,22 @@
             tasksList.innerHTML = '';
             permanentList.innerHTML = '';
 
-            // Calcola elementi visibili oggi nel giornaliero
             let todayTasks = [];
             let permanentItems = [];
+            let searchQuery = searchInput.value.toLowerCase();
 
             appData.tasks.forEach(task => {
                 if (task.type !== 'routine') {
                     permanentItems.push(task);
                 }
 
-                // Logica comparsa nel giornaliero
                 if (task.type === 'routine') {
                     todayTasks.push(task);
                 } else if (task.type === 'deadline' && task.date <= todayString) {
-                    // Se non è stato spuntato per oggi, compari nel giornaliero
                     if (!appData.hiddenToday.includes(task.id)) {
                         todayTasks.push(task);
                     }
                 } else if (task.type === 'birthday' && task.date) {
-                    // Calcola se oggi è il compleanno
                     let parts = task.date.split('-');
                     if (`${parts[1]}-${parts[2]}` === `${todayString.split('-')[1]}-${todayString.split('-')[2]}`) {
                         if (!appData.hiddenToday.includes(task.id)) {
@@ -745,6 +814,11 @@
                 }
             });
 
+            // Filtro ricerca in tempo reale
+            if (searchQuery) {
+                todayTasks = todayTasks.filter(t => t.text.toLowerCase().includes(searchQuery));
+            }
+
             taskCount.textContent = todayTasks.length;
             
             if (todayTasks.length === 0) {
@@ -753,7 +827,6 @@
                 emptyState.style.display = 'none';
             }
 
-            // Render Giornaliero
             todayTasks.forEach(task => {
                 const item = document.createElement('div');
                 item.className = 'task-item';
@@ -762,6 +835,7 @@
                 let metaText = '';
                 let pillClass = '';
                 let pillText = '';
+                let priorityClass = `priority-${task.priority || 'medium'}`;
 
                 if (task.type === 'routine') {
                     pillClass = 'routine'; pillText = 'Giornaliero'; metaText = 'Routine';
@@ -777,7 +851,11 @@
                             <i class="fa-solid fa-check" style="opacity: 0; font-size: 12px;"></i>
                         </div>
                         <div class="task-details">
-                            <span class="task-text"><span class="tag-pill ${pillClass}">${pillText}</span>${escapeHtml(task.text)}</span>
+                            <span class="task-text">
+                                <span class="priority-dot ${priorityClass}"></span>
+                                <span class="tag-pill ${pillClass}">${pillText}</span>
+                                ${escapeHtml(task.text)}
+                            </span>
                             <span class="task-meta">${metaText}</span>
                         </div>
                     </div>
@@ -792,7 +870,7 @@
                 tasksList.appendChild(item);
             });
 
-            // Render Sezione Gestione fissa (per cancellare scadenze/compleanni)
+            // Render Gestione Fissa
             if (permanentItems.length === 0) {
                 permanentList.innerHTML = `<div style="font-size: 13px; color: var(--text-secondary); text-align: center; padding: 6px;">Nessuna scadenza o compleanno salvato.</div>`;
             } else {
@@ -820,16 +898,65 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
+        // Funzionalità Notifiche Locali
+        notifBtn.addEventListener('click', () => {
+            if (!("Notification" in window)) {
+                alert("Questo browser non supporta le notifiche desktop.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification("Agenda Ultimate", { body: "Notifiche attivate con successo! Riceverai i promemoria." });
+                } else {
+                    alert("Permesso notifiche negato.");
+                }
+            });
+        });
+
+        // Esportazione Backup JSON
+        exportBtn.addEventListener('click', () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `agenda_backup_${todayString}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        });
+
+        // Importazione Backup JSON
+        importFile.addEventListener('change', (e) => {
+            const fileReader = new FileReader();
+            if (e.target.files[0]) {
+                fileReader.readAsText(e.target.files[0], "UTF-8");
+                fileReader.onload = (event) => {
+                    try {
+                        const parsedData = JSON.parse(event.target.result);
+                        if (parsedData.tasks) {
+                            appData = parsedData;
+                            saveAppData();
+                            alert("Backup importato con successo!");
+                            settingsModal.classList.remove('active');
+                        } else {
+                            alert("File di backup non valido.");
+                        }
+                    } catch (err) {
+                        alert("Errore durante la lettura del file JSON.");
+                    }
+                };
+            }
+        });
+
         addBtn.addEventListener('click', addItem);
         addBtnStd.addEventListener('click', addItem);
         taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addItem(); });
+        searchInput.addEventListener('input', renderApp);
 
         settingsBtn.addEventListener('click', () => settingsModal.classList.add('active'));
         closeModal.addEventListener('click', () => settingsModal.classList.remove('active'));
         
         clearDataBtn.addEventListener('click', () => {
-            if (confirm("Vuoi eseguire la pulizia intelligente? Verranno rimossi solo i vecchi impegni giornalieri, lasciando intatti i compleanni e le scadenze future.")) {
-                // Filtra via solo i routine
+            if (confirm("Vuoi eseguire la pulizia intelligente? Verranno rimossi solo i vecchi impegni giornalieri passati.")) {
                 appData.tasks = appData.tasks.filter(t => t.type !== 'routine');
                 appData.hiddenToday = [];
                 saveAppData();
