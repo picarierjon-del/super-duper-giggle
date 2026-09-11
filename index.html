@@ -1,1419 +1,361 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Agenda Personale</title>
+    <!-- Meta per iOS Web App -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Agenda">
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- PWA iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="PicariHome🏡" />
-  <meta name="theme-color" content="#070A12" />
+    <style>
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-main: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --accent: #007aff;
+            --success: #34c759;
+            --danger: #ff3b30;
+            --border-color: #e5e5ea;
+        }
 
-  <!-- Manifest -->
-  <link rel="manifest" href="./manifest.webmanifest" />
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  <!-- Icons -->
-  <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="./icon.svg">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px) 16px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-  <title>PicariHome🏡</title>
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-  <!-- Chart.js (cachato dal SW dopo primo avvio) -->
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 10px;
+        }
 
-  <style>
-    :root{
-      --bg0:#070A12;
-      --bg1:#0B1020;
-      --card:rgba(255,255,255,.06);
-      --text:#EAF0FF;
-      --muted:#A7B1CC;
-      --accent:#7C5CFF;
-      --bad:#FF4D6D;
-      --good:#2EE59D;
-      --warn:#FFC14A;
-      --radius:22px;
-      --shadow: 0 20px 50px rgba(0,0,0,.45);
-    }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, -apple-system, system-ui, "SF Pro Display", Segoe UI, Roboto, Helvetica, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 15% -10%, rgba(124,92,255,.40), transparent 60%),
-        radial-gradient(900px 600px at 85% 0%, rgba(46,229,157,.20), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      padding-top: env(safe-area-inset-top);
-      overflow-x:hidden;
-    }
+        header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
 
-    .view{display:none; padding:18px 18px 140px; animation:in .28s ease-out}
-    .view.active{display:block}
-    @keyframes in{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+        .date-display {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    .topbar{
-      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
-      padding: 18px 18px 8px;
-      position: sticky; top: 0; z-index: 10;
-      backdrop-filter: blur(14px);
-      background: linear-gradient(180deg, rgba(7,10,18,.78), rgba(7,10,18,.25));
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .title{display:flex; align-items:flex-end; gap:10px}
-    .title h1{margin:0; font-size:24px; letter-spacing:-.6px}
-    .title .sub{margin-top:3px; font-size:12px; color:var(--muted)}
-    .appMark{
-      width:34px; height:34px; border-radius:12px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: 0 16px 40px rgba(0,0,0,.35);
-      overflow:hidden;
-      flex: 0 0 auto;
-    }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-weight:900;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-      box-shadow: 0 10px 30px rgba(0,0,0,.15);
-      white-space: nowrap;
-    }
-    .chip select{
-      appearance:none; -webkit-appearance:none;
-      background:transparent; border:none; color:var(--text);
-      font-weight:950; font-size:12px;
-      padding:0; margin:0;
-      outline:none;
-      cursor:pointer;
-    }
+        /* Input Card */
+        .input-card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            display: flex;
+            gap: 10px;
+        }
 
-    .card{
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      margin: 14px 0;
-    }
-    .card .hd{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 12px;
-    }
-    .card h2{
-      margin:0;
-      font-size:12px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color: var(--muted);
-    }
+        .input-card input {
+            flex: 1;
+            border: none;
+            background: var(--bg-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
 
-    label{display:block; font-size:11px; font-weight:950; color:var(--muted); margin: 0 0 6px 6px}
-    input, select, button{
-      font-family: inherit;
-    }
-    input, select{
-      width:100%;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--text);
-      border-radius: 18px;
-      padding: 14px 14px;
-      font-size: 16px;
-      outline:none;
-    }
-    input:focus, select:focus{border-color: rgba(124,92,255,.55)}
-    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
-    .hint{font-size:12px; color:var(--muted); line-height:1.35}
-    .divider{height:1px; background: rgba(255,255,255,.08); margin: 14px 0}
+        .input-card input:focus {
+            background: #e3e3e8;
+        }
 
-    .seg{
-      display:flex;
-      background: rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius: 18px;
-      padding:6px;
-      gap:6px;
-    }
-    .seg button{
-      flex:1;
-      border:none;
-      border-radius: 14px;
-      padding: 12px;
-      font-weight:990;
-      color: var(--muted);
-      background: transparent;
-      cursor:pointer;
-      transition: transform .06s ease, background .2s ease, color .2s ease;
-    }
-    .seg button:active{transform:scale(.98)}
-    .seg button.on{
-      color: var(--text);
-      background: linear-gradient(135deg, rgba(124,92,255,.75), rgba(124,92,255,.30));
-      box-shadow: 0 14px 30px rgba(124,92,255,.15);
-    }
+        .input-card button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
 
-    .btn{
-      width:100%;
-      border:none;
-      border-radius: 18px;
-      padding: 14px 16px;
-      font-size: 15px;
-      font-weight: 990;
-      cursor:pointer;
-      transition: transform .06s ease, opacity .2s ease;
-      user-select:none;
-    }
-    .btn:active{transform:scale(.985)}
-    .btn.primary{
-      color: #0b1020;
-      background: linear-gradient(135deg, rgba(46,229,157,1), rgba(46,229,157,.65));
-      box-shadow: 0 20px 50px rgba(46,229,157,.18);
-    }
-    .btn.secondary{
-      color: var(--text);
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .btn.danger{
-      color: var(--bad);
-      background: rgba(255,77,109,.10);
-      border: 1px solid rgba(255,77,109,.22);
-    }
-    .btn:disabled{opacity:.45; cursor:not-allowed}
+        .input-card button:active {
+            transform: scale(0.92);
+            opacity: 0.8;
+        }
 
-    .amountBox{display:flex; align-items:center; justify-content:center; padding: 6px 0 4px}
-    .amountBox input{
-      font-size: 38px;
-      text-align:center;
-      border:none;
-      background: transparent;
-      color: var(--good);
-      padding: 8px 0;
-      margin: 0;
-      width: 100%;
-    }
-    .amountBox input::placeholder{color: rgba(46,229,157,.35)}
+        /* Sezione Lista */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            padding-left: 4px;
+        }
 
-    .kpis{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .kpi{
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-    }
-    .kpi .t{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
-    .kpi .v{margin-top:6px; font-size:18px; font-weight:1000}
-    .v.good{color:var(--good)}
-    .v.bad{color:var(--bad)}
-    .v.warn{color:var(--warn)}
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    .tx-card{
-      display:flex; gap:12px; align-items:center;
-      padding: 12px 6px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .tx-card:last-child{border-bottom:none}
-    .tx-dot{
-      width:10px; height:10px; border-radius:99px;
-      background: rgba(255,255,255,.22);
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 4px rgba(255,255,255,.04);
-    }
-    .tx-dot.income{background: rgba(46,229,157,.9); box-shadow: 0 0 0 4px rgba(46,229,157,.12)}
-    .tx-dot.expense{background: rgba(255,77,109,.9); box-shadow: 0 0 0 4px rgba(255,77,109,.12)}
-    .tx-info{flex:1; min-width:0; cursor:pointer}
-    .tx-info b{display:block; font-size:15px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .tx-info span{font-size:12px; color:var(--muted)}
-    .tx-right{display:flex; align-items:center; gap:10px}
-    .tx-amt{font-weight:1000; font-size:14px; white-space:nowrap}
-    .tx-del{
-      border:none;
-      background: rgba(255,77,109,.10);
-      color: var(--bad);
-      border-radius: 14px;
-      padding: 8px 10px;
-      font-size: 12px;
-      cursor:pointer;
-      border: 1px solid rgba(255,77,109,.20);
-    }
+        .task-item {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .toggleRow{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding: 12px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      margin-top: 10px;
-    }
-    .toggleRow .txt b{display:block; font-size:14px; margin-bottom:2px}
-    .toggleRow .txt span{display:block; font-size:12px; color:var(--muted)}
-    .switch{
-      width: 52px; height: 30px; border-radius: 999px;
-      background: rgba(255,255,255,.14);
-      border: 1px solid rgba(255,255,255,.12);
-      position: relative;
-      cursor:pointer;
-      flex: 0 0 auto;
-      transition: background .2s ease, border-color .2s ease;
-    }
-    .switch::after{
-      content:"";
-      position:absolute; top: 3px; left: 3px;
-      width: 24px; height: 24px; border-radius: 999px;
-      background: #fff;
-      transition: transform .2s ease;
-    }
-    .switch.on{
-      background: rgba(46,229,157,.25);
-      border-color: rgba(46,229,157,.35);
-    }
-    .switch.on::after{transform: translateX(22px)}
-    .warnBox{
-      margin-top:10px;
-      padding: 12px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,193,74,.22);
-      background: rgba(255,193,74,.08);
-      color: rgba(255,193,74,.95);
-      font-size: 12px;
-      font-weight: 950;
-      line-height: 1.35;
-    }
+        .task-item.completed {
+            background-color: rgba(52, 199, 89, 0.12);
+            transform: scale(0.98);
+            opacity: 0;
+            height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin: 0;
+            border: none;
+        }
 
-    nav{
-      position: fixed;
-      left: 14px; right: 14px;
-      bottom: 16px;
-      padding-bottom: env(safe-area-inset-bottom);
-      z-index: 1000;
-    }
-    .navBar{
-      display:flex;
-      background: rgba(11,16,32,.72);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 26px;
-      padding: 8px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
-    }
-    .nav-item{
-      flex:1;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap: 2px;
-      padding: 10px 0;
-      color: var(--muted);
-      text-decoration:none;
-      border-radius: 20px;
-      font-weight: 990;
-      font-size: 10px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      transition: background .2s ease, color .2s ease;
-      user-select:none;
-    }
-    .nav-item i{font-style:normal; font-size: 18px; opacity:.85}
-    .nav-item.active{
-      color: var(--text);
-      background: rgba(124,92,255,.18);
-      border: 1px solid rgba(124,92,255,.25);
-    }
+        .task-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
 
-    .toast{
-      position: fixed;
-      bottom: 98px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,.92);
-      color: #0B1020;
-      padding: 12px 16px;
-      border-radius: 999px;
-      font-weight: 1000;
-      display:none;
-      z-index: 2000;
-      max-width: calc(100vw - 32px);
-      text-align:center;
-      box-shadow: 0 20px 60px rgba(0,0,0,.35);
-    }
+        /* Custom Checkbox */
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
 
-    .netBadge{
-      display:inline-flex; align-items:center; gap:6px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      font-weight:950;
-      font-size: 11px;
-      white-space: nowrap;
-    }
-    .netBadge.on{ color: rgba(46,229,157,.95); border-color: rgba(46,229,157,.25); background: rgba(46,229,157,.08); }
-    .netBadge.off{ color: rgba(255,193,74,.95); border-color: rgba(255,193,74,.25); background: rgba(255,193,74,.08); }
+        .task-item.completing .checkbox {
+            background-color: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
 
-    /* Report filters */
-    .pillRow{
-      display:flex; gap:8px; flex-wrap:wrap;
-    }
-    .pill{
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-weight: 950;
-      font-size: 12px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .pill.on{
-      border-color: rgba(124,92,255,.35);
-      background: rgba(124,92,255,.14);
-    }
-  </style>
+        .task-text {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-main);
+            word-break: break-word;
+            transition: color 0.2s;
+        }
+
+        .task-item.completing .task-text {
+            color: var(--success);
+            text-decoration: line-through;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+            padding: 8px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 40px;
+            font-size: 15px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #d1d1d6;
+        }
+    </style>
 </head>
-
 <body>
-  <div id="toast" class="toast"></div>
 
-  <!-- CASSA -->
-  <div id="view-cassa" class="view active">
-    <div class="topbar">
-      <div class="title">
-        <div class="appMark" aria-hidden="true">
-          <!-- inline tiny icon preview -->
-          <img src="./icon.svg" alt="" style="width:26px;height:26px;opacity:.95">
+    <div class="app-container">
+        <header>
+            <div>
+                <div class="date-display" id="currentDate"></div>
+                <h1>Agenda</h1>
+            </div>
+        </header>
+
+        <!-- Input per nuovo impegno -->
+        <div class="input-card">
+            <input type="text" id="taskInput" placeholder="Nuovo impegno..." autocomplete="off">
+            <button id="addBtn"><i class="fa-solid fa-plus"></i></button>
         </div>
-        <div>
-          <h1>PicariHome🏡</h1>
-          <div class="sub">Aggiungi movimenti in 3 tocchi</div>
+
+        <div class="section-title">I tuoi impegni</div>
+        
+        <!-- Lista Impegni -->
+        <div class="tasks-list" id="tasksList">
+            <!-- Gli elementi verranno inseriti qui via JS -->
         </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px">
-        <div id="netBadge" class="netBadge">● online</div>
-        <div class="chip" onclick="showView('analisi', document.querySelectorAll('.nav-item')[1]); return false;">
-          📊 <span style="opacity:.85">Report</span>
+        
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fa-regular fa-face-smile"></i>
+            <p>Nessun impegno in programma!<br>Aggiungine uno qui sopra.</p>
         </div>
-      </div>
     </div>
 
-    <div class="card">
-      <div class="hd">
-        <h2>Tipo movimento</h2>
-        <div class="hint" id="modeHint" style="font-weight:950"></div>
-      </div>
+    <script>
+        const taskInput = document.getElementById('taskInput');
+        const addBtn = document.getElementById('addBtn');
+        const tasksList = document.getElementById('tasksList');
+        const emptyState = document.getElementById('emptyState');
+        const currentDateEl = document.getElementById('currentDate');
 
-      <div id="typeSeg" class="seg">
-        <button id="type-exp" class="on" onclick="setType('expense')">Uscita</button>
-        <button id="type-inc" onclick="setType('income')">Entrata</button>
-      </div>
+        // Mostra la data odierna formattata in italiano
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        currentDateEl.textContent = new Date().toLocaleDateString('it-IT', options);
 
-      <div class="divider"></div>
+        // Carica i task dal localStorage
+        let tasks = JSON.parse(localStorage.getItem('my_tasks')) || [];
 
-      <label>Importo</label>
-      <div class="amountBox">
-        <input type="number" id="txAmount" inputmode="decimal" placeholder="0.00">
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>Categoria</label>
-          <select id="txCategory"></select>
-        </div>
-        <div>
-          <label>Data</label>
-          <input type="date" id="txDate">
-        </div>
-      </div>
-
-      <label>Descrizione</label>
-      <input type="text" id="txTag" placeholder="Esempio: Cena fuori">
-
-      <button class="btn primary" onclick="saveTx()">Salva</button>
-      <div class="hint" style="margin-top:10px">Tip: nel report tocca una riga per modificarla.</div>
-    </div>
-  </div>
-
-  <!-- ANALISI -->
-  <div id="view-analisi" class="view">
-    <div class="topbar">
-      <div class="title">
-        <div class="appMark" aria-hidden="true">
-          <img src="./icon.svg" alt="" style="width:26px;height:26px;opacity:.95">
-        </div>
-        <div>
-          <h1>Report</h1>
-          <div class="sub">Filtri rapidi + ricerca date</div>
-        </div>
-      </div>
-
-      <div class="chip">
-        📅
-        <select id="filterPreset" aria-label="Filtro rapido">
-          <option value="this_week">Questa settimana</option>
-          <option value="last_week">Settimana scorsa</option>
-          <option value="this_month" selected>Questo mese</option>
-          <option value="last_month">Mese scorso</option>
-          <option value="custom">Personalizzato</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Intervallo</h2>
-        <div class="hint" id="rangeLabel" style="font-weight:950"></div>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>Dal</label>
-          <input type="date" id="rangeFrom">
-        </div>
-        <div>
-          <label>Al</label>
-          <input type="date" id="rangeTo">
-        </div>
-      </div>
-
-      <div class="grid3" style="margin-top:10px">
-        <button class="btn secondary" onclick="applyPreset('this_week')">Questa sett.</button>
-        <button class="btn secondary" onclick="applyPreset('this_month')">Questo mese</button>
-        <button class="btn secondary" onclick="applyPreset('custom')">Usa date</button>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="kpis" id="kpis"></div>
-
-      <div class="divider"></div>
-      <div class="hint" id="salaryHint"></div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Categorie (uscite)</h2>
-        <div class="hint" id="catHint" style="font-weight:950"></div>
-      </div>
-      <canvas id="chartCats" height="210"></canvas>
-      <div id="emptyChartNote" class="hint" style="display:none; margin-top:10px"></div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Cronologia</h2>
-        <div class="hint" id="txCount" style="font-weight:950"></div>
-      </div>
-      <div id="txList"></div>
-    </div>
-  </div>
-
-  <!-- SETUP -->
-  <div id="view-setup" class="view">
-    <div class="topbar">
-      <div class="title">
-        <div class="appMark" aria-hidden="true">
-          <img src="./icon.svg" alt="" style="width:26px;height:26px;opacity:.95">
-        </div>
-        <div>
-          <h1>Setup</h1>
-          <div class="sub">Modalità + stipendio + storage</div>
-        </div>
-      </div>
-      <div class="chip" onclick="showView('cassa', document.querySelectorAll('.nav-item')[0]); return false;">
-        💰 <span style="opacity:.85">Cassa</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Stipendio fisso</h2>
-        <div class="hint" style="font-weight:950">Virtuale (per saldo)</div>
-      </div>
-
-      <label>Importo stipendio (€)</label>
-      <input type="number" id="salaryAmount" inputmode="decimal" placeholder="Es. 1500">
-
-      <div class="grid2">
-        <div>
-          <label>Giorno accredito</label>
-          <input type="number" id="salaryDay" min="1" max="28" inputmode="numeric" placeholder="1-28">
-        </div>
-        <div>
-          <label>Nome</label>
-          <input type="text" id="salaryName" placeholder="Stipendio">
-        </div>
-      </div>
-
-      <button class="btn secondary" onclick="saveSalary()">Salva stipendio</button>
-      <div class="hint" style="margin-top:10px">Lo stipendio non crea movimenti, serve per KPI e saldo.</div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Modalità</h2>
-        <div class="hint" style="font-weight:950">Attiva/disattiva</div>
-      </div>
-
-      <div class="toggleRow">
-        <div class="txt">
-          <b>Abilita Uscite</b>
-          <span>Usa l’app solo per spese</span>
-        </div>
-        <div id="swExpenses" class="switch on" onclick="toggleType('expense')"></div>
-      </div>
-
-      <div class="toggleRow">
-        <div class="txt">
-          <b>Abilita Entrate</b>
-          <span>Usa l’app solo per incassi</span>
-        </div>
-        <div id="swIncome" class="switch on" onclick="toggleType('income')"></div>
-      </div>
-
-      <div id="modeWarn" class="warnBox" style="display:none">
-        Devi lasciare attivo almeno uno tra Entrate o Uscite.
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Categorie</h2>
-        <div class="hint" style="font-weight:950">Aggiungi nuove</div>
-      </div>
-      <div class="grid2">
-        <input type="text" id="newCategory" placeholder="Nuova categoria..." style="margin:0">
-        <button class="btn secondary" onclick="addCategory()" style="margin:0">Aggiungi</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Storage</h2>
-        <div class="hint" style="font-weight:950" id="storageHint">—</div>
-      </div>
-      <div class="hint">
-        PicariHome usa <b>IndexedDB</b> come storage principale e mantiene un <b>snapshot</b> in localStorage come fallback.
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2 style="color:rgba(255,77,109,.95)">Manutenzione</h2>
-        <div class="hint" style="font-weight:950">Pulizia intervallo</div>
-      </div>
-      <div class="grid2" style="margin-bottom:10px">
-        <input type="date" id="cleanFrom" style="margin:0">
-        <input type="date" id="cleanTo" style="margin:0">
-      </div>
-      <button class="btn danger" onclick="cleanRange()">Cancella intervallo</button>
-    </div>
-
-    <div class="card">
-      <div class="hd">
-        <h2>Dati</h2>
-        <div class="hint" style="font-weight:950">Backup</div>
-      </div>
-      <button class="btn secondary" onclick="exportData()">Esporta JSON</button>
-      <div style="height:10px"></div>
-      <button class="btn secondary" onclick="importData()">Importa JSON</button>
-      <div class="divider"></div>
-      <button class="btn danger" onclick="resetAll()">Reset totale</button>
-    </div>
-  </div>
-
-  <!-- Bottom nav -->
-  <nav>
-    <div class="navBar">
-      <a href="#" class="nav-item active" onclick="showView('cassa', this); return false;"><i>💰</i><span>Cassa</span></a>
-      <a href="#" class="nav-item" onclick="showView('analisi', this); return false;"><i>📊</i><span>Report</span></a>
-      <a href="#" class="nav-item" onclick="showView('setup', this); return false;"><i>⚙️</i><span>Setup</span></a>
-    </div>
-  </nav>
-
-<script>
-  // -----------------------------------------
-  // PWA: register Service Worker
-  // -----------------------------------------
-  (function registerSW(){
-    if (!("serviceWorker" in navigator)) return;
-    window.addEventListener("load", async () => {
-      try { await navigator.serviceWorker.register("./sw.js", { scope: "./" }); } catch {}
-    });
-  })();
-
-  // -----------------------------------------
-  // Net badge
-  // -----------------------------------------
-  function updateNetBadge(){
-    const b = document.getElementById("netBadge");
-    if(!b) return;
-    const on = navigator.onLine;
-    b.textContent = on ? "● online" : "● offline";
-    b.classList.toggle("on", on);
-    b.classList.toggle("off", !on);
-  }
-  window.addEventListener("online", updateNetBadge);
-  window.addEventListener("offline", updateNetBadge);
-
-  // -----------------------------------------
-  // IndexedDB + localStorage (dual persistence)
-  // -----------------------------------------
-  const DB_NAME = "PicariHomeDB";
-  const DB_VERSION = 1;
-  const STORE = "kv";
-  const KV_KEY = "state";
-  const LS_KEY = "PicariHome_Snapshot_V2";
-
-  function openDB(){
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = () => {
-        const db = req.result;
-        if(!db.objectStoreNames.contains(STORE)){
-          db.createObjectStore(STORE);
+        function saveAndRender() {
+            localStorage.setItem('my_tasks', JSON.stringify(tasks));
+            renderTasks();
         }
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
 
-  async function idbGet(key){
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readonly");
-      const st = tx.objectStore(STORE);
-      const req = st.get(key);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-      tx.oncomplete = () => db.close();
-    });
-  }
+        function addTask() {
+            const text = taskInput.value.trim();
+            if (text === '') return;
 
-  async function idbSet(key, value){
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readwrite");
-      const st = tx.objectStore(STORE);
-      const req = st.put(value, key);
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => reject(req.error);
-      tx.oncomplete = () => db.close();
-    });
-  }
-
-  async function idbClear(){
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readwrite");
-      const st = tx.objectStore(STORE);
-      const req = st.clear();
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => reject(req.error);
-      tx.oncomplete = () => db.close();
-    });
-  }
-
-  function safeJSONParse(s){
-    try { return JSON.parse(s); } catch { return null; }
-  }
-
-  // -----------------------------------------
-  // App state
-  // -----------------------------------------
-  let state = {
-    categories: ["🛒 Spesa", "🏠 Casa", "🚗 Viaggi", "🍕 Svago", "🏥 Salute", "📦 Altro"],
-    txs: [],
-    currentType: "expense",
-    editingId: null,
-    settings: { enableExpenses: true, enableIncome: true },
-    salary: { amount: 0, day: 1, name: "Stipendio" }
-  };
-
-  function clampInt(v, min, max){
-    v = Math.floor(Number.isFinite(v) ? v : min);
-    return Math.min(max, Math.max(min, v));
-  }
-  function safeUUID(){
-    try{ if (crypto && crypto.randomUUID) return crypto.randomUUID(); }catch{}
-    return "tx-" + Date.now().toString(16) + "-" + Math.random().toString(16).slice(2);
-  }
-  function todayISO(){
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-  function euro(n){
-    const v = Number(n || 0);
-    return v.toLocaleString("it-IT", { style:"currency", currency:"EUR" });
-  }
-  function escapeHtml(s){
-    return String(s ?? "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-  function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
-
-  function notify(msg){
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.style.display = "block";
-    clearTimeout(notify._t);
-    notify._t = setTimeout(()=> t.style.display="none", 2000);
-  }
-
-  // -----------------------------------------
-  // Load / Save (IDB primary + LS snapshot)
-  // -----------------------------------------
-  async function loadState(){
-    // 1) try IndexedDB
-    try{
-      const v = await idbGet(KV_KEY);
-      if(v && typeof v === "object" && Array.isArray(v.categories) && Array.isArray(v.txs)){
-        state = normalizeState(v);
-        return { source: "IndexedDB" };
-      }
-    }catch{}
-
-    // 2) fallback localStorage snapshot
-    const snap = safeJSONParse(localStorage.getItem(LS_KEY) || "");
-    if(snap && Array.isArray(snap.categories) && Array.isArray(snap.txs)){
-      state = normalizeState(snap);
-      // best-effort migrate back to IDB
-      try { await idbSet(KV_KEY, state); } catch {}
-      return { source: "localStorage" };
-    }
-
-    return { source: "default" };
-  }
-
-  function normalizeState(s){
-    const settings = s.settings || {};
-    const salary = s.salary || {};
-    return {
-      categories: Array.isArray(s.categories) ? s.categories : state.categories,
-      txs: Array.isArray(s.txs) ? s.txs : [],
-      currentType: (s.currentType === "income" || s.currentType === "expense") ? s.currentType : "expense",
-      editingId: null,
-      settings: {
-        enableExpenses: settings.enableExpenses !== false,
-        enableIncome: settings.enableIncome !== false
-      },
-      salary: {
-        amount: Number(salary.amount || 0),
-        day: clampInt(Number(salary.day || 1), 1, 28),
-        name: (salary.name || "Stipendio").toString().slice(0, 40)
-      }
-    };
-  }
-
-  let saveTimer = null;
-  function scheduleSave(){
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(saveState, 120);
-  }
-
-  async function saveState(){
-    // snapshot LS (small + fast fallback)
-    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {}
-
-    // IDB primary
-    try { await idbSet(KV_KEY, state); } catch {}
-    updateStorageHint();
-  }
-
-  async function resetStorage(){
-    try { localStorage.removeItem(LS_KEY); } catch {}
-    try { await idbClear(); } catch {}
-  }
-
-  async function updateStorageHint(){
-    const el = document.getElementById("storageHint");
-    if(!el) return;
-    let idbOk = false;
-    try { await idbSet("__ping__", { t: Date.now() }); idbOk = true; } catch {}
-    el.textContent = idbOk ? "IndexedDB attivo ✅ (snapshot LS attivo)" : "IndexedDB NON disponibile (solo localStorage)";
-  }
-
-  // -----------------------------------------
-  // Views
-  // -----------------------------------------
-  function showView(viewId, el){
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-    const target = document.getElementById("view-" + viewId);
-    if(target) target.classList.add("active");
-    if(el) el.classList.add("active");
-    if(viewId === "analisi" || viewId === "setup") renderAll();
-  }
-
-  // -----------------------------------------
-  // Type enable/disable
-  // -----------------------------------------
-  function syncSettingsUI(){
-    document.getElementById("swExpenses").classList.toggle("on", !!state.settings.enableExpenses);
-    document.getElementById("swIncome").classList.toggle("on", !!state.settings.enableIncome);
-    document.getElementById("modeWarn").style.display = (!state.settings.enableExpenses && !state.settings.enableIncome) ? "block" : "none";
-
-    document.getElementById("salaryAmount").value = state.salary.amount || "";
-    document.getElementById("salaryDay").value = state.salary.day || 1;
-    document.getElementById("salaryName").value = state.salary.name || "Stipendio";
-  }
-
-  function toggleType(which){
-    let nextExp = state.settings.enableExpenses;
-    let nextInc = state.settings.enableIncome;
-
-    if(which === "expense") nextExp = !nextExp;
-    if(which === "income") nextInc = !nextInc;
-
-    if(!nextExp && !nextInc){
-      document.getElementById("modeWarn").style.display = "block";
-      notify("Devi lasciare attivo almeno un tipo");
-      return;
-    }
-
-    state.settings.enableExpenses = nextExp;
-    state.settings.enableIncome = nextInc;
-
-    if(state.currentType === "expense" && !state.settings.enableExpenses) state.currentType = "income";
-    if(state.currentType === "income" && !state.settings.enableIncome) state.currentType = "expense";
-
-    scheduleSave();
-    syncSettingsUI();
-    applyTypeAvailability();
-    renderAll();
-  }
-
-  function applyTypeAvailability(){
-    const seg = document.getElementById("typeSeg");
-    const hint = document.getElementById("modeHint");
-    const expOn = !!state.settings.enableExpenses;
-    const incOn = !!state.settings.enableIncome;
-
-    if(expOn && incOn){
-      seg.style.display = "flex";
-      hint.textContent = "Uscite + Entrate";
-      setType(state.currentType, true);
-    } else if(expOn && !incOn){
-      seg.style.display = "none";
-      hint.textContent = "Solo Uscite";
-      state.currentType = "expense";
-      setType("expense", true);
-    } else {
-      seg.style.display = "none";
-      hint.textContent = "Solo Entrate";
-      state.currentType = "income";
-      setType("income", true);
-    }
-  }
-
-  function setType(type, silent=false){
-    if(type === "expense" && !state.settings.enableExpenses){
-      if(!silent) notify("Uscite disattivate in Setup");
-      type = "income";
-    }
-    if(type === "income" && !state.settings.enableIncome){
-      if(!silent) notify("Entrate disattivate in Setup");
-      type = "expense";
-    }
-
-    state.currentType = type;
-    const btnExp = document.getElementById("type-exp");
-    const btnInc = document.getElementById("type-inc");
-    if(btnExp && btnInc){
-      btnExp.classList.toggle("on", type === "expense");
-      btnInc.classList.toggle("on", type === "income");
-    }
-
-    const amt = document.getElementById("txAmount");
-    amt.style.color = (type === "income") ? "var(--good)" : "var(--bad)";
-    scheduleSave();
-  }
-
-  // -----------------------------------------
-  // Salary
-  // -----------------------------------------
-  function saveSalary(){
-    const amt = Number(document.getElementById("salaryAmount").value || 0);
-    const day = clampInt(Number(document.getElementById("salaryDay").value || 1), 1, 28);
-    const name = (document.getElementById("salaryName").value || "Stipendio").trim() || "Stipendio";
-    if(amt < 0 || !Number.isFinite(amt)) return notify("Importo stipendio non valido");
-    state.salary.amount = Math.round(amt * 100) / 100;
-    state.salary.day = day;
-    state.salary.name = name.slice(0, 40);
-    scheduleSave();
-    renderAll();
-    notify("Stipendio salvato");
-  }
-
-  function getSalaryForRange(fromISO, toISO){
-    const amount = Number(state.salary.amount || 0);
-    if(!Number.isFinite(amount) || amount <= 0) return 0;
-
-    // Logica: considera lo stipendio 1 volta per ogni mese incluso nell’intervallo
-    // (così funziona bene con “questo mese” e range lunghi)
-    const months = monthsBetween(fromISO, toISO);
-    return amount * months.length;
-  }
-
-  function monthsBetween(fromISO, toISO){
-    const a = new Date(fromISO + "T00:00:00");
-    const b = new Date(toISO + "T00:00:00");
-    if (isNaN(a) || isNaN(b) || a > b) return [];
-    const out = [];
-    const cur = new Date(a.getFullYear(), a.getMonth(), 1);
-    const end = new Date(b.getFullYear(), b.getMonth(), 1);
-    while(cur <= end){
-      const y = cur.getFullYear();
-      const m = String(cur.getMonth()+1).padStart(2,"0");
-      out.push(`${y}-${m}`);
-      cur.setMonth(cur.getMonth()+1);
-    }
-    return out;
-  }
-
-  // -----------------------------------------
-  // Transactions
-  // -----------------------------------------
-  function saveTx(){
-    const amtRaw = document.getElementById("txAmount").value;
-    const amt = Number(amtRaw);
-    if(!amtRaw || !Number.isFinite(amt) || amt <= 0) return notify("Inserisci importo valido");
-
-    const category = document.getElementById("txCategory").value;
-    const date = document.getElementById("txDate").value || todayISO();
-    const tag = (document.getElementById("txTag").value || "").trim() || "Senza titolo";
-
-    if(state.currentType === "expense" && !state.settings.enableExpenses) return notify("Uscite disattivate");
-    if(state.currentType === "income" && !state.settings.enableIncome) return notify("Entrate disattivate");
-
-    const tx = {
-      id: state.editingId || safeUUID(),
-      type: state.currentType,
-      amount: Math.round(amt * 100) / 100,
-      category,
-      tag,
-      date
-    };
-
-    if(state.editingId){
-      state.txs = state.txs.map(t => t.id === state.editingId ? tx : t);
-      state.editingId = null;
-    } else {
-      state.txs.push(tx);
-    }
-
-    scheduleSave();
-    document.getElementById("txAmount").value = "";
-    document.getElementById("txTag").value = "";
-    notify("Salvato!");
-    renderAll();
-  }
-
-  function editTx(id){
-    const tx = state.txs.find(t => t.id === id);
-    if(!tx) return;
-    state.editingId = id;
-    setType(tx.type, true);
-
-    document.getElementById("txAmount").value = tx.amount;
-    document.getElementById("txCategory").value = tx.category;
-    document.getElementById("txTag").value = tx.tag;
-    document.getElementById("txDate").value = tx.date;
-
-    showView("cassa", document.querySelectorAll(".nav-item")[0]);
-    notify("Modifica movimento");
-  }
-
-  function deleteTx(id, ev){
-    if(ev) ev.stopPropagation();
-    if(confirm("Eliminare questo movimento?")){
-      state.txs = state.txs.filter(t => t.id !== id);
-      scheduleSave();
-      renderAll();
-      notify("Eliminato");
-    }
-  }
-
-  // -----------------------------------------
-  // Report filters (preset + custom range)
-  // -----------------------------------------
-  function startOfWeek(d){
-    // ISO week start: Monday
-    const x = new Date(d);
-    const day = x.getDay(); // 0=Sun..6=Sat
-    const diff = (day === 0 ? -6 : 1 - day);
-    x.setDate(x.getDate() + diff);
-    x.setHours(0,0,0,0);
-    return x;
-  }
-  function endOfWeek(d){
-    const s = startOfWeek(d);
-    const e = new Date(s);
-    e.setDate(e.getDate() + 6);
-    e.setHours(0,0,0,0);
-    return e;
-  }
-  function startOfMonth(d){
-    const x = new Date(d.getFullYear(), d.getMonth(), 1);
-    x.setHours(0,0,0,0);
-    return x;
-  }
-  function endOfMonth(d){
-    const x = new Date(d.getFullYear(), d.getMonth()+1, 0);
-    x.setHours(0,0,0,0);
-    return x;
-  }
-  function toISODate(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function applyPreset(preset){
-    const now = new Date();
-    let from, to;
-
-    if(preset === "this_week"){
-      from = startOfWeek(now);
-      to = endOfWeek(now);
-    } else if(preset === "last_week"){
-      const x = new Date(now);
-      x.setDate(x.getDate() - 7);
-      from = startOfWeek(x);
-      to = endOfWeek(x);
-    } else if(preset === "this_month"){
-      from = startOfMonth(now);
-      to = endOfMonth(now);
-    } else if(preset === "last_month"){
-      const x = new Date(now.getFullYear(), now.getMonth()-1, 1);
-      from = startOfMonth(x);
-      to = endOfMonth(x);
-    } else {
-      // custom: keep current inputs
-      preset = "custom";
-      from = new Date((document.getElementById("rangeFrom").value || todayISO()) + "T00:00:00");
-      to = new Date((document.getElementById("rangeTo").value || todayISO()) + "T00:00:00");
-    }
-
-    document.getElementById("filterPreset").value = preset;
-    document.getElementById("rangeFrom").value = toISODate(from);
-    document.getElementById("rangeTo").value = toISODate(to);
-
-    renderAll();
-  }
-
-  function getActiveRange(){
-    const from = document.getElementById("rangeFrom").value || todayISO();
-    const to = document.getElementById("rangeTo").value || todayISO();
-    if(from > to) return { from: to, to: from };
-    return { from, to };
-  }
-
-  function inRange(dateISO, fromISO, toISO){
-    return dateISO >= fromISO && dateISO <= toISO;
-  }
-
-  // -----------------------------------------
-  // Render
-  // -----------------------------------------
-  let myChart = null;
-
-  function renderAll(){
-    updateNetBadge();
-    syncSettingsUI();
-    applyTypeAvailability();
-
-    // Category select
-    const sel = document.getElementById("txCategory");
-    sel.innerHTML = state.categories.map(c => `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join("");
-
-    // Range
-    const { from, to } = getActiveRange();
-    document.getElementById("rangeLabel").textContent = `${from} → ${to}`;
-
-    // Filter txs by range + enabled types
-    let filtered = state.txs.filter(t => t.date && inRange(t.date, from, to));
-    if(!state.settings.enableExpenses) filtered = filtered.filter(t => t.type !== "expense");
-    if(!state.settings.enableIncome) filtered = filtered.filter(t => t.type !== "income");
-
-    // Totals from txs
-    const realInc = filtered.filter(t => t.type === "income").reduce((s,t)=>s+Number(t.amount||0), 0);
-    const realExp = filtered.filter(t => t.type === "expense").reduce((s,t)=>s+Number(t.amount||0), 0);
-
-    // Salary virtual (per mesi inclusi nel range)
-    const salaryTotal = getSalaryForRange(from, to);
-    const effectiveInc = (state.settings.enableIncome ? realInc : 0) + salaryTotal;
-
-    const saldo = effectiveInc - realExp;
-    const rate = effectiveInc > 0 ? (saldo / effectiveInc) : 0;
-
-    // KPI
-    const incShown = (state.settings.enableIncome ? realInc : 0) + salaryTotal;
-    const kpis = [
-      { t: state.settings.enableIncome ? "Entrate" : "Entrate (fisse)", v: euro(incShown), cls: incShown > 0 ? "good":"warn" },
-      { t: "Uscite", v: euro(realExp), cls:"bad" },
-      { t: "Saldo", v: euro(saldo), cls: saldo >= 0 ? "good":"bad" },
-      { t: "Risparmio %", v: (rate*100).toFixed(1) + "%", cls: rate >= 0 ? "good":"bad" }
-    ];
-    document.getElementById("kpis").innerHTML = kpis.map(k => `
-      <div class="kpi">
-        <div class="t">${escapeHtml(k.t)}</div>
-        <div class="v ${k.cls}">${escapeHtml(k.v)}</div>
-      </div>
-    `).join("");
-
-    // Salary hint
-    const salaryHint = document.getElementById("salaryHint");
-    if(Number(state.salary.amount||0) > 0){
-      const months = monthsBetween(from, to).length;
-      salaryHint.innerHTML =
-        `Stipendio fisso: <b style="color:var(--good)">${escapeHtml(state.salary.name)} ${escapeHtml(euro(state.salary.amount))}</b> × ${months} mese/i = <b style="color:var(--good)">${escapeHtml(euro(salaryTotal))}</b>.`;
-    } else {
-      salaryHint.textContent = "Stipendio fisso non impostato (Setup → Stipendio fisso).";
-    }
-
-    // List
-    const sorted = filtered.slice().sort((a,b)=>{
-      if((a.date||"") === (b.date||"")) return String(b.id).localeCompare(String(a.id));
-      return (b.date||"").localeCompare(a.date||"");
-    });
-
-    document.getElementById("txCount").textContent =
-      sorted.length ? `${sorted.length} movimenti` : "Nessun movimento";
-
-    document.getElementById("txList").innerHTML = sorted.map(t => `
-      <div class="tx-card">
-        <div class="tx-dot ${t.type}"></div>
-        <div class="tx-info" onclick="editTx('${escapeAttr(t.id)}')">
-          <b>${escapeHtml(t.tag)}</b>
-          <span>${escapeHtml(t.category)} • ${escapeHtml(t.date)} • ${t.type === "income" ? "Entrata" : "Uscita"}</span>
-        </div>
-        <div class="tx-right">
-          <div class="tx-amt" style="color:${t.type === "income" ? "var(--good)" : "var(--bad)"}">
-            ${t.type === "income" ? "+" : "-"}${Number(t.amount||0).toFixed(2)}€
-          </div>
-          <button class="tx-del" onclick="deleteTx('${escapeAttr(t.id)}', event)">🗑️</button>
-        </div>
-      </div>
-    `).join("") || `<div class="hint" style="text-align:center; padding:18px 6px">Vuoto</div>`;
-
-    // Chart (expenses by category within range)
-    renderChart(filtered, from, to);
-
-    // Report hint label
-    document.getElementById("catHint").textContent = `${from} → ${to}`;
-  }
-
-  function renderChart(data, from, to){
-    const canvas = document.getElementById("chartCats");
-    const note = document.getElementById("emptyChartNote");
-    if(!canvas) return;
-
-    if(typeof Chart === "undefined"){
-      note.style.display = "block";
-      note.textContent = "Caricamento grafico… (se sei offline al primo avvio, apri una volta online).";
-      return;
-    }
-
-    const ctx = canvas.getContext("2d");
-    if(myChart) myChart.destroy();
-
-    if(!state.settings.enableExpenses){
-      note.style.display = "block";
-      note.textContent = "Grafico categorie: Uscite disattivate in Setup.";
-      myChart = new Chart(ctx, {
-        type: "doughnut",
-        data: { labels: ["—"], datasets: [{ data: [1], borderWidth: 0 }] },
-        options: { cutout: "78%", plugins: { legend: { display: false } } }
-      });
-      return;
-    }
-
-    const expenses = data.filter(t => t.type === "expense");
-    const totals = {};
-    for(const e of expenses){
-      totals[e.category] = (totals[e.category] || 0) + Number(e.amount || 0);
-    }
-
-    const labels = Object.keys(totals);
-    const values = Object.values(totals).map(v => Math.round(v*100)/100);
-
-    if(!labels.length){
-      note.style.display = "block";
-      note.textContent = "Nessuna uscita nell’intervallo selezionato.";
-      myChart = new Chart(ctx, {
-        type: "doughnut",
-        data: { labels: ["Nessuna spesa"], datasets: [{ data: [1], borderWidth: 0 }] },
-        options: { cutout: "78%", plugins: { legend: { display: false } } }
-      });
-      return;
-    }
-
-    note.style.display = "none";
-    myChart = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels,
-        datasets: [{
-          data: values,
-          borderWidth: 0,
-          spacing: 4,
-          backgroundColor: [
-            "#7C5CFF", "#2EE59D", "#FFC14A", "#FF4D6D",
-            "#38BDF8", "#A78BFA", "#FB7185", "#22C55E", "#F59E0B"
-          ]
-        }]
-      },
-      options: {
-        cutout: "78%",
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${euro(ctx.raw)}` } }
+            tasks.push({ id: Date.now(), text: text });
+            taskInput.value = '';
+            saveAndRender();
         }
-      }
-    });
-  }
 
-  // -----------------------------------------
-  // Setup actions
-  // -----------------------------------------
-  function addCategory(){
-    const input = document.getElementById("newCategory");
-    const val = (input.value || "").trim();
-    if(!val) return notify("Scrivi una categoria");
-    if(state.categories.includes(val)){ input.value=""; return notify("Categoria già presente"); }
-    state.categories.push(val);
-    input.value = "";
-    scheduleSave();
-    renderAll();
-    notify("Categoria aggiunta");
-  }
+        function completeTask(id) {
+            const taskElement = document.getElementById(`task-${id}`);
+            taskElement.classList.add('completing');
 
-  function cleanRange(){
-    const from = document.getElementById("cleanFrom").value;
-    const to = document.getElementById("cleanTo").value;
-    if(!from || !to) return notify("Scegli le date");
-    if(from > to) return notify("Intervallo non valido");
-    if(confirm("Eliminare movimenti selezionati?")){
-      state.txs = state.txs.filter(t => (t.date || "") < from || (t.date || "") > to);
-      scheduleSave();
-      renderAll();
-      notify("Pulizia completata");
-    }
-  }
-
-  function exportData(){
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "picarihome_backup.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  function importData(){
-    const inp = document.createElement("input");
-    inp.type = "file";
-    inp.accept = "application/json";
-    inp.onchange = e => {
-      const f = e.target.files && e.target.files[0];
-      if(!f) return;
-      const reader = new FileReader();
-      reader.onload = async r => {
-        try{
-          const parsed = JSON.parse(r.target.result);
-          if(!parsed || !Array.isArray(parsed.categories) || !Array.isArray(parsed.txs)){
-            return notify("Backup non valido");
-          }
-          state = normalizeState(parsed);
-          if(!state.settings.enableExpenses && !state.settings.enableIncome) state.settings.enableExpenses = true;
-          await saveState();
-          renderAll();
-          notify("Backup caricato");
-        }catch{
-          notify("JSON non valido");
+            // Aspetta la fine dell'animazione prima di rimuovere l'elemento dall'array
+            setTimeout(() => {
+                tasks = tasks.filter(task => task.id !== id);
+                saveAndRender();
+            }, 400);
         }
-      };
-      reader.readAsText(f);
-    };
-    inp.click();
-  }
 
-  async function resetAll(){
-    if(confirm("Cancellare tutto?")){
-      await resetStorage();
-      location.reload();
-    }
-  }
+        function deleteTask(id) {
+            tasks = tasks.filter(task => task.id !== id);
+            saveAndRender();
+        }
 
-  // -----------------------------------------
-  // Init
-  // -----------------------------------------
-  async function init(){
-    updateNetBadge();
+        function renderTasks() {
+            tasksList.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            } else {
+                emptyState.style.display = 'none';
+            }
 
-    const res = await loadState();
-    await updateStorageHint();
+            tasks.forEach(task => {
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                item.id = `task-${task.id}`;
 
-    document.getElementById("txDate").value = todayISO();
+                item.innerHTML = `
+                    <div class="task-content">
+                        <div class="checkbox" onclick="completeTask(${task.id})">
+                            <i class="fa-solid fa-check" style="opacity: 0; font-size: 12px;"></i>
+                        </div>
+                        <span class="task-text">${escapeHtml(task.text)}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
 
-    // init report default to "this_month"
-    applyPreset("this_month");
+                // Attiva l'icona di spunta quando si clicca sul cerchio
+                const checkbox = item.querySelector('.checkbox');
+                checkbox.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    icon.style.opacity = '1';
+                });
 
-    // preset selector
-    document.getElementById("filterPreset").addEventListener("change", (e)=>{
-      const v = e.target.value;
-      applyPreset(v);
-    });
+                tasksList.appendChild(item);
+            });
+        }
 
-    // custom dates change => set preset to custom
-    document.getElementById("rangeFrom").addEventListener("change", ()=>{
-      document.getElementById("filterPreset").value = "custom";
-      renderAll();
-    });
-    document.getElementById("rangeTo").addEventListener("change", ()=>{
-      document.getElementById("filterPreset").value = "custom";
-      renderAll();
-    });
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
 
-    const salaryDay = document.getElementById("salaryDay");
-    salaryDay.addEventListener("blur", () => {
-      salaryDay.value = clampInt(Number(salaryDay.value || 1), 1, 28);
-    });
+        // Event Listeners
+        addBtn.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
 
-    if(!state.settings.enableExpenses && !state.settings.enableIncome){
-      state.settings.enableExpenses = true;
-    }
-    if(state.currentType === "expense" && !state.settings.enableExpenses) state.currentType = "income";
-    if(state.currentType === "income" && !state.settings.enableIncome) state.currentType = "expense";
-
-    setType(state.currentType, true);
-    syncSettingsUI();
-    applyTypeAvailability();
-    renderAll();
-
-    // show where we loaded from (silent useful debug)
-    // notify("Dati: " + res.source);
-  }
-
-  window.addEventListener("load", init);
-</script>
+        // Primo avvio
+        renderTasks();
+    </script>
 </body>
 </html>
