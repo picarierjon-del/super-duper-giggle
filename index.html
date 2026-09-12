@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agenda Comando Generale</title>
-    <!-- Meta per iOS Web App -->
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Comando Gen">
-    
-    <!-- Google Fonts & Icons -->
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -26,6 +25,7 @@
             --purple: #af52de;
             --border-color: #e5e5ea;
             --input-bg: #f2f2f7;
+            --appointment: #5856d6;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -41,6 +41,7 @@
                 --purple: #bf5af2;
                 --border-color: #38383a;
                 --input-bg: #2c2c2e;
+                --appointment: #5e5ce6;
             }
         }
 
@@ -105,9 +106,7 @@
             transition: transform 0.2s;
         }
 
-        .icon-btn:active {
-            transform: scale(0.9);
-        }
+        .icon-btn:active { transform: scale(0.9); }
 
         .date-display {
             font-size: 12px;
@@ -117,7 +116,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Selettore di Data Operativa */
         .date-picker-bar {
             background: var(--card-bg);
             padding: 10px 14px;
@@ -125,6 +123,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
 
@@ -135,18 +134,20 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .date-picker-bar input[type="date"] {
             border: none;
             background: var(--input-bg);
-            padding: 6px 10px;
+            padding: 8px 10px;
             border-radius: 8px;
             font-size: 13px;
             color: var(--text-main);
             font-weight: 600;
             outline: none;
             color-scheme: dark light;
+            min-width: 140px;
         }
 
         .btn-reset-date {
@@ -159,7 +160,6 @@
             padding: 4px 6px;
         }
 
-        /* Pannello KPI / Stato Generale */
         .kpi-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -188,7 +188,6 @@
             text-transform: uppercase;
         }
 
-        /* Search Bar */
         .search-bar {
             background: var(--card-bg);
             padding: 10px 14px;
@@ -208,11 +207,8 @@
             outline: none;
         }
 
-        .search-bar i {
-            color: var(--text-secondary);
-        }
+        .search-bar i { color: var(--text-secondary); }
 
-        /* Box In Arrivo */
         .upcoming-box {
             background: linear-gradient(135deg, #1c1c1e 0%, #3a3a3c 100%);
             border-radius: 16px;
@@ -237,7 +233,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-height: 140px;
+            max-height: 160px;
             overflow-y: auto;
         }
 
@@ -250,6 +246,7 @@
             justify-content: space-between;
             align-items: center;
             font-size: 12px;
+            gap: 10px;
         }
 
         .upcoming-info {
@@ -270,7 +267,6 @@
             flex-shrink: 0;
         }
 
-        /* Input Card Comando */
         .input-card {
             background: var(--card-bg);
             padding: 14px;
@@ -282,7 +278,8 @@
         }
 
         .type-selector {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             background: var(--input-bg);
             padding: 3px;
             border-radius: 10px;
@@ -290,11 +287,10 @@
         }
 
         .type-btn {
-            flex: 1;
             border: none;
             background: transparent;
-            padding: 7px;
-            font-size: 11px;
+            padding: 7px 4px;
+            font-size: 10.5px;
             font-weight: 600;
             color: var(--text-secondary);
             border-radius: 8px;
@@ -328,36 +324,40 @@
             font-size: 14px;
             color: var(--text-main);
             outline: none;
+            min-width: 0;
+        }
+
+        .input-card select { max-width: 130px; }
+
+        .input-card input[type="time"],
+        .input-card input[type="date"] {
             color-scheme: dark light;
         }
 
-        .input-card select {
-            max-width: 130px;
-        }
-
-        .input-card button.submit-btn {
+        .submit-btn {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 0 16px;
+            padding: 11px 16px;
             border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            width: 100%;
             transition: opacity 0.2s, transform 0.2s;
         }
 
-        .input-card button.submit-btn:active {
-            transform: scale(0.95);
-        }
+        .submit-btn:active { transform: scale(0.97); }
 
-        /* Filtri Tab Rapidi */
         .filter-tabs {
             display: flex;
             gap: 6px;
             overflow-x: auto;
             padding-bottom: 2px;
+            scrollbar-width: none;
         }
+
+        .filter-tabs::-webkit-scrollbar { display: none; }
 
         .filter-tab {
             background: var(--card-bg);
@@ -378,7 +378,6 @@
             color: var(--card-bg);
         }
 
-        /* Sezione Liste Impegni */
         .section-title {
             font-size: 15px;
             font-weight: 600;
@@ -402,7 +401,7 @@
             font-size: 13px;
             font-weight: 700;
             color: var(--text-secondary);
-            margin: 6px 0 2px 4px;
+            margin: 8px 0 2px 4px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -466,8 +465,9 @@
         .task-details {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
             overflow: hidden;
+            flex: 1;
         }
 
         .task-text {
@@ -478,11 +478,24 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            flex-wrap: wrap;
         }
 
         .task-meta {
             font-size: 11px;
             color: var(--text-secondary);
+        }
+
+        .time-badge {
+            min-width: 48px;
+            text-align: center;
+            background: rgba(88, 86, 214, 0.12);
+            color: var(--appointment);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 7px;
+            border-radius: 8px;
+            flex-shrink: 0;
         }
 
         .priority-dot {
@@ -491,6 +504,7 @@
             border-radius: 50%;
             flex-shrink: 0;
         }
+
         .priority-high { background-color: var(--danger); }
         .priority-medium { background-color: var(--warning); }
         .priority-low { background-color: var(--success); }
@@ -502,10 +516,11 @@
             font-weight: 600;
             text-transform: uppercase;
         }
+
         .tag-pill.routine { background: rgba(0,122,255,0.1); color: var(--accent); }
+        .tag-pill.appointment { background: rgba(88,86,214,0.12); color: var(--appointment); }
         .tag-pill.deadline { background: rgba(255,149,0,0.1); color: var(--warning); }
-        .tag-pill.timed { background: rgba(175,82,222,0.1); color: var(--purple); }
-        .tag-pill.birthday { background: rgba(255,45,85,0.1); color: var(--danger); }
+        .tag-pill.birthday { background: rgba(175,82,222,0.1); color: var(--purple); }
 
         .delete-btn {
             background: none;
@@ -517,9 +532,7 @@
             transition: color 0.2s;
         }
 
-        .delete-btn:hover {
-            color: var(--danger);
-        }
+        .delete-btn:hover { color: var(--danger); }
 
         .empty-state {
             text-align: center;
@@ -528,7 +541,6 @@
             font-size: 13px;
         }
 
-        /* Sezione Gestione Fissa */
         .management-section {
             background: var(--card-bg);
             border-radius: 16px;
@@ -536,7 +548,7 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             margin-top: 10px;
         }
-        
+
         .management-header {
             font-size: 14px;
             font-weight: 600;
@@ -557,13 +569,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
             padding: 8px 10px;
             background: var(--input-bg);
             border-radius: 8px;
             font-size: 12px;
         }
 
-        /* Modale Comando */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -604,13 +616,11 @@
             overflow-y: auto;
         }
 
-        .modal-overlay.active .modal-card {
-            transform: scale(1);
-        }
+        .modal-overlay.active .modal-card { transform: scale(1); }
 
         .modal-card h3 { font-size: 18px; font-weight: 600; }
         .modal-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-        
+
         .modal-buttons {
             display: flex;
             flex-direction: column;
@@ -628,11 +638,11 @@
             cursor: pointer;
             text-align: center;
         }
+
         .btn-action { background: var(--input-bg); color: var(--text-main); }
         .btn-primary { background: var(--accent); color: white; }
         .btn-danger { background: var(--danger); color: white; }
 
-        /* Stili per il gestore routine nel modale */
         .routine-manager-box {
             background: var(--input-bg);
             border-radius: 12px;
@@ -642,6 +652,7 @@
             gap: 8px;
             margin-top: 4px;
         }
+
         .routine-manager-box h4 {
             font-size: 13px;
             font-weight: 600;
@@ -650,6 +661,7 @@
             align-items: center;
             gap: 6px;
         }
+
         .routine-preset-list {
             display: flex;
             flex-direction: column;
@@ -657,6 +669,7 @@
             max-height: 100px;
             overflow-y: auto;
         }
+
         .routine-preset-item {
             display: flex;
             justify-content: space-between;
@@ -666,711 +679,1087 @@
             border-radius: 6px;
             font-size: 11px;
         }
+
+        @media (max-width: 390px) {
+            .date-picker-bar { align-items: flex-start; flex-direction: column; }
+            .date-picker-bar > div { width: 100%; }
+            .date-picker-bar input[type="date"] { flex: 1; width: 100%; }
+            .type-selector { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
+
 <body>
+<div class="app-container">
 
-    <div class="app-container">
-        <header>
-            <div>
-                <div class="date-display" id="currentDateHeader"></div>
-                <h1>Quartier Generale</h1>
-            </div>
-            <div class="header-actions">
-                <button class="icon-btn" id="settingsBtn" title="Pannello Comando"><i class="fa-solid fa-sliders"></i></button>
-            </div>
-        </header>
-
-        <!-- Selettore di Data Operativa -->
-        <div class="date-picker-bar">
-            <label for="targetDateSelect"><i class="fa-solid fa-calendar-days"></i> Data Operativa:</label>
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <input type="date" id="targetDateSelect">
-                <button class="btn-reset-date" id="resetDateBtn" title="Torna a Oggi">Oggi</button>
-            </div>
+    <header>
+        <div>
+            <div class="date-display" id="currentDateHeader"></div>
+            <h1>Quartier Generale</h1>
         </div>
-
-        <!-- Pannello KPI Strategico -->
-        <div class="kpi-container">
-            <div class="kpi-card">
-                <div class="kpi-value" id="kpiTotal">0</div>
-                <div class="kpi-label">Totali Giorno</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-value" id="kpiDone" style="color: var(--success);">0</div>
-                <div class="kpi-label">Eseguiti</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-value" id="kpiUrgent" style="color: var(--danger);">0</div>
-                <div class="kpi-label">Critici / Urgenti</div>
-            </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="settingsBtn" title="Pannello Comando">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
         </div>
+    </header>
 
-        <!-- Barra di Ricerca Tattica -->
-        <div class="search-bar">
-            <i class="fa-solid fa-crosshairs"></i>
-            <input type="text" id="searchInput" placeholder="Cerca nel database operativo..." autocomplete="off">
-        </div>
-
-        <!-- Box In Arrivo Strategico -->
-        <div class="upcoming-box">
-            <div class="upcoming-header"><i class="fa-solid fa-radar"></i> In arrivo (Prossimi eventi critici)</div>
-            <div class="upcoming-list" id="upcomingList"></div>
-        </div>
-
-        <!-- Card Inserimento Operativo -->
-        <div class="input-card">
-            <div class="type-selector">
-                <button class="type-btn active" data-type="routine">Giornaliero</button>
-                <button class="type-btn" data-type="timed">Impegno Orario</button>
-                <button class="type-btn" data-type="deadline">Scadenza</button>
-                <button class="type-btn" data-type="birthday">Compleanno</button>
-            </div>
-            
-            <div class="form-fields">
-                <div class="input-group">
-                    <input type="text" id="taskInput" placeholder="Nuova abitudine fissa..." autocomplete="off">
-                    <select id="taskPriority">
-                        <option value="low">Bassa</option>
-                        <option value="medium" selected>Media</option>
-                        <option value="high">Alta (Critica)</option>
-                    </select>
-                </div>
-                
-                <!-- Gruppo Data per Scadenze e Compleanni -->
-                <div class="input-group" id="dateInputGroup" style="display: none;">
-                    <input type="date" id="taskDate">
-                </div>
-
-                <!-- Gruppo Orario e Data per Impegni Orari con Notifica -2h -->
-                <div class="input-group" id="timedInputGroup" style="display: none;">
-                    <input type="date" id="timedDate">
-                    <input type="time" id="timedTime" style="max-width: 120px;">
-                </div>
-
-                <div>
-                    <button class="submit-btn" id="addBtn" style="width: 100%; padding: 10px;"><i class="fa-solid fa-plus"></i> Registra Elemento</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filtri Rapidi per Categoria -->
-        <div class="filter-tabs">
-            <button class="filter-tab active" data-filter="all">Tutti</button>
-            <button class="filter-tab" data-filter="routine">Giornalieri</button>
-            <button class="filter-tab" data-filter="timed">Orari</button>
-            <button class="filter-tab" data-filter="deadline">Scadenze</button>
-            <button class="filter-tab" data-filter="birthday">Compleanni</button>
-        </div>
-
-        <div class="section-title">
-            <span id="sectionTitleText">Operazioni Selezionate</span>
-            <span class="badge-count" id="taskCount">0</span>
-        </div>
-        
-        <!-- Lista Impegni Selezionati -->
-        <div class="tasks-list" id="tasksList"></div>
-        
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="fa-solid fa-check-double" style="font-size: 32px; margin-bottom: 6px; color: var(--success);"></i>
-            <p>Nessuna operazione programmata per questa data.</p>
-        </div>
-
-        <!-- Sezione Gestione Fissa -->
-        <div class="management-section">
-            <div class="management-header"><i class="fa-solid fa-vault"></i> Archivio Impegni Orari, Scadenze & Compleanni</div>
-            <div class="sub-list" id="permanentList"></div>
+    <div class="date-picker-bar">
+        <label for="targetDateSelect">
+            <i class="fa-solid fa-calendar-days"></i>
+            Giorno Agenda
+        </label>
+        <div style="display:flex;align-items:center;gap:6px;">
+            <input type="date" id="targetDateSelect">
+            <button class="btn-reset-date" id="resetDateBtn">Oggi</button>
         </div>
     </div>
 
-    <!-- Modale Pannello di Controllo -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal-card">
-            <h3>Centro Comando & Manutenzione</h3>
-            <p>Configura i protocolli, crea le routine giornaliere fisse o gestisci i backup protetti.</p>
-            
-            <!-- Sezione Configurazione Routine Fisse -->
-            <div class="routine-manager-box">
-                <h4><i class="fa-solid fa-list-check"></i> Gestore Routine Fisse Giornaliere</h4>
-                <div style="display: flex; gap: 4px;">
-                    <input type="text" id="newRoutineName" placeholder="Nuova abitudine fissa..." style="flex:1; border:none; background:var(--card-bg); padding:6px 8px; border-radius:6px; font-size:12px; color:var(--text-main); outline:none;">
-                    <select id="newRoutineSlot" style="border:none; background:var(--card-bg); padding:6px; border-radius:6px; font-size:11px; color:var(--text-main); outline:none;">
-                        <option value="mattina">☀️ Mattina</option>
-                        <option value="sera">🌙 Sera</option>
-                    </select>
-                    <button class="btn-primary" id="addRoutinePresetBtn" style="border:none; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
-                </div>
-                <div class="routine-preset-list" id="routinePresetList"></div>
-            </div>
-
-            <div class="modal-buttons">
-                <button class="btn-modal btn-primary" id="notifBtn"><i class="fa-solid fa-bell"></i> Attiva Canale Notifiche</button>
-                <button class="btn-modal btn-action" id="exportBtn"><i class="fa-solid fa-download"></i> Esporta Database Backup (.json)</button>
-                <label class="btn-modal btn-action" style="display:inline-block; cursor:pointer; text-align:center; padding-top:10px;">
-                    <i class="fa-solid fa-upload"></i> Importa Database <input type="file" id="importFile" accept=".json" style="display:none;">
-                </label>
-                <button class="btn-modal btn-danger" id="clearDataBtn">Pulizia Registri Passati</button>
-                <button class="btn-modal btn-action" id="closeModal" style="margin-top: 4px;">Chiudi Pannello</button>
-            </div>
+    <div class="kpi-container">
+        <div class="kpi-card">
+            <div class="kpi-value" id="kpiTotal">0</div>
+            <div class="kpi-label">Totali Giorno</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value" id="kpiDone" style="color:var(--success);">0</div>
+            <div class="kpi-label">Eseguiti</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value" id="kpiUrgent" style="color:var(--danger);">0</div>
+            <div class="kpi-label">Urgenti</div>
         </div>
     </div>
 
-    <script>
-        const taskInput = document.getElementById('taskInput');
-        const taskDate = document.getElementById('taskDate');
-        const timedDate = document.getElementById('timedDate');
-        const timedTime = document.getElementById('timedTime');
-        const taskPriority = document.getElementById('taskPriority');
-        const addBtn = document.getElementById('addBtn');
-        const dateInputGroup = document.getElementById('dateInputGroup');
-        const timedInputGroup = document.getElementById('timedInputGroup');
-        const searchInput = document.getElementById('searchInput');
-        
-        const targetDateSelect = document.getElementById('targetDateSelect');
-        const resetDateBtn = document.getElementById('resetDateBtn');
-        const currentDateHeader = document.getElementById('currentDateHeader');
-        const sectionTitleText = document.getElementById('sectionTitleText');
+    <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Cerca nella giornata..." autocomplete="off">
+    </div>
 
-        const tasksList = document.getElementById('tasksList');
-        const upcomingList = document.getElementById('upcomingList');
-        const permanentList = document.getElementById('permanentList');
-        const emptyState = document.getElementById('emptyState');
-        const taskCount = document.getElementById('taskCount');
-        
-        // KPI Elements
-        const kpiTotal = document.getElementById('kpiTotal');
-        const kpiDone = document.getElementById('kpiDone');
-        const kpiUrgent = document.getElementById('kpiUrgent');
-        
-        const settingsBtn = document.getElementById('settingsBtn');
-        const settingsModal = document.getElementById('settingsModal');
-        const closeModal = document.getElementById('closeModal');
-        const clearDataBtn = document.getElementById('clearDataBtn');
-        const notifBtn = document.getElementById('notifBtn');
-        const exportBtn = document.getElementById('exportBtn');
-        const importFile = document.getElementById('importFile');
+    <div class="upcoming-box">
+        <div class="upcoming-header">
+            <i class="fa-solid fa-clock"></i>
+            Prossimi appuntamenti e scadenze
+        </div>
+        <div class="upcoming-list" id="upcomingList"></div>
+    </div>
 
-        // Routine Manager Inputs nel Modale
-        const newRoutineName = document.getElementById('newRoutineName');
-        const newRoutineSlot = document.getElementById('newRoutineSlot');
-        const addRoutinePresetBtn = document.getElementById('addRoutinePresetBtn');
-        const routinePresetList = document.getElementById('routinePresetList');
+    <div class="input-card">
+        <div class="type-selector">
+            <button class="type-btn active" data-type="appointment">Impegno</button>
+            <button class="type-btn" data-type="routine">Giornaliero</button>
+            <button class="type-btn" data-type="deadline">Scadenza</button>
+            <button class="type-btn" data-type="birthday">Compleanno</button>
+        </div>
 
-        const typeButtons = document.querySelectorAll('.type-btn');
-        const filterTabs = document.querySelectorAll('.filter-tab');
-        let currentType = 'routine';
-        let currentFilter = 'all';
+        <div class="form-fields">
+            <div class="input-group">
+                <input type="text" id="taskInput" placeholder="Nuovo impegno..." autocomplete="off">
+                <select id="taskPriority">
+                    <option value="low">Bassa</option>
+                    <option value="medium" selected>Media</option>
+                    <option value="high">Alta</option>
+                </select>
+            </div>
 
-        const today = new Date();
-        const todayString = today.toISOString().split('T')[0];
-        targetDateSelect.value = todayString;
+            <div class="input-group" id="appointmentFields">
+                <input type="date" id="appointmentDate">
+                <input type="time" id="appointmentTime">
+            </div>
+
+            <div class="input-group" id="routineSubGroup" style="display:none;">
+                <select id="routineTimeSlot" style="max-width:100%;">
+                    <option value="mattina">âï¸ Sessione Mattutina</option>
+                    <option value="sera">ð Sessione Serale</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="dateInputGroup" style="display:none;">
+                <input type="date" id="taskDate">
+            </div>
+
+            <button class="submit-btn" id="addBtn">
+                <i class="fa-solid fa-plus"></i> Registra Impegno
+            </button>
+        </div>
+    </div>
+
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">Tutti</button>
+        <button class="filter-tab" data-filter="appointment">Impegni</button>
+        <button class="filter-tab" data-filter="routine">Giornalieri</button>
+        <button class="filter-tab" data-filter="deadline">Scadenze</button>
+        <button class="filter-tab" data-filter="birthday">Compleanni</button>
+    </div>
+
+    <div class="section-title">
+        <span id="sectionTitleText">Agenda del giorno</span>
+        <span class="badge-count" id="taskCount">0</span>
+    </div>
+
+    <div class="tasks-list" id="tasksList"></div>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+        <i class="fa-solid fa-calendar-check" style="font-size:32px;margin-bottom:6px;color:var(--success);"></i>
+        <p>Nessun elemento programmato per questa giornata.</p>
+    </div>
+
+    <div class="management-section">
+        <div class="management-header">
+            <i class="fa-solid fa-vault"></i>
+            Archivio Eventi Fissi
+        </div>
+        <div class="sub-list" id="permanentList"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal-card">
+        <h3>Centro Comando & Manutenzione</h3>
+        <p>Configura routine fisse, notifiche e backup.</p>
+
+        <div class="routine-manager-box">
+            <h4><i class="fa-solid fa-list-check"></i> Gestore Routine Fisse</h4>
+
+            <div style="display:flex;gap:4px;">
+                <input
+                    type="text"
+                    id="newRoutineName"
+                    placeholder="Nuova abitudine..."
+                    style="flex:1;border:none;background:var(--card-bg);padding:6px 8px;border-radius:6px;font-size:12px;color:var(--text-main);outline:none;"
+                >
+
+                <select
+                    id="newRoutineSlot"
+                    style="border:none;background:var(--card-bg);padding:6px;border-radius:6px;font-size:11px;color:var(--text-main);outline:none;"
+                >
+                    <option value="mattina">âï¸ Mattina</option>
+                    <option value="sera">ð Sera</option>
+                </select>
+
+                <button
+                    class="btn-primary"
+                    id="addRoutinePresetBtn"
+                    style="border:none;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+
+            <div class="routine-preset-list" id="routinePresetList"></div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="btn-modal btn-primary" id="notifBtn">
+                <i class="fa-solid fa-bell"></i> Attiva Notifiche
+            </button>
+
+            <button class="btn-modal btn-action" id="exportBtn">
+                <i class="fa-solid fa-download"></i> Esporta Backup (.json)
+            </button>
+
+            <label class="btn-modal btn-action" style="display:inline-block;cursor:pointer;text-align:center;padding-top:10px;">
+                <i class="fa-solid fa-upload"></i>
+                Importa Database
+                <input type="file" id="importFile" accept=".json" style="display:none;">
+            </label>
+
+            <button class="btn-modal btn-danger" id="clearDataBtn">
+                Pulizia Registri Passati
+            </button>
+
+            <button class="btn-modal btn-action" id="closeModal" style="margin-top:4px;">
+                Chiudi Pannello
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'agenda_general_data_v4';
+
+    const taskInput = document.getElementById('taskInput');
+    const taskDate = document.getElementById('taskDate');
+    const taskPriority = document.getElementById('taskPriority');
+    const routineTimeSlot = document.getElementById('routineTimeSlot');
+    const appointmentDate = document.getElementById('appointmentDate');
+    const appointmentTime = document.getElementById('appointmentTime');
+
+    const addBtn = document.getElementById('addBtn');
+
+    const dateInputGroup = document.getElementById('dateInputGroup');
+    const routineSubGroup = document.getElementById('routineSubGroup');
+    const appointmentFields = document.getElementById('appointmentFields');
+
+    const searchInput = document.getElementById('searchInput');
+
+    const targetDateSelect = document.getElementById('targetDateSelect');
+    const resetDateBtn = document.getElementById('resetDateBtn');
+    const currentDateHeader = document.getElementById('currentDateHeader');
+    const sectionTitleText = document.getElementById('sectionTitleText');
+
+    const tasksList = document.getElementById('tasksList');
+    const upcomingList = document.getElementById('upcomingList');
+    const permanentList = document.getElementById('permanentList');
+    const emptyState = document.getElementById('emptyState');
+    const taskCount = document.getElementById('taskCount');
+
+    const kpiTotal = document.getElementById('kpiTotal');
+    const kpiDone = document.getElementById('kpiDone');
+    const kpiUrgent = document.getElementById('kpiUrgent');
+
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeModal = document.getElementById('closeModal');
+    const clearDataBtn = document.getElementById('clearDataBtn');
+    const notifBtn = document.getElementById('notifBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const importFile = document.getElementById('importFile');
+
+    const newRoutineName = document.getElementById('newRoutineName');
+    const newRoutineSlot = document.getElementById('newRoutineSlot');
+    const addRoutinePresetBtn = document.getElementById('addRoutinePresetBtn');
+    const routinePresetList = document.getElementById('routinePresetList');
+
+    const typeButtons = document.querySelectorAll('.type-btn');
+    const filterTabs = document.querySelectorAll('.filter-tab');
+
+    let currentType = 'appointment';
+    let currentFilter = 'all';
+
+    function localDateString(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    const todayString = localDateString();
+
+    targetDateSelect.value = todayString;
+    appointmentDate.value = todayString;
+    taskDate.value = todayString;
+
+    function loadAppData() {
+        const current = localStorage.getItem(STORAGE_KEY);
+        if (current) {
+            try {
+                const parsed = JSON.parse(current);
+                if (!parsed.tasks) parsed.tasks = [];
+                if (!parsed.hiddenToday) parsed.hiddenToday = {};
+                if (!parsed.completedCount) parsed.completedCount = {};
+                return parsed;
+            } catch (e) {}
+        }
+
+        // Migrazione automatica dalla versione precedente.
+        const old = localStorage.getItem('agenda_general_data_v3');
+        if (old) {
+            try {
+                const migrated = JSON.parse(old);
+                if (!migrated.tasks) migrated.tasks = [];
+                if (!migrated.hiddenToday) migrated.hiddenToday = {};
+                if (!migrated.completedCount) migrated.completedCount = {};
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+                return migrated;
+            } catch (e) {}
+        }
+
+        return {
+            lastDate: todayString,
+            tasks: [
+                {
+                    id: 101,
+                    text: "Lavare i denti ðª¥",
+                    type: 'routine',
+                    routineSlot: 'mattina',
+                    priority: 'medium',
+                    date: null,
+                    time: null
+                },
+                {
+                    id: 102,
+                    text: "Lavare i denti ðª¥",
+                    type: 'routine',
+                    routineSlot: 'sera',
+                    priority: 'medium',
+                    date: null,
+                    time: null
+                }
+            ],
+            hiddenToday: {},
+            completedCount: {}
+        };
+    }
+
+    let appData = loadAppData();
+
+    function saveAppData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        renderApp();
+        renderRoutineManagerList();
+    }
+
+    function setType(type) {
+        currentType = type;
 
         typeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                typeButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentType = btn.getAttribute('data-type');
-
-                // Gestione visibilità campi inserimento
-                dateInputGroup.style.display = 'none';
-                timedInputGroup.style.display = 'none';
-
-                if (currentType === 'routine') {
-                    taskInput.placeholder = "Nuova abitudine (es. Lavare i denti 🪥)...";
-                } else if (currentType === 'timed') {
-                    timedInputGroup.style.display = 'flex';
-                    taskInput.placeholder = "Oggetto dell'impegno orario...";
-                    if(!timedDate.value) timedDate.value = targetDateSelect.value;
-                    if(!timedTime.value) timedTime.value = "12:00";
-                } else if (currentType === 'deadline') {
-                    dateInputGroup.style.display = 'flex';
-                    taskInput.placeholder = "Oggetto della scadenza...";
-                    if(!taskDate.value) taskDate.value = targetDateSelect.value;
-                } else if (currentType === 'birthday') {
-                    dateInputGroup.style.display = 'flex';
-                    taskInput.placeholder = "Nome del festeggiato...";
-                    if(!taskDate.value) taskDate.value = targetDateSelect.value;
-                }
-            });
+            btn.classList.toggle('active', btn.dataset.type === type);
         });
 
-        filterTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                filterTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentFilter = tab.getAttribute('data-filter');
-                renderApp();
-            });
-        });
+        appointmentFields.style.display = type === 'appointment' ? 'flex' : 'none';
+        routineSubGroup.style.display = type === 'routine' ? 'flex' : 'none';
+        dateInputGroup.style.display = (type === 'deadline' || type === 'birthday') ? 'flex' : 'none';
 
-        targetDateSelect.addEventListener('change', renderApp);
-        resetDateBtn.addEventListener('click', () => {
-            targetDateSelect.value = todayString;
+        if (type === 'appointment') {
+            taskInput.placeholder = 'Nuovo impegno...';
+            addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Registra Impegno';
+            appointmentDate.value = targetDateSelect.value || todayString;
+            if (!appointmentTime.value) appointmentTime.value = '09:00';
+        }
+
+        if (type === 'routine') {
+            taskInput.placeholder = 'Nuova abitudine giornaliera...';
+            addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Registra Abitudine';
+        }
+
+        if (type === 'deadline') {
+            taskInput.placeholder = 'Oggetto della scadenza...';
+            addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Registra Scadenza';
+            taskDate.value = targetDateSelect.value || todayString;
+        }
+
+        if (type === 'birthday') {
+            taskInput.placeholder = 'Nome del festeggiato...';
+            addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Registra Compleanno';
+            taskDate.value = targetDateSelect.value || todayString;
+        }
+    }
+
+    typeButtons.forEach(btn => {
+        btn.addEventListener('click', () => setType(btn.dataset.type));
+    });
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentFilter = tab.dataset.filter;
             renderApp();
         });
+    });
 
-        function loadAppData() {
-            let data = JSON.parse(localStorage.getItem('agenda_general_data_v4')) || { 
-                lastDate: todayString, 
-                tasks: [
-                    { id: 101, text: "Lavare i denti 🪥", type: 'routine', routineSlot: 'mattina', priority: 'medium', date: null },
-                    { id: 102, text: "Lavare i denti 🪥", type: 'routine', routineSlot: 'sera', priority: 'medium', date: null }
-                ], 
-                hiddenToday: {}, 
-                completedCount: {} 
-            };
-            if (!data.hiddenToday) data.hiddenToday = {};
-            if (!data.completedCount) data.completedCount = {};
-            return data;
-        }
+    targetDateSelect.addEventListener('change', () => {
+        const selected = targetDateSelect.value;
 
-        let appData = loadAppData();
-
-        function saveAppData() {
-            localStorage.setItem('agenda_general_data_v4', JSON.stringify(appData));
-            renderApp();
-            renderRoutineManagerList();
-        }
-
-        function addItem() {
-            const text = taskInput.value.trim();
-            if (text === '') return;
-
-            let newItem = {
-                id: Date.now(),
-                text: text,
-                type: currentType,
-                priority: taskPriority.value,
-                routineSlot: null,
-                date: null,
-                time: null,
-                notified: false
-            };
-
-            if (currentType === 'routine') {
-                // Per default le routine inserite da principale vanno assegnate casualmente o a mattina (assegniamo mattina di default, gestibile da gestore fisse)
-                newItem.routineSlot = 'mattina';
-            } else if (currentType === 'timed') {
-                newItem.date = timedDate.value;
-                newItem.time = timedTime.value;
-                if (!newItem.date || !newItem.time) {
-                    alert("Seleziona data e orario validi per l'impegno!");
-                    return;
-                }
-            } else if (currentType === 'deadline' || currentType === 'birthday') {
-                newItem.date = taskDate.value;
-                if (!newItem.date) {
-                    alert("Seleziona una data valida per l'elemento!");
-                    return;
-                }
+        // Il calendario Ã¨ il filtro principale e anche la data predefinita
+        // per i nuovi impegni/scadenze.
+        if (selected) {
+            appointmentDate.value = selected;
+            if (currentType === 'deadline' || currentType === 'birthday') {
+                taskDate.value = selected;
             }
-
-            appData.tasks.push(newItem);
-            taskInput.value = '';
-            saveAppData();
         }
 
-        // Aggiunta rapida di routine fissa dalle impostazioni
-        function addRoutinePreset() {
-            const name = newRoutineName.value.trim();
-            if(!name) return;
-            let newItem = {
-                id: Date.now(),
-                text: name,
-                type: 'routine',
-                priority: 'medium',
-                routineSlot: newRoutineSlot.value,
-                date: null,
-                time: null
-            };
-            appData.tasks.push(newItem);
-            newRoutineName.value = '';
-            saveAppData();
+        renderApp();
+    });
+
+    resetDateBtn.addEventListener('click', () => {
+        targetDateSelect.value = todayString;
+        appointmentDate.value = todayString;
+
+        if (currentType === 'deadline' || currentType === 'birthday') {
+            taskDate.value = todayString;
         }
 
-        function completeTask(id, type, selectedDate) {
-            const taskElement = document.getElementById(`task-${id}`);
-            if(taskElement) taskElement.classList.add('completing');
+        renderApp();
+    });
 
-            setTimeout(() => {
-                if (!appData.hiddenToday[selectedDate]) appData.hiddenToday[selectedDate] = [];
-                if (!appData.hiddenToday[selectedDate].includes(id)) {
-                    appData.hiddenToday[selectedDate].push(id);
-                }
-                
-                if (!appData.completedCount[selectedDate]) appData.completedCount[selectedDate] = 0;
-                appData.completedCount[selectedDate]++;
+    function addItem() {
+        const text = taskInput.value.trim();
+        if (!text) return;
 
-                saveAppData();
-            }, 400);
-        }
+        let newItem = {
+            id: Date.now(),
+            text,
+            type: currentType,
+            priority: taskPriority.value,
+            routineSlot: null,
+            date: null,
+            time: null
+        };
 
-        function deletePermanentItem(id) {
-            appData.tasks = appData.tasks.filter(t => t.id !== id);
-            Object.keys(appData.hiddenToday).forEach(dateKey => {
-                appData.hiddenToday[dateKey] = appData.hiddenToday[dateKey].filter(hiddenId => hiddenId !== id);
-            });
-            saveAppData();
-        }
-
-        function renderRoutineManagerList() {
-            routinePresetList.innerHTML = '';
-            let routines = appData.tasks.filter(t => t.type === 'routine');
-            if(routines.length === 0) {
-                routinePresetList.innerHTML = `<div style="font-size:11px; color:var(--text-secondary); text-align:center;">Nessuna routine configurata.</div>`;
-                return;
-            }
-            routines.forEach(r => {
-                let slotLabel = r.routineSlot === 'mattina' ? '☀️ Mattina' : '🌙 Sera';
-                const el = document.createElement('div');
-                el.className = 'routine-preset-item';
-                el.innerHTML = `
-                    <span><strong>${escapeHtml(r.text)}</strong> (${slotLabel})</span>
-                    <button class="delete-btn" onclick="deletePermanentItem(${r.id})" style="font-size:12px; padding:2px 4px;"><i class="fa-solid fa-trash-can"></i></button>
-                `;
-                routinePresetList.appendChild(el);
-            });
-        }
-
-        function updateUpcomingEvents() {
-            upcomingList.innerHTML = '';
-            let eventsList = [];
-            const nowTime = new Date(todayString).getTime();
-
-            appData.tasks.forEach(task => {
-                if (task.type === 'deadline' && task.date) {
-                    let dTime = new Date(task.date).getTime();
-                    let diffDays = Math.ceil((dTime - nowTime) / (1000 * 60 * 60 * 24));
-                    if (diffDays >= 0) {
-                        eventsList.push({ title: task.text, days: diffDays, label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`, priority: task.priority });
-                    }
-                } else if (task.type === 'timed' && task.date) {
-                    let tTime = new Date(task.date).getTime();
-                    let diffDays = Math.ceil((tTime - nowTime) / (1000 * 60 * 60 * 24));
-                    if (diffDays >= 0) {
-                        eventsList.push({ title: `🕒 ${task.text} (${task.time})`, days: diffDays, label: diffDays === 0 ? `Oggi ${task.time}` : `Tra ${diffDays}g`, priority: task.priority });
-                    }
-                } else if (task.type === 'birthday' && task.date) {
-                    let bDateParts = task.date.split('-');
-                    let bMonth = parseInt(bDateParts[1]);
-                    let bDay = parseInt(bDateParts[2]);
-                    let bYear = parseInt(bDateParts[0]);
-
-                    let nextBday = new Date(today.getFullYear(), bMonth - 1, bDay);
-                    if (nextBday.getTime() < new Date(todayString).getTime()) {
-                        nextBday.setFullYear(today.getFullYear() + 1);
-                    }
-                    let diffDays = Math.ceil((nextBday.getTime() - nowTime) / (1000 * 60 * 60 * 24));
-                    let turningYears = nextBday.getFullYear() - bYear;
-
-                    eventsList.push({ title: `🎂 ${task.text} (${turningYears}a)`, days: diffDays, label: diffDays === 0 ? 'Oggi!' : `Tra ${diffDays}g`, priority: 'medium' });
-                }
-            });
-
-            eventsList.sort((a, b) => a.days - b.days);
-            let top5 = eventsList.slice(0, 5);
-
-            if (top5.length === 0) {
-                upcomingList.innerHTML = `<div style="font-size: 12px; opacity: 0.8; text-align: center; padding: 4px;">Nessuna operazione imminente in archivio.</div>`;
+        if (currentType === 'appointment') {
+            if (!appointmentDate.value) {
+                alert('Seleziona la data dellâimpegno.');
                 return;
             }
 
-            top5.forEach(ev => {
-                const el = document.createElement('div');
-                el.className = 'upcoming-item';
-                el.innerHTML = `
-                    <div class="upcoming-info">
-                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 11px; opacity: 0.8;"></i>
-                        <span>${escapeHtml(ev.title)}</span>
-                    </div>
-                    <span class="upcoming-badge">${ev.label}</span>
-                `;
-                upcomingList.appendChild(el);
-            });
+            if (!appointmentTime.value) {
+                alert('Seleziona lâorario dellâimpegno.');
+                return;
+            }
+
+            newItem.date = appointmentDate.value;
+            newItem.time = appointmentTime.value;
         }
 
-        // Sistema di controllo notifiche -2 ore in background
-        function checkNotifications() {
-            if (!("Notification" in window) || Notification.permission !== "granted") return;
+        if (currentType === 'routine') {
+            newItem.routineSlot = routineTimeSlot.value;
+        }
 
-            const now = new Date();
-            appData.tasks.forEach(task => {
-                if (task.type === 'timed' && task.date && task.time && !task.notified) {
-                    const taskDateTime = new Date(`${task.date}T${task.time}:00`);
-                    const notifyTime = new Date(taskDateTime.getTime() - (2 * 60 * 60 * 1000)); // 2 ore prima
+        if (currentType === 'deadline' || currentType === 'birthday') {
+            if (!taskDate.value) {
+                alert('Seleziona una data valida.');
+                return;
+            }
+            newItem.date = taskDate.value;
+        }
 
-                    if (now >= notifyTime && now < taskDateTime) {
-                        let priorityText = task.priority === 'high' ? '⚠️ ALTA PRIORITÀ: ' : '';
-                        new Notification("Quartier Generale - Promemoria Impegno", {
-                            body: `${priorityText}${task.text} è previsto per le ore ${task.time} (tra 2 ore)!`
-                        });
-                        task.notified = true;
-                        saveAppData();
-                    }
+        appData.tasks.push(newItem);
+
+        taskInput.value = '';
+
+        // Se inserisco un impegno su una data diversa,
+        // porto automaticamente l'agenda a quel giorno.
+        if (currentType === 'appointment') {
+            targetDateSelect.value = newItem.date;
+        }
+
+        saveAppData();
+    }
+
+    function addRoutinePreset() {
+        const name = newRoutineName.value.trim();
+        if (!name) return;
+
+        appData.tasks.push({
+            id: Date.now(),
+            text: name,
+            type: 'routine',
+            priority: 'medium',
+            routineSlot: newRoutineSlot.value,
+            date: null,
+            time: null
+        });
+
+        newRoutineName.value = '';
+        saveAppData();
+    }
+
+    function completeTask(id, selectedDate) {
+        const taskElement = document.getElementById(`task-${id}`);
+        if (taskElement) taskElement.classList.add('completing');
+
+        setTimeout(() => {
+            if (!appData.hiddenToday[selectedDate]) {
+                appData.hiddenToday[selectedDate] = [];
+            }
+
+            if (!appData.hiddenToday[selectedDate].includes(id)) {
+                appData.hiddenToday[selectedDate].push(id);
+            }
+
+            if (!appData.completedCount[selectedDate]) {
+                appData.completedCount[selectedDate] = 0;
+            }
+
+            appData.completedCount[selectedDate]++;
+
+            saveAppData();
+        }, 250);
+    }
+
+    function deletePermanentItem(id) {
+        appData.tasks = appData.tasks.filter(t => t.id !== id);
+
+        Object.keys(appData.hiddenToday).forEach(dateKey => {
+            appData.hiddenToday[dateKey] =
+                appData.hiddenToday[dateKey].filter(hiddenId => hiddenId !== id);
+        });
+
+        saveAppData();
+    }
+
+    function renderRoutineManagerList() {
+        routinePresetList.innerHTML = '';
+
+        const routines = appData.tasks.filter(t => t.type === 'routine');
+
+        if (!routines.length) {
+            routinePresetList.innerHTML =
+                '<div style="font-size:11px;color:var(--text-secondary);text-align:center;">Nessuna routine configurata.</div>';
+            return;
+        }
+
+        routines.forEach(r => {
+            const slotLabel = r.routineSlot === 'mattina' ? 'âï¸ Mattina' : 'ð Sera';
+
+            const el = document.createElement('div');
+            el.className = 'routine-preset-item';
+            el.innerHTML = `
+                <span><strong>${escapeHtml(r.text)}</strong> (${slotLabel})</span>
+                <button
+                    class="delete-btn"
+                    onclick="deletePermanentItem(${r.id})"
+                    style="font-size:12px;padding:2px 4px;"
+                >
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            `;
+
+            routinePresetList.appendChild(el);
+        });
+    }
+
+    function getEventDateTime(task) {
+        if (!task.date) return null;
+
+        if (task.type === 'appointment') {
+            return new Date(`${task.date}T${task.time || '00:00'}:00`);
+        }
+
+        return new Date(`${task.date}T00:00:00`);
+    }
+
+    function updateUpcomingEvents() {
+        upcomingList.innerHTML = '';
+
+        const now = new Date();
+        const eventsList = [];
+
+        appData.tasks.forEach(task => {
+            if (task.type === 'appointment' && task.date && task.time) {
+                const dt = getEventDateTime(task);
+
+                if (dt >= now) {
+                    const dayLabel =
+                        task.date === todayString
+                            ? 'Oggi'
+                            : new Date(`${task.date}T00:00:00`)
+                                .toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+
+                    eventsList.push({
+                        title: task.text,
+                        timestamp: dt.getTime(),
+                        label: `${dayLabel} Â· ${task.time}`,
+                        icon: 'fa-clock'
+                    });
                 }
-            });
+            }
+
+            if (task.type === 'deadline' && task.date) {
+                const dt = new Date(`${task.date}T23:59:59`);
+
+                if (dt >= now) {
+                    const diffMs =
+                        new Date(`${task.date}T00:00:00`) -
+                        new Date(`${todayString}T00:00:00`);
+
+                    const diffDays = Math.round(diffMs / 86400000);
+
+                    eventsList.push({
+                        title: task.text,
+                        timestamp: dt.getTime(),
+                        label: diffDays === 0 ? 'Scade oggi' : `Tra ${diffDays}g`,
+                        icon: 'fa-triangle-exclamation'
+                    });
+                }
+            }
+
+            if (task.type === 'birthday' && task.date) {
+                const parts = task.date.split('-');
+                const month = Number(parts[1]);
+                const day = Number(parts[2]);
+
+                let nextBirthday = new Date(now.getFullYear(), month - 1, day, 0, 0, 0);
+
+                const todayAtMidnight = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate()
+                );
+
+                if (nextBirthday < todayAtMidnight) {
+                    nextBirthday = new Date(now.getFullYear() + 1, month - 1, day, 0, 0, 0);
+                }
+
+                const diffDays = Math.round(
+                    (nextBirthday - todayAtMidnight) / 86400000
+                );
+
+                eventsList.push({
+                    title: `ð ${task.text}`,
+                    timestamp: nextBirthday.getTime(),
+                    label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`,
+                    icon: 'fa-cake-candles'
+                });
+            }
+        });
+
+        eventsList.sort((a, b) => a.timestamp - b.timestamp);
+
+        const top = eventsList.slice(0, 6);
+
+        if (!top.length) {
+            upcomingList.innerHTML =
+                '<div style="font-size:12px;opacity:0.8;text-align:center;padding:4px;">Nessun evento futuro registrato.</div>';
+            return;
         }
-        setInterval(checkNotifications, 30000); // Controlla ogni 30 secondi
 
-        function renderApp() {
-            tasksList.innerHTML = '';
-            permanentList.innerHTML = '';
+        top.forEach(ev => {
+            const el = document.createElement('div');
+            el.className = 'upcoming-item';
+            el.innerHTML = `
+                <div class="upcoming-info">
+                    <i class="fa-solid ${ev.icon}" style="font-size:11px;opacity:0.8;"></i>
+                    <span>${escapeHtml(ev.title)}</span>
+                </div>
+                <span class="upcoming-badge">${escapeHtml(ev.label)}</span>
+            `;
+            upcomingList.appendChild(el);
+        });
+    }
 
-            const selectedDate = targetDateSelect.value;
-            const optionsHeader = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            const dateObj = new Date(selectedDate + 'T00:00:00');
-            currentDateHeader.textContent = dateObj.toLocaleDateString('it-IT', optionsHeader);
-            sectionTitleText.textContent = `Operazioni per il ${dateObj.toLocaleDateString('it-IT', { day: 'numeric', month: 'long' })}`;
+    function matchesSelectedDay(task, selectedDate) {
+        if (task.type === 'routine') return true;
 
-            let selectedTasks = [];
-            let permanentItems = [];
-            let urgentCount = 0;
-            let searchQuery = searchInput.value.toLowerCase();
-            let hiddenListForDate = appData.hiddenToday[selectedDate] || [];
+        if (task.type === 'appointment') {
+            return task.date === selectedDate;
+        }
 
-            appData.tasks.forEach(task => {
-                if (task.type !== 'routine') {
-                    permanentItems.push(task);
+        if (task.type === 'deadline') {
+            return task.date === selectedDate;
+        }
+
+        if (task.type === 'birthday' && task.date) {
+            const taskParts = task.date.split('-');
+            const selectedParts = selectedDate.split('-');
+
+            return (
+                taskParts[1] === selectedParts[1] &&
+                taskParts[2] === selectedParts[2]
+            );
+        }
+
+        return false;
+    }
+
+    function getSortValue(task) {
+        if (task.type === 'appointment' && task.time) {
+            const [h, m] = task.time.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        if (task.type === 'deadline') return 1450;
+        if (task.type === 'birthday') return 1460;
+        return 1500;
+    }
+
+    function renderApp() {
+        tasksList.innerHTML = '';
+        permanentList.innerHTML = '';
+
+        const selectedDate = targetDateSelect.value || todayString;
+        const dateObj = new Date(`${selectedDate}T00:00:00`);
+
+        currentDateHeader.textContent = dateObj.toLocaleDateString(
+            'it-IT',
+            {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }
+        );
+
+        sectionTitleText.textContent =
+            `Agenda del ${dateObj.toLocaleDateString('it-IT', {
+                day: 'numeric',
+                month: 'long'
+            })}`;
+
+        const hiddenListForDate = appData.hiddenToday[selectedDate] || [];
+        const searchQuery = searchInput.value.trim().toLowerCase();
+
+        let selectedTasks = [];
+        const permanentItems = [];
+
+        appData.tasks.forEach(task => {
+            if (task.type === 'deadline' || task.type === 'birthday') {
+                permanentItems.push(task);
+            }
+
+            if (
+                matchesSelectedDay(task, selectedDate) &&
+                !hiddenListForDate.includes(task.id)
+            ) {
+                selectedTasks.push(task);
+            }
+        });
+
+        selectedTasks.sort((a, b) => {
+            if (a.type === 'appointment' && b.type !== 'appointment') return -1;
+            if (a.type !== 'appointment' && b.type === 'appointment') return 1;
+            return getSortValue(a) - getSortValue(b);
+        });
+
+        const completedForThisDate =
+            appData.completedCount[selectedDate] || 0;
+
+        const urgentCount = selectedTasks.filter(task => {
+            if (task.priority === 'high') return true;
+
+            if (task.type === 'deadline' && task.date === todayString) {
+                return true;
+            }
+
+            return false;
+        }).length;
+
+        kpiTotal.textContent =
+            selectedTasks.length + completedForThisDate;
+
+        kpiDone.textContent =
+            completedForThisDate;
+
+        kpiUrgent.textContent =
+            urgentCount;
+
+        if (currentFilter !== 'all') {
+            selectedTasks =
+                selectedTasks.filter(t => t.type === currentFilter);
+        }
+
+        if (searchQuery) {
+            selectedTasks =
+                selectedTasks.filter(t =>
+                    t.text.toLowerCase().includes(searchQuery)
+                );
+        }
+
+        taskCount.textContent = selectedTasks.length;
+
+        emptyState.style.display =
+            selectedTasks.length ? 'none' : 'block';
+
+        const appointmentTasks =
+            selectedTasks
+                .filter(t => t.type === 'appointment')
+                .sort((a, b) => getSortValue(a) - getSortValue(b));
+
+        const morningTasks =
+            selectedTasks.filter(
+                t => t.type === 'routine' && t.routineSlot === 'mattina'
+            );
+
+        const otherTasks =
+            selectedTasks.filter(
+                t => t.type === 'deadline' || t.type === 'birthday'
+            );
+
+        const eveningTasks =
+            selectedTasks.filter(
+                t => t.type === 'routine' && t.routineSlot === 'sera'
+            );
+
+        function renderTaskItems(taskArray) {
+            taskArray.forEach(task => {
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                item.id = `task-${task.id}`;
+
+                let metaText = '';
+                let pillClass = '';
+                let pillText = '';
+                let timeBadge = '';
+
+                const priorityClass =
+                    `priority-${task.priority || 'medium'}`;
+
+                if (task.type === 'appointment') {
+                    pillClass = 'appointment';
+                    pillText = 'Impegno';
+                    metaText =
+                        `Programma del ${selectedDate.split('-').reverse().join('/')}`;
+                    timeBadge =
+                        `<span class="time-badge">${escapeHtml(task.time || '--:--')}</span>`;
                 }
 
                 if (task.type === 'routine') {
-                    if (!hiddenListForDate.includes(task.id)) {
-                        selectedTasks.push(task);
-                        if(task.priority === 'high') urgentCount++;
-                    }
-                } else if (task.type === 'timed' && task.date === selectedDate) {
-                    if (!hiddenListForDate.includes(task.id)) {
-                        selectedTasks.push(task);
-                        if(task.priority === 'high') urgentCount++;
-                    }
-                } else if (task.type === 'deadline' && task.date === selectedDate) {
-                    if (!hiddenListForDate.includes(task.id)) {
-                        selectedTasks.push(task);
-                        if(task.priority === 'high' || task.date === todayString) urgentCount++;
-                    }
-                } else if (task.type === 'birthday' && task.date) {
-                    let parts = task.date.split('-');
-                    let selParts = selectedDate.split('-');
-                    if (`${parts[1]}-${parts[2]}` === `${selParts[1]}-${selParts[2]}`) {
-                        if (!hiddenListForDate.includes(task.id)) {
-                            selectedTasks.push(task);
-                        }
-                    }
+                    pillClass = 'routine';
+                    pillText =
+                        task.routineSlot === 'mattina'
+                            ? 'âï¸ Mattina'
+                            : 'ð Sera';
+
+                    metaText = 'Abitudine giornaliera';
                 }
-            });
 
-            // Aggiorna KPI Dashboard
-            let completedForThisDate = appData.completedCount[selectedDate] || 0;
-            kpiTotal.textContent = selectedTasks.length + completedForThisDate;
-            kpiDone.textContent = completedForThisDate;
-            kpiUrgent.textContent = urgentCount;
+                if (task.type === 'deadline') {
+                    pillClass = 'deadline';
+                    pillText = 'Scadenza';
+                    metaText =
+                        `Scadenza: ${task.date.split('-').reverse().join('/')}`;
+                }
 
-            // Filtri Tab Categoria
-            if (currentFilter !== 'all') {
-                selectedTasks = selectedTasks.filter(t => t.type === currentFilter);
-            }
+                if (task.type === 'birthday') {
+                    pillClass = 'birthday';
+                    pillText = 'Compleanno';
+                    metaText = 'Ricorrenza annuale';
+                }
 
-            // Ricerca in tempo reale
-            if (searchQuery) {
-                selectedTasks = selectedTasks.filter(t => t.text.toLowerCase().includes(searchQuery));
-            }
-
-            taskCount.textContent = selectedTasks.length;
-            
-            if (selectedTasks.length === 0) {
-                emptyState.style.display = 'block';
-            } else {
-                emptyState.style.display = 'none';
-            }
-
-            // Separiamo le routine mattina / sera e altri impegni
-            let mattinaTasks = selectedTasks.filter(t => t.type === 'routine' && t.routineSlot === 'mattina');
-            let seraTasks = selectedTasks.filter(t => t.type === 'routine' && t.routineSlot === 'sera');
-            let timedTasks = selectedTasks.filter(t => t.type === 'timed');
-            let otherTasks = selectedTasks.filter(t => t.type !== 'routine' && t.type !== 'timed');
-
-            function renderTaskItems(taskArray) {
-                taskArray.forEach(task => {
-                    const item = document.createElement('div');
-                    item.className = 'task-item';
-                    item.id = `task-${task.id}`;
-
-                    let metaText = '';
-                    let pillClass = '';
-                    let pillText = '';
-                    let priorityClass = `priority-${task.priority || 'medium'}`;
-
-                    if (task.type === 'routine') {
-                        pillClass = 'routine'; 
-                        pillText = task.routineSlot === 'mattina' ? '☀️ Mattina' : '🌙 Sera'; 
-                        metaText = 'Abitudine Giornaliera';
-                    } else if (task.type === 'timed') {
-                        pillClass = 'timed'; pillText = `🕒 ${task.time}`; metaText = `Impegno orario alle ${task.time}`;
-                    } else if (task.type === 'deadline') {
-                        pillClass = 'deadline'; pillText = 'Scadenza'; metaText = `Scadenza: ${task.date.split('-').reverse().join('/')}`;
-                    } else if (task.type === 'birthday') {
-                        pillClass = 'birthday'; pillText = 'Compleanno'; metaText = 'Ricorrenza!';
-                    }
-
-                    item.innerHTML = `
-                        <div class="task-content">
-                            <div class="checkbox" onclick="completeTask(${task.id}, '${task.type}', '${selectedDate}')">
-                                <i class="fa-solid fa-check" style="opacity: 0; font-size: 11px;"></i>
-                            </div>
-                            <div class="task-details">
-                                <span class="task-text">
-                                    <span class="priority-dot ${priorityClass}"></span>
-                                    <span class="tag-pill ${pillClass}">${pillText}</span>
-                                    ${escapeHtml(task.text)}
-                                </span>
-                                <span class="task-meta">${metaText}</span>
-                            </div>
+                item.innerHTML = `
+                    <div class="task-content">
+                        <div
+                            class="checkbox"
+                            onclick="completeTask(${task.id}, '${selectedDate}')"
+                        >
+                            <i
+                                class="fa-solid fa-check"
+                                style="opacity:0;font-size:11px;"
+                            ></i>
                         </div>
-                    `;
 
-                    const checkbox = item.querySelector('.checkbox');
-                    checkbox.addEventListener('click', function() {
-                        const icon = this.querySelector('i');
-                        icon.style.opacity = '1';
-                    });
+                        ${timeBadge}
 
-                    tasksList.appendChild(item);
+                        <div class="task-details">
+                            <span class="task-text">
+                                <span class="priority-dot ${priorityClass}"></span>
+                                <span class="tag-pill ${pillClass}">${pillText}</span>
+                                ${escapeHtml(task.text)}
+                            </span>
+
+                            <span class="task-meta">${metaText}</span>
+                        </div>
+                    </div>
+                `;
+
+                const checkbox = item.querySelector('.checkbox');
+
+                checkbox.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    icon.style.opacity = '1';
                 });
-            }
 
-            // Mostra Gruppi Ordinati
-            if (mattinaTasks.length > 0 && currentFilter !== 'deadline' && currentFilter !== 'birthday' && currentFilter !== 'timed') {
-                const titleM = document.createElement('div');
-                titleM.className = 'routine-group-title';
-                titleM.innerHTML = '<i class="fa-solid fa-sun" style="color: var(--warning);"></i> Routine Mattutina';
-                tasksList.appendChild(titleM);
-                renderTaskItems(mattinaTasks);
-            }
+                tasksList.appendChild(item);
+            });
+        }
 
-            if (timedTasks.length > 0) {
-                const titleT = document.createElement('div');
-                titleT.className = 'routine-group-title';
-                titleT.innerHTML = '<i class="fa-solid fa-clock" style="color: var(--purple);"></i> Impegni Orari (Notifica -2h)';
-                tasksList.appendChild(titleT);
-                renderTaskItems(timedTasks);
-            }
+        if (appointmentTasks.length) {
+            const title = document.createElement('div');
+            title.className = 'routine-group-title';
+            title.innerHTML =
+                '<i class="fa-solid fa-clock" style="color:var(--appointment);"></i> Impegni con orario';
+            tasksList.appendChild(title);
 
-            if (otherTasks.length > 0) {
-                if((mattinaTasks.length > 0 || seraTasks.length > 0 || timedTasks.length > 0) && currentFilter === 'all') {
-                    const titleO = document.createElement('div');
-                    titleO.className = 'routine-group-title';
-                    titleO.innerHTML = '<i class="fa-solid fa-list-check"></i> Scadenze ed Eventi';
-                    tasksList.appendChild(titleO);
-                }
-                renderTaskItems(otherTasks);
-            }
+            renderTaskItems(appointmentTasks);
+        }
 
-            if (seraTasks.length > 0 && currentFilter !== 'deadline' && currentFilter !== 'birthday' && currentFilter !== 'timed') {
-                const titleS = document.createElement('div');
-                titleS.className = 'routine-group-title';
-                titleS.innerHTML = '<i class="fa-solid fa-moon" style="color: var(--purple);"></i> Routine Serale';
-                tasksList.appendChild(titleS);
-                renderTaskItems(seraTasks);
-            }
+        if (morningTasks.length) {
+            const title = document.createElement('div');
+            title.className = 'routine-group-title';
+            title.innerHTML =
+                '<i class="fa-solid fa-sun" style="color:var(--warning);"></i> Routine Mattutina';
+            tasksList.appendChild(title);
 
-            // Render Archivio Fisso
-            if (permanentItems.length === 0) {
-                permanentList.innerHTML = `<div style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 4px;">Nessun impegno o scadenza registrata nell'archivio.</div>`;
-            } else {
-                permanentItems.forEach(task => {
+            renderTaskItems(morningTasks);
+        }
+
+        if (otherTasks.length) {
+            const title = document.createElement('div');
+            title.className = 'routine-group-title';
+            title.innerHTML =
+                '<i class="fa-solid fa-list-check"></i> Scadenze e ricorrenze';
+            tasksList.appendChild(title);
+
+            renderTaskItems(otherTasks);
+        }
+
+        if (eveningTasks.length) {
+            const title = document.createElement('div');
+            title.className = 'routine-group-title';
+            title.innerHTML =
+                '<i class="fa-solid fa-moon" style="color:var(--purple);"></i> Routine Serale';
+            tasksList.appendChild(title);
+
+            renderTaskItems(eveningTasks);
+        }
+
+        if (!permanentItems.length) {
+            permanentList.innerHTML =
+                '<div style="font-size:12px;color:var(--text-secondary);text-align:center;padding:4px;">Nessuna scadenza o compleanno registrato.</div>';
+        } else {
+            permanentItems
+                .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
+                .forEach(task => {
                     const subItem = document.createElement('div');
                     subItem.className = 'sub-item';
-                    let pType = task.type === 'timed' ? 'Orario' : (task.type === 'deadline' ? 'Scadenza' : 'Compleanno');
-                    let timeInfo = task.time ? ` alle ${task.time}` : '';
+
+                    const pType =
+                        task.type === 'deadline'
+                            ? 'Scadenza'
+                            : 'Compleanno';
+
                     subItem.innerHTML = `
-                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            <strong>${escapeHtml(task.text)}</strong> <span style="font-size:11px; color:var(--text-secondary);">(${pType}: ${task.date.split('-').reverse().join('/')}${timeInfo})</span>
+                        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            <strong>${escapeHtml(task.text)}</strong>
+                            <span style="font-size:11px;color:var(--text-secondary);">
+                                (${pType}: ${task.date.split('-').reverse().join('/')})
+                            </span>
                         </div>
-                        <button class="delete-btn" onclick="deletePermanentItem(${task.id})" title="Elimina definitivamente">
+
+                        <button
+                            class="delete-btn"
+                            onclick="deletePermanentItem(${task.id})"
+                            title="Elimina definitivamente"
+                        >
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     `;
+
                     permanentList.appendChild(subItem);
                 });
-            }
-
-            updateUpcomingEvents();
         }
 
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        updateUpcomingEvents();
+    }
+
+    function escapeHtml(text = '') {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+
+        return String(text).replace(
+            /[&<>"']/g,
+            m => map[m]
+        );
+    }
+
+    notifBtn.addEventListener('click', () => {
+        if (!('Notification' in window)) {
+            alert('Notifiche non supportate da questo browser.');
+            return;
         }
 
-        notifBtn.addEventListener('click', () => {
-            if (!("Notification" in window)) {
-                alert("Canale notifiche non supportato dal browser.");
-                return;
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                new Notification('Quartier Generale', {
+                    body: 'Canale notifiche attivato.'
+                });
+            } else {
+                alert('Permesso notifiche negato.');
             }
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    new Notification("Quartier Generale", { body: "Canale di trasmissione notifiche attivato con successo." });
-                } else {
-                    alert("Permesso notifiche negato.");
+        });
+    });
+
+    exportBtn.addEventListener('click', () => {
+        const blob = new Blob(
+            [JSON.stringify(appData, null, 2)],
+            { type: 'application/json;charset=utf-8' }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+
+        a.href = url;
+        a.download = `agenda_generale_${todayString}.json`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    });
+
+    importFile.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = event => {
+            try {
+                const parsed = JSON.parse(event.target.result);
+
+                if (!parsed.tasks || !Array.isArray(parsed.tasks)) {
+                    alert('Struttura file non valida.');
+                    return;
                 }
-            });
-        });
 
-        exportBtn.addEventListener('click', () => {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `database_generale_${todayString}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        });
+                if (!parsed.hiddenToday) parsed.hiddenToday = {};
+                if (!parsed.completedCount) parsed.completedCount = {};
 
-        importFile.addEventListener('change', (e) => {
-            const fileReader = new FileReader();
-            if (e.target.files[0]) {
-                fileReader.readAsText(e.target.files[0], "UTF-8");
-                fileReader.onload = (event) => {
-                    try {
-                        const parsedData = JSON.parse(event.target.result);
-                        if (parsedData.tasks) {
-                            appData = parsedData;
-                            saveAppData();
-                            alert("Database importato con successo!");
-                            settingsModal.classList.remove('active');
-                        } else {
-                            alert("Struttura file non valida.");
-                        }
-                    } catch (err) {
-                        alert("Errore critico durante l'importazione.");
-                    }
-                };
-            }
-        });
-
-        addBtn.addEventListener('click', addItem);
-        addRoutinePresetBtn.addEventListener('click', addRoutinePreset);
-        taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addItem(); });
-        newRoutineName.addEventListener('keypress', (e) => { if (e.key === 'Enter') addRoutinePreset(); });
-        searchInput.addEventListener('input', renderApp);
-
-        settingsBtn.addEventListener('click', () => {
-            renderRoutineManagerList();
-            settingsModal.classList.add('active');
-        });
-        closeModal.addEventListener('click', () => settingsModal.classList.remove('active'));
-        
-        clearDataBtn.addEventListener('click', () => {
-            if (confirm("Confermi la pulizia dei registri storici passati? Gli eventi futuri e i compleanni rimarranno protetti.")) {
-                appData.tasks = appData.tasks.filter(t => t.type !== 'deadline' && t.type !== 'timed' || new Date(t.date).getTime() >= new Date(todayString).getTime());
-                appData.hiddenToday = {};
-                appData.completedCount = {};
+                appData = parsed;
                 saveAppData();
-                settingsModal.classList.remove('active');
-            }
-        });
 
-        renderApp();
-    </script>
+                alert('Database importato con successo.');
+                settingsModal.classList.remove('active');
+            } catch (err) {
+                alert('Errore durante lâimportazione.');
+            }
+        };
+
+        reader.readAsText(file, 'UTF-8');
+    });
+
+    addBtn.addEventListener('click', addItem);
+    addRoutinePresetBtn.addEventListener('click', addRoutinePreset);
+
+    taskInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') addItem();
+    });
+
+    newRoutineName.addEventListener('keydown', e => {
+        if (e.key === 'Enter') addRoutinePreset();
+    });
+
+    searchInput.addEventListener('input', renderApp);
+
+    settingsBtn.addEventListener('click', () => {
+        renderRoutineManagerList();
+        settingsModal.classList.add('active');
+    });
+
+    closeModal.addEventListener('click', () => {
+        settingsModal.classList.remove('active');
+    });
+
+    clearDataBtn.addEventListener('click', () => {
+        if (
+            confirm(
+                'Confermi la pulizia dei registri storici passati? Gli eventi futuri e i compleanni rimarranno.'
+            )
+        ) {
+            appData.tasks = appData.tasks.filter(task => {
+                if (task.type === 'routine') return true;
+                if (task.type === 'birthday') return true;
+
+                if (task.type === 'appointment') {
+                    return !task.date || task.date >= todayString;
+                }
+
+                if (task.type === 'deadline') {
+                    return !task.date || task.date >= todayString;
+                }
+
+                return true;
+            });
+
+            appData.hiddenToday = {};
+            appData.completedCount = {};
+
+            saveAppData();
+            settingsModal.classList.remove('active');
+        }
+    });
+
+    setType('appointment');
+    renderRoutineManagerList();
+    renderApp();
+</script>
 </body>
 </html>
