@@ -79,7 +79,7 @@
         }
 
         header h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
@@ -115,6 +115,48 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        /* Selettore Data Tattico (Pianificazione Giornaliera) */
+        .date-picker-bar {
+            background: var(--card-bg);
+            padding: 10px 14px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .date-picker-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-picker-bar input[type="date"] {
+            border: none;
+            background: var(--input-bg);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 600;
+            outline: none;
+            color-scheme: dark light;
+        }
+
+        .btn-reset-date {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 6px;
         }
 
         /* Pannello KPI / Stato Generale */
@@ -292,10 +334,6 @@
             max-width: 120px;
         }
 
-        .input-card input[type="date"] {
-            color-scheme: dark light;
-        }
-
         .input-card button.submit-btn {
             background: var(--accent);
             color: white;
@@ -312,7 +350,7 @@
             transform: scale(0.95);
         }
 
-        /* Filtri Tab Rapidi (Filtro per categoria) */
+        /* Filtri Tab Rapidi */
         .filter-tabs {
             display: flex;
             gap: 6px;
@@ -584,7 +622,7 @@
     <div class="app-container">
         <header>
             <div>
-                <div class="date-display" id="currentDate"></div>
+                <div class="date-display" id="currentDateHeader"></div>
                 <h1>Quartier Generale</h1>
             </div>
             <div class="header-actions">
@@ -592,11 +630,20 @@
             </div>
         </header>
 
+        <!-- Selettore di Data Operativa per Organizzazione Mirata -->
+        <div class="date-picker-bar">
+            <label for="targetDateSelect"><i class="fa-solid fa-calendar-days"></i> Data Operativa:</label>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <input type="date" id="targetDateSelect">
+                <button class="btn-reset-date" id="resetDateBtn" title="Torna a Oggi">Oggi</button>
+            </div>
+        </div>
+
         <!-- Pannello KPI Strategico -->
         <div class="kpi-container">
             <div class="kpi-card">
                 <div class="kpi-value" id="kpiTotal">0</div>
-                <div class="kpi-label">Totali Oggi</div>
+                <div class="kpi-label">Totali Giorno</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-value" id="kpiDone" style="color: var(--success);">0</div>
@@ -656,16 +703,16 @@
         </div>
 
         <div class="section-title">
-            <span>Operazioni Odierne</span>
+            <span id="sectionTitleText">Operazioni Selezionate</span>
             <span class="badge-count" id="taskCount">0</span>
         </div>
         
-        <!-- Lista Impegni Odierni -->
+        <!-- Lista Impegni Selezionati -->
         <div class="tasks-list" id="tasksList"></div>
         
         <div class="empty-state" id="emptyState" style="display: none;">
             <i class="fa-solid fa-check-double" style="font-size: 32px; margin-bottom: 6px; color: var(--success);"></i>
-            <p>Tutte le operazioni odierne sono state completate.</p>
+            <p>Nessuna operazione programmata per questa data.</p>
         </div>
 
         <!-- Sezione Gestione Scadenze e Compleanni Fissi -->
@@ -702,11 +749,15 @@
         const standardAddWrapper = document.getElementById('standardAddWrapper');
         const searchInput = document.getElementById('searchInput');
         
+        const targetDateSelect = document.getElementById('targetDateSelect');
+        const resetDateBtn = document.getElementById('resetDateBtn');
+        const currentDateHeader = document.getElementById('currentDateHeader');
+        const sectionTitleText = document.getElementById('sectionTitleText');
+
         const tasksList = document.getElementById('tasksList');
         const upcomingList = document.getElementById('upcomingList');
         const permanentList = document.getElementById('permanentList');
         const emptyState = document.getElementById('emptyState');
-        const currentDateEl = document.getElementById('currentDate');
         const taskCount = document.getElementById('taskCount');
         
         // KPI Elements
@@ -726,12 +777,12 @@
         const filterTabs = document.querySelectorAll('.filter-tab');
         let currentType = 'routine';
         let currentFilter = 'all';
-        let completedTodayCount = 0;
 
         const today = new Date();
         const todayString = today.toISOString().split('T')[0];
-        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        currentDateEl.textContent = today.toLocaleDateString('it-IT', options);
+        
+        // Imposta la data iniziale sul selettore pari a oggi
+        targetDateSelect.value = todayString;
 
         typeButtons.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -747,10 +798,12 @@
                     dateInputGroup.style.display = 'flex';
                     standardAddWrapper.style.display = 'none';
                     taskInput.placeholder = "Oggetto della scadenza...";
+                    if(!taskDate.value) taskDate.value = targetDateSelect.value;
                 } else if (currentType === 'birthday') {
                     dateInputGroup.style.display = 'flex';
                     standardAddWrapper.style.display = 'none';
                     taskInput.placeholder = "Nome del festeggiato...";
+                    if(!taskDate.value) taskDate.value = targetDateSelect.value;
                 }
             });
         });
@@ -764,14 +817,16 @@
             });
         });
 
+        targetDateSelect.addEventListener('change', renderApp);
+        resetDateBtn.addEventListener('click', () => {
+            targetDateSelect.value = todayString;
+            renderApp();
+        });
+
         function loadAppData() {
-            let data = JSON.parse(localStorage.getItem('agenda_general_data')) || { lastDate: todayString, tasks: [], hiddenToday: [], completedCount: 0 };
-            if (data.lastDate !== todayString) {
-                data.lastDate = todayString;
-                data.hiddenToday = [];
-                data.completedCount = 0;
-                localStorage.setItem('agenda_general_data', JSON.stringify(data));
-            }
+            let data = JSON.parse(localStorage.getItem('agenda_general_data')) || { lastDate: todayString, tasks: [], hiddenToday: {}, completedCount: {} };
+            if (!data.hiddenToday) data.hiddenToday = {};
+            if (!data.completedCount) data.completedCount = {};
             return data;
         }
 
@@ -801,30 +856,39 @@
 
             appData.tasks.push(newItem);
             taskInput.value = '';
-            taskDate.value = '';
             saveAppData();
         }
 
-        function completeTask(id, type) {
+        function completeTask(id, type, selectedDate) {
             const taskElement = document.getElementById(`task-${id}`);
             if(taskElement) taskElement.classList.add('completing');
 
             setTimeout(() => {
                 if (type === 'routine') {
-                    appData.tasks = appData.tasks.filter(t => t.id !== id);
+                    // Per le routine giornaliere, salviamo lo stato di completamento legato a quella specifica data
+                    if (!appData.hiddenToday[selectedDate]) appData.hiddenToday[selectedDate] = [];
+                    if (!appData.hiddenToday[selectedDate].includes(id)) {
+                        appData.hiddenToday[selectedDate].push(id);
+                    }
                 } else {
-                    if (!appData.hiddenToday.includes(id)) {
-                        appData.hiddenToday.push(id);
+                    if (!appData.hiddenToday[selectedDate]) appData.hiddenToday[selectedDate] = [];
+                    if (!appData.hiddenToday[selectedDate].includes(id)) {
+                        appData.hiddenToday[selectedDate].push(id);
                     }
                 }
-                appData.completedCount = (appData.completedCount || 0) + 1;
+                
+                if (!appData.completedCount[selectedDate]) appData.completedCount[selectedDate] = 0;
+                appData.completedCount[selectedDate]++;
+
                 saveAppData();
             }, 400);
         }
 
         function deletePermanentItem(id) {
             appData.tasks = appData.tasks.filter(t => t.id !== id);
-            appData.hiddenToday = appData.hiddenToday.filter(hiddenId => hiddenId !== id);
+            Object.keys(appData.hiddenToday).forEach(dateKey => {
+                appData.hiddenToday[dateKey] = appData.hiddenToday[dateKey].filter(hiddenId => hiddenId !== id);
+            });
             saveAppData();
         }
 
@@ -883,10 +947,17 @@
             tasksList.innerHTML = '';
             permanentList.innerHTML = '';
 
-            let todayTasks = [];
+            const selectedDate = targetDateSelect.value;
+            const optionsHeader = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const dateObj = new Date(selectedDate + 'T00:00:00');
+            currentDateHeader.textContent = dateObj.toLocaleDateString('it-IT', optionsHeader);
+            sectionTitleText.textContent = `Operazioni per il ${dateObj.toLocaleDateString('it-IT', { day: 'numeric', month: 'long' })}`;
+
+            let selectedTasks = [];
             let permanentItems = [];
             let urgentCount = 0;
             let searchQuery = searchInput.value.toLowerCase();
+            let hiddenListForDate = appData.hiddenToday[selectedDate] || [];
 
             appData.tasks.forEach(task => {
                 if (task.type !== 'routine') {
@@ -894,47 +965,52 @@
                 }
 
                 if (task.type === 'routine') {
-                    todayTasks.push(task);
-                    if(task.priority === 'high') urgentCount++;
-                } else if (task.type === 'deadline' && task.date <= todayString) {
-                    if (!appData.hiddenToday.includes(task.id)) {
-                        todayTasks.push(task);
+                    if (!hiddenListForDate.includes(task.id)) {
+                        selectedTasks.push(task);
+                        if(task.priority === 'high') urgentCount++;
+                    }
+                } else if (task.type === 'deadline' && task.date === selectedDate) {
+                    if (!hiddenListForDate.includes(task.id)) {
+                        selectedTasks.push(task);
                         if(task.priority === 'high' || task.date === todayString) urgentCount++;
                     }
                 } else if (task.type === 'birthday' && task.date) {
                     let parts = task.date.split('-');
-                    if (`${parts[1]}-${parts[2]}` === `${todayString.split('-')[1]}-${todayString.split('-')[2]}`) {
-                        if (!appData.hiddenToday.includes(task.id)) {
-                            todayTasks.push(task);
+                    let selParts = selectedDate.split('-');
+                    // Confronta Mese e Giorno per i compleanni
+                    if (`${parts[1]}-${parts[2]}` === `${selParts[1]}-${selParts[2]}`) {
+                        if (!hiddenListForDate.includes(task.id)) {
+                            selectedTasks.push(task);
                         }
                     }
                 }
             });
 
-            // Aggiorna KPI Dashboard
-            kpiTotal.textContent = todayTasks.length + (appData.completedCount || 0);
-            kpiDone.textContent = appData.completedCount || 0;
+            // Aggiorna KPI Dashboard sulla base della data selezionata
+            let completedForThisDate = appData.completedCount[selectedDate] || 0;
+            kpiTotal.textContent = selectedTasks.length + completedForThisDate;
+            kpiDone.textContent = completedForThisDate;
             kpiUrgent.textContent = urgentCount;
 
             // Filtro per tab di categoria
             if (currentFilter !== 'all') {
-                todayTasks = todayTasks.filter(t => t.type === currentFilter);
+                selectedTasks = selectedTasks.filter(t => t.type === currentFilter);
             }
 
             // Filtro ricerca in tempo reale
             if (searchQuery) {
-                todayTasks = todayTasks.filter(t => t.text.toLowerCase().includes(searchQuery));
+                selectedTasks = selectedTasks.filter(t => t.text.toLowerCase().includes(searchQuery));
             }
 
-            taskCount.textContent = todayTasks.length;
+            taskCount.textContent = selectedTasks.length;
             
-            if (todayTasks.length === 0) {
+            if (selectedTasks.length === 0) {
                 emptyState.style.display = 'block';
             } else {
                 emptyState.style.display = 'none';
             }
 
-            todayTasks.forEach(task => {
+            selectedTasks.forEach(task => {
                 const item = document.createElement('div');
                 item.className = 'task-item';
                 item.id = `task-${task.id}`;
@@ -949,12 +1025,12 @@
                 } else if (task.type === 'deadline') {
                     pillClass = 'deadline'; pillText = 'Scadenza'; metaText = `Scadenza: ${task.date.split('-').reverse().join('/')}`;
                 } else if (task.type === 'birthday') {
-                    pillClass = 'birthday'; pillText = 'Compleanno'; metaText = 'Ricorrenza odierna!';
+                    pillClass = 'birthday'; pillText = 'Compleanno'; metaText = 'Ricorrenza!';
                 }
 
                 item.innerHTML = `
                     <div class="task-content">
-                        <div class="checkbox" onclick="completeTask(${task.id}, '${task.type}')">
+                        <div class="checkbox" onclick="completeTask(${task.id}, '${task.type}', '${selectedDate}')">
                             <i class="fa-solid fa-check" style="opacity: 0; font-size: 11px;"></i>
                         </div>
                         <div class="task-details">
@@ -1060,10 +1136,10 @@
         closeModal.addEventListener('click', () => settingsModal.classList.remove('active'));
         
         clearDataBtn.addEventListener('click', () => {
-            if (confirm("Confermi la pulizia dei registri giornalieri passati? Gli eventi futuri e i compleanni rimarranno protetti.")) {
+            if (confirm("Confermi la pulizia dei registri storici passati? Gli eventi futuri e i compleanni rimarranno protetti.")) {
                 appData.tasks = appData.tasks.filter(t => t.type !== 'routine');
-                appData.hiddenToday = [];
-                appData.completedCount = 0;
+                appData.hiddenToday = {};
+                appData.completedCount = {};
                 saveAppData();
                 settingsModal.classList.remove('active');
             }
