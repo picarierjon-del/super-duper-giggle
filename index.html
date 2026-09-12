@@ -328,6 +328,7 @@
             font-size: 14px;
             color: var(--text-main);
             outline: none;
+            color-scheme: dark light;
         }
 
         .input-card select {
@@ -503,7 +504,8 @@
         }
         .tag-pill.routine { background: rgba(0,122,255,0.1); color: var(--accent); }
         .tag-pill.deadline { background: rgba(255,149,0,0.1); color: var(--warning); }
-        .tag-pill.birthday { background: rgba(175,82,222,0.1); color: var(--purple); }
+        .tag-pill.timed { background: rgba(175,82,222,0.1); color: var(--purple); }
+        .tag-pill.birthday { background: rgba(255,45,85,0.1); color: var(--danger); }
 
         .delete-btn {
             background: none;
@@ -720,13 +722,14 @@
         <div class="input-card">
             <div class="type-selector">
                 <button class="type-btn active" data-type="routine">Giornaliero</button>
+                <button class="type-btn" data-type="timed">Impegno Orario</button>
                 <button class="type-btn" data-type="deadline">Scadenza</button>
                 <button class="type-btn" data-type="birthday">Compleanno</button>
             </div>
             
             <div class="form-fields">
                 <div class="input-group">
-                    <input type="text" id="taskInput" placeholder="Nuova direttiva o abitudine..." autocomplete="off">
+                    <input type="text" id="taskInput" placeholder="Nuova abitudine fissa..." autocomplete="off">
                     <select id="taskPriority">
                         <option value="low">Bassa</option>
                         <option value="medium" selected>Media</option>
@@ -734,20 +737,18 @@
                     </select>
                 </div>
                 
-                <!-- Sotto-selezione specifica per Routine (Mattina/Sera) -->
-                <div class="input-group" id="routineSubGroup">
-                    <select id="routineTimeSlot" style="max-width: 100%;">
-                        <option value="mattina">☀️ Sessione Mattutina</option>
-                        <option value="sera">🌙 Sessione Serale</option>
-                    </select>
-                </div>
-
+                <!-- Gruppo Data per Scadenze e Compleanni -->
                 <div class="input-group" id="dateInputGroup" style="display: none;">
                     <input type="date" id="taskDate">
                 </div>
-                
+
+                <!-- Gruppo Orario e Data per Impegni Orari con Notifica -2h -->
+                <div class="input-group" id="timedInputGroup" style="display: none;">
+                    <input type="date" id="timedDate">
+                    <input type="time" id="timedTime" style="max-width: 120px;">
+                </div>
+
                 <div>
-                    <!-- ID CORRETTO: id="addBtn" -->
                     <button class="submit-btn" id="addBtn" style="width: 100%; padding: 10px;"><i class="fa-solid fa-plus"></i> Registra Elemento</button>
                 </div>
             </div>
@@ -757,6 +758,7 @@
         <div class="filter-tabs">
             <button class="filter-tab active" data-filter="all">Tutti</button>
             <button class="filter-tab" data-filter="routine">Giornalieri</button>
+            <button class="filter-tab" data-filter="timed">Orari</button>
             <button class="filter-tab" data-filter="deadline">Scadenze</button>
             <button class="filter-tab" data-filter="birthday">Compleanni</button>
         </div>
@@ -776,7 +778,7 @@
 
         <!-- Sezione Gestione Fissa -->
         <div class="management-section">
-            <div class="management-header"><i class="fa-solid fa-vault"></i> Archivio Scadenze & Compleanni Fissi</div>
+            <div class="management-header"><i class="fa-solid fa-vault"></i> Archivio Impegni Orari, Scadenze & Compleanni</div>
             <div class="sub-list" id="permanentList"></div>
         </div>
     </div>
@@ -787,7 +789,7 @@
             <h3>Centro Comando & Manutenzione</h3>
             <p>Configura i protocolli, crea le routine giornaliere fisse o gestisci i backup protetti.</p>
             
-            <!-- Nuova Sezione Configurazione Routine Fisse -->
+            <!-- Sezione Configurazione Routine Fisse -->
             <div class="routine-manager-box">
                 <h4><i class="fa-solid fa-list-check"></i> Gestore Routine Fisse Giornaliere</h4>
                 <div style="display: flex; gap: 4px;">
@@ -816,11 +818,12 @@
     <script>
         const taskInput = document.getElementById('taskInput');
         const taskDate = document.getElementById('taskDate');
+        const timedDate = document.getElementById('timedDate');
+        const timedTime = document.getElementById('timedTime');
         const taskPriority = document.getElementById('taskPriority');
-        const routineTimeSlot = document.getElementById('routineTimeSlot');
         const addBtn = document.getElementById('addBtn');
         const dateInputGroup = document.getElementById('dateInputGroup');
-        const routineSubGroup = document.getElementById('routineSubGroup');
+        const timedInputGroup = document.getElementById('timedInputGroup');
         const searchInput = document.getElementById('searchInput');
         
         const targetDateSelect = document.getElementById('targetDateSelect');
@@ -868,18 +871,23 @@
                 btn.classList.add('active');
                 currentType = btn.getAttribute('data-type');
 
+                // Gestione visibilità campi inserimento
+                dateInputGroup.style.display = 'none';
+                timedInputGroup.style.display = 'none';
+
                 if (currentType === 'routine') {
-                    dateInputGroup.style.display = 'none';
-                    routineSubGroup.style.display = 'flex';
                     taskInput.placeholder = "Nuova abitudine (es. Lavare i denti 🪥)...";
+                } else if (currentType === 'timed') {
+                    timedInputGroup.style.display = 'flex';
+                    taskInput.placeholder = "Oggetto dell'impegno orario...";
+                    if(!timedDate.value) timedDate.value = targetDateSelect.value;
+                    if(!timedTime.value) timedTime.value = "12:00";
                 } else if (currentType === 'deadline') {
                     dateInputGroup.style.display = 'flex';
-                    routineSubGroup.style.display = 'none';
                     taskInput.placeholder = "Oggetto della scadenza...";
                     if(!taskDate.value) taskDate.value = targetDateSelect.value;
                 } else if (currentType === 'birthday') {
                     dateInputGroup.style.display = 'flex';
-                    routineSubGroup.style.display = 'none';
                     taskInput.placeholder = "Nome del festeggiato...";
                     if(!taskDate.value) taskDate.value = targetDateSelect.value;
                 }
@@ -902,7 +910,7 @@
         });
 
         function loadAppData() {
-            let data = JSON.parse(localStorage.getItem('agenda_general_data_v3')) || { 
+            let data = JSON.parse(localStorage.getItem('agenda_general_data_v4')) || { 
                 lastDate: todayString, 
                 tasks: [
                     { id: 101, text: "Lavare i denti 🪥", type: 'routine', routineSlot: 'mattina', priority: 'medium', date: null },
@@ -919,7 +927,7 @@
         let appData = loadAppData();
 
         function saveAppData() {
-            localStorage.setItem('agenda_general_data_v3', JSON.stringify(appData));
+            localStorage.setItem('agenda_general_data_v4', JSON.stringify(appData));
             renderApp();
             renderRoutineManagerList();
         }
@@ -933,13 +941,28 @@
                 text: text,
                 type: currentType,
                 priority: taskPriority.value,
-                routineSlot: currentType === 'routine' ? routineTimeSlot.value : null,
-                date: (currentType === 'deadline' || currentType === 'birthday') ? taskDate.value : null
+                routineSlot: null,
+                date: null,
+                time: null,
+                notified: false
             };
 
-            if ((currentType === 'deadline' || currentType === 'birthday') && !newItem.date) {
-                alert("Seleziona una data valida per la direttiva!");
-                return;
+            if (currentType === 'routine') {
+                // Per default le routine inserite da principale vanno assegnate casualmente o a mattina (assegniamo mattina di default, gestibile da gestore fisse)
+                newItem.routineSlot = 'mattina';
+            } else if (currentType === 'timed') {
+                newItem.date = timedDate.value;
+                newItem.time = timedTime.value;
+                if (!newItem.date || !newItem.time) {
+                    alert("Seleziona data e orario validi per l'impegno!");
+                    return;
+                }
+            } else if (currentType === 'deadline' || currentType === 'birthday') {
+                newItem.date = taskDate.value;
+                if (!newItem.date) {
+                    alert("Seleziona una data valida per l'elemento!");
+                    return;
+                }
             }
 
             appData.tasks.push(newItem);
@@ -957,7 +980,8 @@
                 type: 'routine',
                 priority: 'medium',
                 routineSlot: newRoutineSlot.value,
-                date: null
+                date: null,
+                time: null
             };
             appData.tasks.push(newItem);
             newRoutineName.value = '';
@@ -1020,6 +1044,12 @@
                     if (diffDays >= 0) {
                         eventsList.push({ title: task.text, days: diffDays, label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`, priority: task.priority });
                     }
+                } else if (task.type === 'timed' && task.date) {
+                    let tTime = new Date(task.date).getTime();
+                    let diffDays = Math.ceil((tTime - nowTime) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 0) {
+                        eventsList.push({ title: `🕒 ${task.text} (${task.time})`, days: diffDays, label: diffDays === 0 ? `Oggi ${task.time}` : `Tra ${diffDays}g`, priority: task.priority });
+                    }
                 } else if (task.type === 'birthday' && task.date) {
                     let bDateParts = task.date.split('-');
                     let bMonth = parseInt(bDateParts[1]);
@@ -1059,6 +1089,29 @@
             });
         }
 
+        // Sistema di controllo notifiche -2 ore in background
+        function checkNotifications() {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+            const now = new Date();
+            appData.tasks.forEach(task => {
+                if (task.type === 'timed' && task.date && task.time && !task.notified) {
+                    const taskDateTime = new Date(`${task.date}T${task.time}:00`);
+                    const notifyTime = new Date(taskDateTime.getTime() - (2 * 60 * 60 * 1000)); // 2 ore prima
+
+                    if (now >= notifyTime && now < taskDateTime) {
+                        let priorityText = task.priority === 'high' ? '⚠️ ALTA PRIORITÀ: ' : '';
+                        new Notification("Quartier Generale - Promemoria Impegno", {
+                            body: `${priorityText}${task.text} è previsto per le ore ${task.time} (tra 2 ore)!`
+                        });
+                        task.notified = true;
+                        saveAppData();
+                    }
+                }
+            });
+        }
+        setInterval(checkNotifications, 30000); // Controlla ogni 30 secondi
+
         function renderApp() {
             tasksList.innerHTML = '';
             permanentList.innerHTML = '';
@@ -1081,6 +1134,11 @@
                 }
 
                 if (task.type === 'routine') {
+                    if (!hiddenListForDate.includes(task.id)) {
+                        selectedTasks.push(task);
+                        if(task.priority === 'high') urgentCount++;
+                    }
+                } else if (task.type === 'timed' && task.date === selectedDate) {
                     if (!hiddenListForDate.includes(task.id)) {
                         selectedTasks.push(task);
                         if(task.priority === 'high') urgentCount++;
@@ -1125,10 +1183,11 @@
                 emptyState.style.display = 'none';
             }
 
-            // Separiamo le routine mattina / sera
+            // Separiamo le routine mattina / sera e altri impegni
             let mattinaTasks = selectedTasks.filter(t => t.type === 'routine' && t.routineSlot === 'mattina');
             let seraTasks = selectedTasks.filter(t => t.type === 'routine' && t.routineSlot === 'sera');
-            let otherTasks = selectedTasks.filter(t => t.type !== 'routine');
+            let timedTasks = selectedTasks.filter(t => t.type === 'timed');
+            let otherTasks = selectedTasks.filter(t => t.type !== 'routine' && t.type !== 'timed');
 
             function renderTaskItems(taskArray) {
                 taskArray.forEach(task => {
@@ -1145,6 +1204,8 @@
                         pillClass = 'routine'; 
                         pillText = task.routineSlot === 'mattina' ? '☀️ Mattina' : '🌙 Sera'; 
                         metaText = 'Abitudine Giornaliera';
+                    } else if (task.type === 'timed') {
+                        pillClass = 'timed'; pillText = `🕒 ${task.time}`; metaText = `Impegno orario alle ${task.time}`;
                     } else if (task.type === 'deadline') {
                         pillClass = 'deadline'; pillText = 'Scadenza'; metaText = `Scadenza: ${task.date.split('-').reverse().join('/')}`;
                     } else if (task.type === 'birthday') {
@@ -1178,7 +1239,7 @@
             }
 
             // Mostra Gruppi Ordinati
-            if (mattinaTasks.length > 0 && currentFilter !== 'deadline' && currentFilter !== 'birthday') {
+            if (mattinaTasks.length > 0 && currentFilter !== 'deadline' && currentFilter !== 'birthday' && currentFilter !== 'timed') {
                 const titleM = document.createElement('div');
                 titleM.className = 'routine-group-title';
                 titleM.innerHTML = '<i class="fa-solid fa-sun" style="color: var(--warning);"></i> Routine Mattutina';
@@ -1186,8 +1247,16 @@
                 renderTaskItems(mattinaTasks);
             }
 
+            if (timedTasks.length > 0) {
+                const titleT = document.createElement('div');
+                titleT.className = 'routine-group-title';
+                titleT.innerHTML = '<i class="fa-solid fa-clock" style="color: var(--purple);"></i> Impegni Orari (Notifica -2h)';
+                tasksList.appendChild(titleT);
+                renderTaskItems(timedTasks);
+            }
+
             if (otherTasks.length > 0) {
-                if(mattinaTasks.length > 0 || seraTasks.length > 0) {
+                if((mattinaTasks.length > 0 || seraTasks.length > 0 || timedTasks.length > 0) && currentFilter === 'all') {
                     const titleO = document.createElement('div');
                     titleO.className = 'routine-group-title';
                     titleO.innerHTML = '<i class="fa-solid fa-list-check"></i> Scadenze ed Eventi';
@@ -1196,7 +1265,7 @@
                 renderTaskItems(otherTasks);
             }
 
-            if (seraTasks.length > 0 && currentFilter !== 'deadline' && currentFilter !== 'birthday') {
+            if (seraTasks.length > 0 && currentFilter !== 'deadline' && currentFilter !== 'birthday' && currentFilter !== 'timed') {
                 const titleS = document.createElement('div');
                 titleS.className = 'routine-group-title';
                 titleS.innerHTML = '<i class="fa-solid fa-moon" style="color: var(--purple);"></i> Routine Serale';
@@ -1204,17 +1273,18 @@
                 renderTaskItems(seraTasks);
             }
 
-            // Render Archivio Fisso Scadenze / Compleanni
+            // Render Archivio Fisso
             if (permanentItems.length === 0) {
-                permanentList.innerHTML = `<div style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 4px;">Nessuna scadenza o compleanno registrato.</div>`;
+                permanentList.innerHTML = `<div style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 4px;">Nessun impegno o scadenza registrata nell'archivio.</div>`;
             } else {
                 permanentItems.forEach(task => {
                     const subItem = document.createElement('div');
                     subItem.className = 'sub-item';
-                    let pType = task.type === 'deadline' ? 'Scadenza' : 'Compleanno';
+                    let pType = task.type === 'timed' ? 'Orario' : (task.type === 'deadline' ? 'Scadenza' : 'Compleanno');
+                    let timeInfo = task.time ? ` alle ${task.time}` : '';
                     subItem.innerHTML = `
                         <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            <strong>${escapeHtml(task.text)}</strong> <span style="font-size:11px; color:var(--text-secondary);">(${pType}: ${task.date.split('-').reverse().join('/')})</span>
+                            <strong>${escapeHtml(task.text)}</strong> <span style="font-size:11px; color:var(--text-secondary);">(${pType}: ${task.date.split('-').reverse().join('/')}${timeInfo})</span>
                         </div>
                         <button class="delete-btn" onclick="deletePermanentItem(${task.id})" title="Elimina definitivamente">
                             <i class="fa-solid fa-trash-can"></i>
@@ -1234,12 +1304,12 @@
 
         notifBtn.addEventListener('click', () => {
             if (!("Notification" in window)) {
-                alert("Canale notifiche non supportato.");
+                alert("Canale notifiche non supportato dal browser.");
                 return;
             }
             Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
-                    new Notification("Quartier Generale", { body: "Canale di trasmissione notifiche attivato." });
+                    new Notification("Quartier Generale", { body: "Canale di trasmissione notifiche attivato con successo." });
                 } else {
                     alert("Permesso notifiche negato.");
                 }
@@ -1292,7 +1362,7 @@
         
         clearDataBtn.addEventListener('click', () => {
             if (confirm("Confermi la pulizia dei registri storici passati? Gli eventi futuri e i compleanni rimarranno protetti.")) {
-                appData.tasks = appData.tasks.filter(t => t.type !== 'deadline' || new Date(t.date).getTime() >= new Date(todayString).getTime());
+                appData.tasks = appData.tasks.filter(t => t.type !== 'deadline' && t.type !== 'timed' || new Date(t.date).getTime() >= new Date(todayString).getTime());
                 appData.hiddenToday = {};
                 appData.completedCount = {};
                 saveAppData();
