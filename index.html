@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Agenda & Compleanni Ultimate</title>
+    <title>Agenda Comando Generale</title>
     <!-- Meta per iOS Web App -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Agenda Ultimate">
+    <meta name="apple-mobile-web-app-title" content="Comando Gen">
     
     <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,7 +28,6 @@
             --input-bg: #f2f2f7;
         }
 
-        /* Dark Mode automatica basata sul sistema iOS */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #000000;
@@ -68,7 +67,7 @@
             max-width: 500px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
             padding-bottom: 30px;
         }
 
@@ -76,31 +75,31 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-top: 10px;
+            padding-top: 5px;
         }
 
         header h1 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
         .header-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .icon-btn {
             background: var(--card-bg);
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-main);
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             transition: transform 0.2s;
@@ -111,11 +110,40 @@
         }
 
         .date-display {
-            font-size: 13px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Pannello KPI / Stato Generale */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .kpi-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
             color: var(--text-secondary);
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         /* Search Bar */
@@ -133,7 +161,7 @@
             border: none;
             background: transparent;
             width: 100%;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-main);
             outline: none;
         }
@@ -142,21 +170,21 @@
             color: var(--text-secondary);
         }
 
-        /* Upcoming Box */
+        /* Box In Arrivo */
         .upcoming-box {
-            background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
-            border-radius: 18px;
-            padding: 16px;
+            background: linear-gradient(135deg, #1c1c1e 0%, #3a3a3c 100%);
+            border-radius: 16px;
+            padding: 14px;
             color: white;
-            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         .upcoming-header {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -166,49 +194,49 @@
         .upcoming-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 160px;
+            gap: 6px;
+            max-height: 140px;
             overflow-y: auto;
         }
 
         .upcoming-item {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 8px 12px;
-            border-radius: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .upcoming-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         .upcoming-badge {
-            font-size: 11px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 3px 8px;
-            border-radius: 6px;
+            font-size: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: 600;
             flex-shrink: 0;
         }
 
-        /* Input Card Avanzata */
+        /* Input Card Comando */
         .input-card {
             background: var(--card-bg);
-            padding: 16px;
-            border-radius: 18px;
+            padding: 14px;
+            border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .type-selector {
@@ -223,8 +251,8 @@
             flex: 1;
             border: none;
             background: transparent;
-            padding: 8px;
-            font-size: 12px;
+            padding: 7px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
             border-radius: 8px;
@@ -241,7 +269,7 @@
         .form-fields {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .input-group {
@@ -253,15 +281,15 @@
             flex: 1;
             border: none;
             background: var(--input-bg);
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-main);
             outline: none;
         }
 
         .input-card select {
-            max-width: 130px;
+            max-width: 120px;
         }
 
         .input-card input[type="date"] {
@@ -272,9 +300,9 @@
             background: var(--accent);
             color: white;
             border: none;
-            padding: 0 18px;
+            padding: 0 16px;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.2s, transform 0.2s;
@@ -282,16 +310,41 @@
 
         .input-card button.submit-btn:active {
             transform: scale(0.95);
-            opacity: 0.8;
+        }
+
+        /* Filtri Tab Rapidi (Filtro per categoria) */
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .filter-tab {
+            background: var(--card-bg);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+
+        .filter-tab.active {
+            background: var(--text-main);
+            color: var(--card-bg);
         }
 
         /* Sezione Liste Impegni */
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-secondary);
-            margin-top: 6px;
-            padding-left: 4px;
+            padding-left: 2px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -308,12 +361,12 @@
         .tasks-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .task-item {
             background: var(--card-bg);
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -337,14 +390,14 @@
         .task-content {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex: 1;
             overflow: hidden;
         }
 
         .checkbox {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border: 2px solid var(--text-secondary);
             border-radius: 50%;
             display: flex;
@@ -369,7 +422,7 @@
         }
 
         .task-text {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             color: var(--text-main);
             word-break: break-word;
@@ -379,14 +432,13 @@
         }
 
         .task-meta {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
         }
 
-        /* Priority Indicator Dot */
         .priority-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             flex-shrink: 0;
         }
@@ -395,8 +447,8 @@
         .priority-low { background-color: var(--success); }
 
         .tag-pill {
-            font-size: 10px;
-            padding: 2px 6px;
+            font-size: 9px;
+            padding: 2px 5px;
             border-radius: 4px;
             font-weight: 600;
             text-transform: uppercase;
@@ -409,8 +461,8 @@
             background: none;
             border: none;
             color: var(--text-secondary);
-            font-size: 15px;
-            padding: 8px;
+            font-size: 14px;
+            padding: 6px;
             cursor: pointer;
             transition: color 0.2s;
         }
@@ -422,23 +474,22 @@
         .empty-state {
             text-align: center;
             color: var(--text-secondary);
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 15px;
+            font-size: 13px;
         }
 
         /* Sezione Gestione Fissa */
         .management-section {
-            margin-top: 10px;
             background: var(--card-bg);
-            border-radius: 18px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 14px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
         
         .management-header {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: var(--text-main);
             display: flex;
             align-items: center;
@@ -448,7 +499,7 @@
         .sub-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .sub-item {
@@ -457,11 +508,11 @@
             align-items: center;
             padding: 8px 10px;
             background: var(--input-bg);
-            border-radius: 10px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 12px;
         }
 
-        /* Modale Impostazioni */
+        /* Modale Comando */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -489,35 +540,35 @@
             background: var(--card-bg);
             width: 100%;
             max-width: 400px;
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: 18px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             transform: scale(0.95);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
         .modal-overlay.active .modal-card {
             transform: scale(1);
         }
 
-        .modal-card h3 { font-size: 20px; font-weight: 600; }
-        .modal-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+        .modal-card h3 { font-size: 18px; font-weight: 600; }
+        .modal-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
         
         .modal-buttons {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 6px;
         }
 
         .btn-modal {
             width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
             border: none;
             cursor: pointer;
@@ -534,26 +585,42 @@
         <header>
             <div>
                 <div class="date-display" id="currentDate"></div>
-                <h1>Agenda Ultimate</h1>
+                <h1>Quartier Generale</h1>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" id="settingsBtn" title="Impostazioni"><i class="fa-solid fa-gear"></i></button>
+                <button class="icon-btn" id="settingsBtn" title="Pannello Comando"><i class="fa-solid fa-sliders"></i></button>
             </div>
         </header>
 
-        <!-- Barra di Ricerca -->
-        <div class="search-bar">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="Cerca impegni o compleanni..." autocomplete="off">
+        <!-- Pannello KPI Strategico -->
+        <div class="kpi-container">
+            <div class="kpi-card">
+                <div class="kpi-value" id="kpiTotal">0</div>
+                <div class="kpi-label">Totali Oggi</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" id="kpiDone" style="color: var(--success);">0</div>
+                <div class="kpi-label">Eseguiti</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" id="kpiUrgent" style="color: var(--danger);">0</div>
+                <div class="kpi-label">Critici / Urgenti</div>
+            </div>
         </div>
 
-        <!-- Box In Arrivo: Prossimi 7 eventi -->
+        <!-- Barra di Ricerca Tattica -->
+        <div class="search-bar">
+            <i class="fa-solid fa-crosshairs"></i>
+            <input type="text" id="searchInput" placeholder="Cerca nel database operativo..." autocomplete="off">
+        </div>
+
+        <!-- Box In Arrivo Strategico -->
         <div class="upcoming-box">
-            <div class="upcoming-header"><i class="fa-solid fa-bell"></i> In arrivo (Prossimi 7 eventi)</div>
+            <div class="upcoming-header"><i class="fa-solid fa-radar"></i> In arrivo (Prossimi eventi critici)</div>
             <div class="upcoming-list" id="upcomingList"></div>
         </div>
 
-        <!-- Card Inserimento Avanzato con Priorità -->
+        <!-- Card Inserimento Operativo -->
         <div class="input-card">
             <div class="type-selector">
                 <button class="type-btn active" data-type="routine">Giornaliero</button>
@@ -563,11 +630,11 @@
             
             <div class="form-fields">
                 <div class="input-group">
-                    <input type="text" id="taskInput" placeholder="Nome impegno o persona..." autocomplete="off">
+                    <input type="text" id="taskInput" placeholder="Nuova direttiva o nome..." autocomplete="off">
                     <select id="taskPriority">
-                        <option value="low">Priorità Bassa</option>
-                        <option value="medium" selected>Priorità Media</option>
-                        <option value="high">Priorità Alta</option>
+                        <option value="low">Bassa</option>
+                        <option value="medium" selected>Media</option>
+                        <option value="high">Alta (Critica)</option>
                     </select>
                 </div>
                 <div class="input-group" id="dateInputGroup" style="display: none;">
@@ -575,13 +642,21 @@
                     <button class="submit-btn" id="addBtn"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="standardAddWrapper">
-                    <button class="submit-btn" id="addBtnStd" style="width: 100%; padding: 12px;"><i class="fa-solid fa-plus"></i> Aggiungi Impegno</button>
+                    <button class="submit-btn" id="addBtnStd" style="width: 100%; padding: 10px;"><i class="fa-solid fa-plus"></i> Registra Direttiva</button>
                 </div>
             </div>
         </div>
 
+        <!-- Filtri Rapidi per Categoria -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">Tutti</button>
+            <button class="filter-tab" data-filter="routine">Giornalieri</button>
+            <button class="filter-tab" data-filter="deadline">Scadenze</button>
+            <button class="filter-tab" data-filter="birthday">Compleanni</button>
+        </div>
+
         <div class="section-title">
-            <span>Impegni del Giorno</span>
+            <span>Operazioni Odierne</span>
             <span class="badge-count" id="taskCount">0</span>
         </div>
         
@@ -589,30 +664,30 @@
         <div class="tasks-list" id="tasksList"></div>
         
         <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="fa-regular fa-face-smile" style="font-size: 36px; margin-bottom: 8px;"></i>
-            <p>Nessun impegno in programma per oggi.</p>
+            <i class="fa-solid fa-check-double" style="font-size: 32px; margin-bottom: 6px; color: var(--success);"></i>
+            <p>Tutte le operazioni odierne sono state completate.</p>
         </div>
 
         <!-- Sezione Gestione Scadenze e Compleanni Fissi -->
         <div class="management-section">
-            <div class="management-header"><i class="fa-solid fa-calendar-days"></i> Gestione Scadenze & Compleanni</div>
+            <div class="management-header"><i class="fa-solid fa-vault"></i> Archivio Scadenze & Compleanni Fissi</div>
             <div class="sub-list" id="permanentList"></div>
         </div>
     </div>
 
-    <!-- Modale Impostazioni & Backup -->
+    <!-- Modale Pannello di Controllo -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-card">
-            <h3>Impostazioni e Extra</h3>
-            <p>Gestisci le notifiche del mattino, esegui il backup dei dati o effettua la pulizia intelligente dei vecchi impegni passati.</p>
+            <h3>Centro Comando & Manutenzione</h3>
+            <p>Configura i protocolli di sicurezza, esegui il backup protetto o la pulizia dei registri storici passati.</p>
             <div class="modal-buttons">
-                <button class="btn-modal btn-primary" id="notifBtn"><i class="fa-solid fa-bell"></i> Abilita Notifiche Mattutine</button>
-                <button class="btn-modal btn-action" id="exportBtn"><i class="fa-solid fa-download"></i> Esporta Backup (JSON)</button>
-                <label class="btn-modal btn-action" style="display:inline-block; cursor:pointer; text-align:center; line-height: normal; padding-top:14px;">
-                    <i class="fa-solid fa-upload"></i> Importa Backup <input type="file" id="importFile" accept=".json" style="display:none;">
+                <button class="btn-modal btn-primary" id="notifBtn"><i class="fa-solid fa-bell"></i> Attiva Canale Notifiche</button>
+                <button class="btn-modal btn-action" id="exportBtn"><i class="fa-solid fa-download"></i> Esporta Database Backup (.json)</button>
+                <label class="btn-modal btn-action" style="display:inline-block; cursor:pointer; text-align:center; padding-top:10px;">
+                    <i class="fa-solid fa-upload"></i> Importa Database <input type="file" id="importFile" accept=".json" style="display:none;">
                 </label>
-                <button class="btn-modal btn-danger" id="clearDataBtn">Pulizia Intelligente Vecchi Dati</button>
-                <button class="btn-modal btn-action" id="closeModal" style="margin-top: 6px;">Chiudi</button>
+                <button class="btn-modal btn-danger" id="clearDataBtn">Pulizia Registri Passati</button>
+                <button class="btn-modal btn-action" id="closeModal" style="margin-top: 4px;">Chiudi Pannello</button>
             </div>
         </div>
     </div>
@@ -634,6 +709,11 @@
         const currentDateEl = document.getElementById('currentDate');
         const taskCount = document.getElementById('taskCount');
         
+        // KPI Elements
+        const kpiTotal = document.getElementById('kpiTotal');
+        const kpiDone = document.getElementById('kpiDone');
+        const kpiUrgent = document.getElementById('kpiUrgent');
+        
         const settingsBtn = document.getElementById('settingsBtn');
         const settingsModal = document.getElementById('settingsModal');
         const closeModal = document.getElementById('closeModal');
@@ -643,11 +723,14 @@
         const importFile = document.getElementById('importFile');
 
         const typeButtons = document.querySelectorAll('.type-btn');
+        const filterTabs = document.querySelectorAll('.filter-tab');
         let currentType = 'routine';
+        let currentFilter = 'all';
+        let completedTodayCount = 0;
 
         const today = new Date();
         const todayString = today.toISOString().split('T')[0];
-        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
         currentDateEl.textContent = today.toLocaleDateString('it-IT', options);
 
         typeButtons.forEach(btn => {
@@ -663,7 +746,7 @@
                 } else if (currentType === 'deadline') {
                     dateInputGroup.style.display = 'flex';
                     standardAddWrapper.style.display = 'none';
-                    taskInput.placeholder = "Descrizione scadenza...";
+                    taskInput.placeholder = "Oggetto della scadenza...";
                 } else if (currentType === 'birthday') {
                     dateInputGroup.style.display = 'flex';
                     standardAddWrapper.style.display = 'none';
@@ -672,12 +755,22 @@
             });
         });
 
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.getAttribute('data-filter');
+                renderApp();
+            });
+        });
+
         function loadAppData() {
-            let data = JSON.parse(localStorage.getItem('agenda_ultimate_data')) || { lastDate: todayString, tasks: [], hiddenToday: [] };
+            let data = JSON.parse(localStorage.getItem('agenda_general_data')) || { lastDate: todayString, tasks: [], hiddenToday: [], completedCount: 0 };
             if (data.lastDate !== todayString) {
                 data.lastDate = todayString;
                 data.hiddenToday = [];
-                localStorage.setItem('agenda_ultimate_data', JSON.stringify(data));
+                data.completedCount = 0;
+                localStorage.setItem('agenda_general_data', JSON.stringify(data));
             }
             return data;
         }
@@ -685,7 +778,7 @@
         let appData = loadAppData();
 
         function saveAppData() {
-            localStorage.setItem('agenda_ultimate_data', JSON.stringify(appData));
+            localStorage.setItem('agenda_general_data', JSON.stringify(appData));
             renderApp();
         }
 
@@ -702,7 +795,7 @@
             };
 
             if ((currentType === 'deadline' || currentType === 'birthday') && !newItem.date) {
-                alert("Seleziona una data valida!");
+                alert("Seleziona una data valida per la direttiva!");
                 return;
             }
 
@@ -724,6 +817,7 @@
                         appData.hiddenToday.push(id);
                     }
                 }
+                appData.completedCount = (appData.completedCount || 0) + 1;
                 saveAppData();
             }, 400);
         }
@@ -744,7 +838,7 @@
                     let dTime = new Date(task.date).getTime();
                     let diffDays = Math.ceil((dTime - nowTime) / (1000 * 60 * 60 * 24));
                     if (diffDays >= 0) {
-                        eventsList.push({ title: task.text, days: diffDays, label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`, type: 'Scadenza' });
+                        eventsList.push({ title: task.text, days: diffDays, label: diffDays === 0 ? 'Oggi' : `Tra ${diffDays}g`, priority: task.priority });
                     }
                 } else if (task.type === 'birthday' && task.date) {
                     let bDateParts = task.date.split('-');
@@ -759,24 +853,24 @@
                     let diffDays = Math.ceil((nextBday.getTime() - nowTime) / (1000 * 60 * 60 * 24));
                     let turningYears = nextBday.getFullYear() - bYear;
 
-                    eventsList.push({ title: `🎂 ${task.text} (${turningYears}a)`, days: diffDays, label: diffDays === 0 ? 'Oggi!' : `Tra ${diffDays}g`, type: 'Compleanno' });
+                    eventsList.push({ title: `🎂 ${task.text} (${turningYears}a)`, days: diffDays, label: diffDays === 0 ? 'Oggi!' : `Tra ${diffDays}g`, priority: 'medium' });
                 }
             });
 
             eventsList.sort((a, b) => a.days - b.days);
-            let top7 = eventsList.slice(0, 7);
+            let top5 = eventsList.slice(0, 5);
 
-            if (top7.length === 0) {
-                upcomingList.innerHTML = `<div style="font-size: 13px; opacity: 0.8; text-align: center; padding: 6px;">Nessun evento imminente.</div>`;
+            if (top5.length === 0) {
+                upcomingList.innerHTML = `<div style="font-size: 12px; opacity: 0.8; text-align: center; padding: 4px;">Nessuna operazione imminente in archivio.</div>`;
                 return;
             }
 
-            top7.forEach(ev => {
+            top5.forEach(ev => {
                 const el = document.createElement('div');
                 el.className = 'upcoming-item';
                 el.innerHTML = `
                     <div class="upcoming-info">
-                        <i class="fa-solid fa-calendar-day" style="font-size: 12px; opacity: 0.8;"></i>
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 11px; opacity: 0.8;"></i>
                         <span>${escapeHtml(ev.title)}</span>
                     </div>
                     <span class="upcoming-badge">${ev.label}</span>
@@ -791,6 +885,7 @@
 
             let todayTasks = [];
             let permanentItems = [];
+            let urgentCount = 0;
             let searchQuery = searchInput.value.toLowerCase();
 
             appData.tasks.forEach(task => {
@@ -800,9 +895,11 @@
 
                 if (task.type === 'routine') {
                     todayTasks.push(task);
+                    if(task.priority === 'high') urgentCount++;
                 } else if (task.type === 'deadline' && task.date <= todayString) {
                     if (!appData.hiddenToday.includes(task.id)) {
                         todayTasks.push(task);
+                        if(task.priority === 'high' || task.date === todayString) urgentCount++;
                     }
                 } else if (task.type === 'birthday' && task.date) {
                     let parts = task.date.split('-');
@@ -813,6 +910,16 @@
                     }
                 }
             });
+
+            // Aggiorna KPI Dashboard
+            kpiTotal.textContent = todayTasks.length + (appData.completedCount || 0);
+            kpiDone.textContent = appData.completedCount || 0;
+            kpiUrgent.textContent = urgentCount;
+
+            // Filtro per tab di categoria
+            if (currentFilter !== 'all') {
+                todayTasks = todayTasks.filter(t => t.type === currentFilter);
+            }
 
             // Filtro ricerca in tempo reale
             if (searchQuery) {
@@ -838,17 +945,17 @@
                 let priorityClass = `priority-${task.priority || 'medium'}`;
 
                 if (task.type === 'routine') {
-                    pillClass = 'routine'; pillText = 'Giornaliero'; metaText = 'Routine';
+                    pillClass = 'routine'; pillText = 'Giornaliero'; metaText = 'Routine Operativa';
                 } else if (task.type === 'deadline') {
                     pillClass = 'deadline'; pillText = 'Scadenza'; metaText = `Scadenza: ${task.date.split('-').reverse().join('/')}`;
                 } else if (task.type === 'birthday') {
-                    pillClass = 'birthday'; pillText = 'Compleanno'; metaText = 'Oggi compie gli anni!';
+                    pillClass = 'birthday'; pillText = 'Compleanno'; metaText = 'Ricorrenza odierna!';
                 }
 
                 item.innerHTML = `
                     <div class="task-content">
                         <div class="checkbox" onclick="completeTask(${task.id}, '${task.type}')">
-                            <i class="fa-solid fa-check" style="opacity: 0; font-size: 12px;"></i>
+                            <i class="fa-solid fa-check" style="opacity: 0; font-size: 11px;"></i>
                         </div>
                         <div class="task-details">
                             <span class="task-text">
@@ -870,9 +977,9 @@
                 tasksList.appendChild(item);
             });
 
-            // Render Gestione Fissa
+            // Render Archivio Fisso
             if (permanentItems.length === 0) {
-                permanentList.innerHTML = `<div style="font-size: 13px; color: var(--text-secondary); text-align: center; padding: 6px;">Nessuna scadenza o compleanno salvato.</div>`;
+                permanentList.innerHTML = `<div style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 4px;">Nessuna scadenza o compleanno registrato.</div>`;
             } else {
                 permanentItems.forEach(task => {
                     const subItem = document.createElement('div');
@@ -880,7 +987,7 @@
                     let pType = task.type === 'deadline' ? 'Scadenza' : 'Compleanno';
                     subItem.innerHTML = `
                         <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            <strong>${escapeHtml(task.text)}</strong> <span style="font-size:12px; color:var(--text-secondary);">(${pType}: ${task.date.split('-').reverse().join('/')})</span>
+                            <strong>${escapeHtml(task.text)}</strong> <span style="font-size:11px; color:var(--text-secondary);">(${pType}: ${task.date.split('-').reverse().join('/')})</span>
                         </div>
                         <button class="delete-btn" onclick="deletePermanentItem(${task.id})" title="Elimina definitivamente">
                             <i class="fa-solid fa-trash-can"></i>
@@ -898,33 +1005,30 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // Funzionalità Notifiche Locali
         notifBtn.addEventListener('click', () => {
             if (!("Notification" in window)) {
-                alert("Questo browser non supporta le notifiche desktop.");
+                alert("Canale notifiche non supportato.");
                 return;
             }
             Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
-                    new Notification("Agenda Ultimate", { body: "Notifiche attivate con successo! Riceverai i promemoria." });
+                    new Notification("Quartier Generale", { body: "Canale di trasmissione notifiche attivato." });
                 } else {
                     alert("Permesso notifiche negato.");
                 }
             });
         });
 
-        // Esportazione Backup JSON
         exportBtn.addEventListener('click', () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `agenda_backup_${todayString}.json`);
+            downloadAnchor.setAttribute("download", `database_generale_${todayString}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
         });
 
-        // Importazione Backup JSON
         importFile.addEventListener('change', (e) => {
             const fileReader = new FileReader();
             if (e.target.files[0]) {
@@ -935,13 +1039,13 @@
                         if (parsedData.tasks) {
                             appData = parsedData;
                             saveAppData();
-                            alert("Backup importato con successo!");
+                            alert("Database importato con successo!");
                             settingsModal.classList.remove('active');
                         } else {
-                            alert("File di backup non valido.");
+                            alert("Struttura file non valida.");
                         }
                     } catch (err) {
-                        alert("Errore durante la lettura del file JSON.");
+                        alert("Errore critico durante l'importazione.");
                     }
                 };
             }
@@ -956,9 +1060,10 @@
         closeModal.addEventListener('click', () => settingsModal.classList.remove('active'));
         
         clearDataBtn.addEventListener('click', () => {
-            if (confirm("Vuoi eseguire la pulizia intelligente? Verranno rimossi solo i vecchi impegni giornalieri passati.")) {
+            if (confirm("Confermi la pulizia dei registri giornalieri passati? Gli eventi futuri e i compleanni rimarranno protetti.")) {
                 appData.tasks = appData.tasks.filter(t => t.type !== 'routine');
                 appData.hiddenToday = [];
+                appData.completedCount = 0;
                 saveAppData();
                 settingsModal.classList.remove('active');
             }
