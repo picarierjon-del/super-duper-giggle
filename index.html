@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Quartier Generale">
-<title>Quartier Generale · V5</title>
+<title>Quartier Generale · V6 PRO</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -169,6 +169,34 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
 .status-line{font-size:10.5px;color:var(--muted);line-height:1.35;background:var(--input);padding:8px 9px;border-radius:9px}
 .toast{position:fixed;left:50%;bottom:max(env(safe-area-inset-bottom),20px);transform:translate(-50%,18px);background:rgba(28,28,30,.94);color:#fff;padding:9px 13px;border-radius:11px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:2000;max-width:88%;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* V6 PRO */
+.focus-card{padding:14px;display:flex;flex-direction:column;gap:10px}
+.focus-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.focus-title{font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px}
+.focus-percent{font-size:12px;font-weight:800;color:var(--accent)}
+.progress-track{height:7px;border-radius:99px;background:var(--input);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--success);border-radius:99px;transition:width .35s ease}
+.focus-list{display:flex;flex-direction:column;gap:6px}
+.focus-item{display:flex;align-items:center;gap:8px;font-size:11.5px;background:var(--input);padding:7px 9px;border-radius:9px}
+.focus-rank{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--card);font-size:10px;font-weight:800;flex:0 0 auto}
+.focus-item-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.day-chip{border:0;background:var(--input);color:var(--muted);border-radius:8px;padding:7px 2px;font-size:10px;font-weight:800;cursor:pointer}
+.day-chip.active{background:var(--accent);color:#fff}
+.reminder-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.reminder-row label{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap}
+.reminder-row select{max-width:none!important}
+.streak-badge{font-size:9px;font-weight:800;color:var(--warning);background:rgba(255,149,0,.11);padding:2px 5px;border-radius:5px}
+.overdue-badge{font-size:9px;font-weight:800;color:var(--danger);background:rgba(255,59,48,.11);padding:2px 5px;border-radius:5px}
+.alarm-panel{position:fixed;left:50%;bottom:max(env(safe-area-inset-bottom),20px);transform:translate(-50%,140%);width:min(92%,430px);background:var(--card);border:1px solid var(--line);box-shadow:0 15px 45px rgba(0,0,0,.25);border-radius:18px;padding:14px;z-index:2100;transition:.3s cubic-bezier(.16,1,.3,1)}
+.alarm-panel.show{transform:translate(-50%,0)}
+.alarm-panel-title{font-size:14px;font-weight:800;margin-bottom:4px}
+.alarm-panel-text{font-size:12px;color:var(--muted);margin-bottom:10px}
+.alarm-panel-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.alarm-panel-actions button{border:0;border-radius:10px;padding:9px 6px;font-size:11px;font-weight:800;cursor:pointer;background:var(--input);color:var(--text)}
+.alarm-panel-actions button:last-child{background:var(--accent);color:#fff}
+
 </style>
 </head>
 
@@ -196,6 +224,15 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
     <div class="kpi-card"><div class="kpi-value" id="kpiTotal">0</div><div class="kpi-label">Totali giorno</div></div>
     <div class="kpi-card"><div class="kpi-value" id="kpiDone" style="color:var(--success)">0</div><div class="kpi-label">Eseguiti</div></div>
     <div class="kpi-card"><div class="kpi-value" id="kpiUrgent" style="color:var(--danger)">0</div><div class="kpi-label">Critici</div></div>
+  </div>
+
+  <div class="focus-card card">
+    <div class="focus-head">
+      <div class="focus-title"><i class="fa-solid fa-bullseye"></i> Focus di oggi · Top 3</div>
+      <div class="focus-percent" id="focusPercent">0%</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="focus-list" id="focusList"></div>
   </div>
 
   <div class="search-bar card">
@@ -234,20 +271,31 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
           </select>
           <input type="time" id="routineTime" value="07:00" aria-label="Orario routine">
         </div>
+        <div class="weekdays" id="routineWeekdays">
+          <button type="button" class="day-chip active" data-day="1">L</button><button type="button" class="day-chip active" data-day="2">M</button><button type="button" class="day-chip active" data-day="3">M</button><button type="button" class="day-chip active" data-day="4">G</button><button type="button" class="day-chip active" data-day="5">V</button><button type="button" class="day-chip active" data-day="6">S</button><button type="button" class="day-chip active" data-day="0">D</button>
+        </div>
         <label class="alarm-toggle" style="margin-top:8px">
           <input type="checkbox" id="routineAlarm">
           <span>🔔 Sveglia / avviso all'orario della routine</span>
         </label>
-        <div class="helper">L'allarme sonoro funziona mentre la pagina è aperta. La notifica di sistema dipende dal supporto del browser/PWA.</div>
+        <div class="helper">Puoi scegliere i giorni della settimana. L'allarme sonoro funziona mentre la pagina è aperta; le notifiche di sistema dipendono dal browser/PWA.</div>
       </div>
 
       <div class="input-group" id="dateInputGroup" style="display:none">
         <input type="date" id="taskDate">
       </div>
 
-      <div class="input-group" id="timedInputGroup" style="display:none">
-        <input type="date" id="timedDate">
-        <input type="time" id="timedTime" value="12:00" style="max-width:120px">
+      <div id="timedInputGroup" style="display:none">
+        <div class="input-group">
+          <input type="date" id="timedDate">
+          <input type="time" id="timedTime" value="12:00" style="max-width:120px">
+        </div>
+        <div class="reminder-row">
+          <label for="timedReminder">Promemoria</label>
+          <select id="timedReminder">
+            <option value="0">All'orario</option><option value="30">30 min prima</option><option value="60">1 ora prima</option><option value="120" selected>2 ore prima</option><option value="1440">1 giorno prima</option>
+          </select>
+        </div>
       </div>
 
       <button class="submit-btn" id="addBtn"><i class="fa-solid fa-plus"></i> Registra elemento</button>
@@ -295,6 +343,9 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
           <option value="sera">🌙 Sera</option>
         </select>
         <input id="newRoutineTime" type="time" value="07:00">
+        <div class="weekdays full" id="newRoutineWeekdays">
+          <button type="button" class="day-chip active" data-day="1">L</button><button type="button" class="day-chip active" data-day="2">M</button><button type="button" class="day-chip active" data-day="3">M</button><button type="button" class="day-chip active" data-day="4">G</button><button type="button" class="day-chip active" data-day="5">V</button><button type="button" class="day-chip active" data-day="6">S</button><button type="button" class="day-chip active" data-day="0">D</button>
+        </div>
         <label class="alarm-toggle full">
           <input type="checkbox" id="newRoutineAlarm">
           <span>🔔 Attiva avviso all'orario</span>
@@ -320,20 +371,29 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
   </div>
 </div>
 
+<div class="alarm-panel" id="alarmPanel">
+  <div class="alarm-panel-title" id="alarmPanelTitle">🔔 Sveglia</div>
+  <div class="alarm-panel-text" id="alarmPanelText"></div>
+  <div class="alarm-panel-actions">
+    <button id="snooze5Btn">+5 min</button>
+    <button id="snooze10Btn">+10 min</button>
+    <button id="dismissAlarmBtn">Fatto</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
 'use strict';
 
-const STORAGE_KEY = 'agenda_general_data_v5';
-const LEGACY_KEYS = ['agenda_general_data_v4'];
+const STORAGE_KEY = 'agenda_general_data_v6';
+const LEGACY_KEYS = ['agenda_general_data_v5','agenda_general_data_v4'];
 const $ = id => document.getElementById(id);
 
 const els = {
   taskInput:$('taskInput'), taskDate:$('taskDate'), timedDate:$('timedDate'), timedTime:$('timedTime'),
   taskPriority:$('taskPriority'), addBtn:$('addBtn'), dateInputGroup:$('dateInputGroup'),
   timedInputGroup:$('timedInputGroup'), routineInputGroup:$('routineInputGroup'),
-  routineSlot:$('routineSlot'), routineTime:$('routineTime'), routineAlarm:$('routineAlarm'),
+  routineSlot:$('routineSlot'), routineTime:$('routineTime'), routineAlarm:$('routineAlarm'), routineWeekdays:$('routineWeekdays'), timedReminder:$('timedReminder'),
   searchInput:$('searchInput'), targetDateSelect:$('targetDateSelect'), resetDateBtn:$('resetDateBtn'),
   currentDateHeader:$('currentDateHeader'), sectionTitleText:$('sectionTitleText'),
   tasksList:$('tasksList'), upcomingList:$('upcomingList'), permanentList:$('permanentList'),
@@ -344,7 +404,7 @@ const els = {
   newRoutineName:$('newRoutineName'), newRoutineSlot:$('newRoutineSlot'),
   newRoutineTime:$('newRoutineTime'), newRoutineAlarm:$('newRoutineAlarm'),
   addRoutinePresetBtn:$('addRoutinePresetBtn'), routinePresetList:$('routinePresetList'),
-  notificationStatus:$('notificationStatus'), toast:$('toast')
+  notificationStatus:$('notificationStatus'), focusList:$('focusList'), focusPercent:$('focusPercent'), progressFill:$('progressFill'), newRoutineWeekdays:$('newRoutineWeekdays'), alarmPanel:$('alarmPanel'), alarmPanelTitle:$('alarmPanelTitle'), alarmPanelText:$('alarmPanelText'), snooze5Btn:$('snooze5Btn'), snooze10Btn:$('snooze10Btn'), dismissAlarmBtn:$('dismissAlarmBtn'), toast:$('toast')
 };
 
 const typeButtons = [...document.querySelectorAll('.type-btn')];
@@ -389,13 +449,15 @@ function todayStr(){ return localDateString(new Date()); }
 
 function defaultData() {
   return {
-    version:5,
+    version:6,
     tasks:[
-      {id:uid(),text:'Lavare i denti 🪥',type:'routine',routineSlot:'mattina',routineTime:'08:00',alarmEnabled:false,priority:'medium',date:null,time:null},
-      {id:uid(),text:'Lavare i denti 🪥',type:'routine',routineSlot:'sera',routineTime:'22:00',alarmEnabled:false,priority:'medium',date:null,time:null}
+      {id:uid(),text:'Lavare i denti 🪥',type:'routine',routineSlot:'mattina',routineTime:'08:00',alarmEnabled:false,weekdays:[0,1,2,3,4,5,6],priority:'medium',date:null,time:null},
+      {id:uid(),text:'Lavare i denti 🪥',type:'routine',routineSlot:'sera',routineTime:'22:00',alarmEnabled:false,weekdays:[0,1,2,3,4,5,6],priority:'medium',date:null,time:null}
     ],
     completed:{},
     notificationLog:{},
+    oneTimeDone:{},
+    snoozes:{},
     settings:{timedReminderMinutes:120,historyRetentionDays:90}
   };
 }
@@ -412,7 +474,7 @@ function normalizeData(raw) {
   }
 
   return {
-    version:5,
+    version:6,
     tasks:raw.tasks.map(t=>({
       id:Number(t.id)||uid(),
       text:String(t.text||'').trim(),
@@ -420,12 +482,16 @@ function normalizeData(raw) {
       routineSlot:t.routineSlot==='sera'?'sera':'mattina',
       routineTime:t.routineTime || (t.type==='routine' ? null : null),
       alarmEnabled:Boolean(t.alarmEnabled),
+      weekdays:Array.isArray(t.weekdays)&&t.weekdays.length?t.weekdays.map(Number):[0,1,2,3,4,5,6],
+      reminderMinutes:Number.isFinite(Number(t.reminderMinutes))?Number(t.reminderMinutes):120,
       priority:['low','medium','high'].includes(t.priority)?t.priority:'medium',
       date:t.date||null,
       time:t.time||null
     })).filter(t=>t.text),
     completed,
     notificationLog:raw.notificationLog && typeof raw.notificationLog==='object' ? raw.notificationLog : {},
+    oneTimeDone:raw.oneTimeDone && typeof raw.oneTimeDone==='object' ? raw.oneTimeDone : {},
+    snoozes:raw.snoozes && typeof raw.snoozes==='object' ? raw.snoozes : {},
     settings:{
       timedReminderMinutes:Number(raw.settings?.timedReminderMinutes)||120,
       historyRetentionDays:Number(raw.settings?.historyRetentionDays)||90
@@ -461,17 +527,48 @@ function saveData(render=true) {
 function isCompleted(taskId,dateStr) {
   return (appData.completed[dateStr]||[]).includes(taskId);
 }
-function markCompleted(taskId,dateStr) {
-  if(!appData.completed[dateStr]) appData.completed[dateStr]=[];
-  if(!appData.completed[dateStr].includes(taskId)) {
-    appData.completed[dateStr].push(taskId);
-    return true;
+function selectedWeekdays(container) {
+  return [...container.querySelectorAll('.day-chip.active')].map(b=>Number(b.dataset.day));
+}
+function setupWeekdayPicker(container) {
+  container.querySelectorAll('.day-chip').forEach(btn=>btn.addEventListener('click',()=>btn.classList.toggle('active')));
+}
+function weekdayApplies(task,dateStr) {
+  const d=parseLocalDate(dateStr);
+  return !task.weekdays || task.weekdays.includes(d.getDay());
+}
+function routineStreak(taskId,fromDateStr=todayStr()) {
+  let streak=0;
+  let d=parseLocalDate(fromDateStr);
+  for(let i=0;i<365;i++){
+    const ds=localDateString(d);
+    const task=appData.tasks.find(t=>t.id===taskId);
+    if(task && weekdayApplies(task,ds)){
+      if(isCompleted(taskId,ds)) streak++; else if(ds!==todayStr()) break; else if(streak===0){}
+    }
+    d.setDate(d.getDate()-1);
   }
-  return false;
+  return streak;
+}
+function markCompleted(taskId,dateStr) {
+  const task=appData.tasks.find(t=>t.id===taskId);
+  if(!task) return false;
+  if(task.type!=='routine') {
+    if(appData.oneTimeDone[taskId]) return false;
+    appData.oneTimeDone[taskId]=Date.now();
+  }
+  if(!appData.completed[dateStr]) appData.completed[dateStr]=[];
+  if(!appData.completed[dateStr].includes(taskId)) appData.completed[dateStr].push(taskId);
+  return true;
 }
 function taskAppliesToDate(task,dateStr) {
-  if(task.type==='routine') return true;
-  if(task.type==='timed' || task.type==='deadline') return task.date===dateStr;
+  if(task.type==='routine') return weekdayApplies(task,dateStr);
+  if(task.type==='timed') return task.date===dateStr && !appData.oneTimeDone[task.id];
+  if(task.type==='deadline') {
+    if(appData.oneTimeDone[task.id]) return false;
+    if(task.date===dateStr) return true;
+    return dateStr===todayStr() && task.date<dateStr;
+  }
   if(task.type==='birthday' && task.date) return task.date.slice(5)===dateStr.slice(5);
   return false;
 }
@@ -487,7 +584,7 @@ function setType(type) {
     els.routineInputGroup.style.display='block';
     els.taskInput.placeholder='Nuova abitudine (es. Sveglia 🔔)...';
   } else if(type==='timed') {
-    els.timedInputGroup.style.display='flex';
+    els.timedInputGroup.style.display='block';
     els.taskInput.placeholder="Oggetto dell'impegno orario...";
     els.timedDate.value ||= els.targetDateSelect.value;
     els.timedTime.value ||= '12:00';
@@ -518,10 +615,13 @@ function addItem() {
     item.routineSlot=els.routineSlot.value;
     item.routineTime=els.routineTime.value||null;
     item.alarmEnabled=els.routineAlarm.checked;
+    item.weekdays=selectedWeekdays(els.routineWeekdays);
+    if(!item.weekdays.length) return showToast('Seleziona almeno un giorno.');
     if(item.alarmEnabled && !item.routineTime) return showToast("Imposta un orario per l'avviso.");
   } else if(currentType==='timed') {
     item.date=els.timedDate.value;
     item.time=els.timedTime.value;
+    item.reminderMinutes=Number(els.timedReminder.value)||0;
     if(!item.date || !item.time) return showToast('Seleziona data e orario.');
   } else {
     item.date=els.taskDate.value;
@@ -544,8 +644,8 @@ function addRoutinePreset() {
 
   appData.tasks.push({
     id:uid(),text:name,type:'routine',priority:'medium',
-    routineSlot:els.newRoutineSlot.value,routineTime,alarmEnabled,
-    date:null,time:null
+    routineSlot:els.newRoutineSlot.value,routineTime,alarmEnabled,weekdays:selectedWeekdays(els.newRoutineWeekdays),
+    date:null,time:null,reminderMinutes:120
   });
   els.newRoutineName.value='';
   els.newRoutineAlarm.checked=false;
@@ -573,9 +673,9 @@ window.deletePermanentItem = function(id) {
     appData.completed[d]=(appData.completed[d]||[]).filter(x=>x!==id);
     if(appData.completed[d].length===0) delete appData.completed[d];
   });
-  Object.keys(appData.notificationLog).forEach(k=>{
-    if(k.includes(`:${id}:`)) delete appData.notificationLog[k];
-  });
+  Object.keys(appData.notificationLog).forEach(k=>{ if(k.includes(`:${id}:`)) delete appData.notificationLog[k]; });
+  delete appData.oneTimeDone[id];
+  delete appData.snoozes[id];
   saveData();
 };
 
@@ -603,6 +703,27 @@ window.editRoutine = function(id) {
   saveData();
 };
 
+window.editTask = function(id) {
+  const t=appData.tasks.find(x=>x.id===id);
+  if(!t) return;
+  const text=prompt('Titolo:',t.text); if(text===null) return;
+  const clean=text.trim(); if(!clean) return showToast('Titolo non valido.');
+  t.text=clean;
+  if(t.type==='timed') {
+    const date=prompt('Data YYYY-MM-DD:',t.date||''); if(date===null) return;
+    const time=prompt('Ora HH:MM:',t.time||''); if(time===null) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^\d{2}:\d{2}$/.test(time)) return showToast('Data o ora non valida.');
+    t.date=date;t.time=time;
+    const rem=prompt('Promemoria in minuti prima (0, 30, 60, 120, 1440):',String(t.reminderMinutes??120));
+    if(rem!==null) t.reminderMinutes=Math.max(0,Number(rem)||0);
+  } else if(t.type==='deadline'||t.type==='birthday') {
+    const date=prompt('Data YYYY-MM-DD:',t.date||''); if(date===null) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return showToast('Data non valida.');
+    t.date=date;
+  }
+  saveData(); showToast('Elemento aggiornato.');
+};
+
 function renderRoutineManagerList() {
   const routines=appData.tasks.filter(t=>t.type==='routine')
     .sort((a,b)=>(a.routineSlot||'').localeCompare(b.routineSlot||'') || (a.routineTime||'99:99').localeCompare(b.routineTime||'99:99'));
@@ -618,10 +739,11 @@ function renderRoutineManagerList() {
     const slot=r.routineSlot==='sera'?'🌙 Sera':'☀️ Mattina';
     const alarm=r.alarmEnabled?' · 🔔':'';
     const time=r.routineTime?` · ${r.routineTime}`:'';
+    const days=(r.weekdays||[0,1,2,3,4,5,6]).length===7?' · Ogni giorno':` · ${(r.weekdays||[]).length}g/set`;
     row.innerHTML=`
       <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
         <strong>${escapeHtml(r.text)}</strong><br>
-        <span style="color:var(--muted)">${slot}${time}${alarm}</span>
+        <span style="color:var(--muted)">${slot}${time}${alarm}${days}</span>
       </span>
       <span class="sub-actions">
         <button class="edit-btn" onclick="editRoutine(${r.id})" title="Modifica"><i class="fa-solid fa-pen"></i></button>
@@ -693,14 +815,15 @@ function taskPresentation(task) {
   if(task.type==='routine') {
     const slot=task.routineSlot==='sera'?'🌙 Sera':'☀️ Mattina';
     const time=task.routineTime?` · ${task.routineTime}`:'';
+    const streak=routineStreak(task.id,els.targetDateSelect.value||todayStr());
     return {
       pillClass:task.alarmEnabled?'alarm':'routine',
       pillText:task.alarmEnabled?'🔔 Sveglia':slot,
-      meta:`Abitudine giornaliera${time}${task.alarmEnabled?' · avviso attivo':''}`
+      meta:`Abitudine${time}${task.alarmEnabled?' · avviso attivo':''}${streak?` · 🔥 ${streak} giorni`:''}`
     };
   }
   if(task.type==='timed') return {pillClass:'timed',pillText:`🕒 ${task.time}`,meta:`Impegno alle ${task.time}`};
-  if(task.type==='deadline') return {pillClass:'deadline',pillText:'Scadenza',meta:`Scadenza: ${task.date.split('-').reverse().join('/')}`};
+  if(task.type==='deadline') { const overdue=task.date<todayStr()&&!appData.oneTimeDone[task.id]; return {pillClass:'deadline',pillText:overdue?'⚠️ Arretrata':'Scadenza',meta:`Scadenza: ${task.date.split('-').reverse().join('/')}${overdue?' · da recuperare':''}`}; }
   return {pillClass:'birthday',pillText:'Compleanno',meta:'Ricorrenza annuale'};
 }
 
@@ -735,6 +858,22 @@ function renderTaskArray(arr,dateStr) {
   });
 }
 
+function renderFocus(allApplicable,pending,selectedDate) {
+  const done=allApplicable.length-pending.length;
+  const pct=allApplicable.length?Math.round(done/allApplicable.length*100):100;
+  els.focusPercent.textContent=`${pct}%`;
+  els.progressFill.style.width=`${pct}%`;
+  const rank={high:0,medium:1,low:2};
+  const sorted=[...pending].sort((a,b)=>{
+    const at=a.type==='timed'?(a.time||'99:99'):a.type==='deadline'&&a.date<selectedDate?'00:00':a.type==='routine'?(a.routineTime||'99:99'):'99:99';
+    const bt=b.type==='timed'?(b.time||'99:99'):b.type==='deadline'&&b.date<selectedDate?'00:00':b.type==='routine'?(b.routineTime||'99:99'):'99:99';
+    return rank[a.priority||'medium']-rank[b.priority||'medium'] || at.localeCompare(bt);
+  }).slice(0,3);
+  els.focusList.innerHTML='';
+  if(!sorted.length){ els.focusList.innerHTML='<div style="font-size:11px;color:var(--muted)">Giornata completata. Nessuna priorità aperta.</div>'; return; }
+  sorted.forEach((t,i)=>{ const row=document.createElement('div');row.className='focus-item';row.innerHTML=`<span class="focus-rank">${i+1}</span><span class="focus-item-text">${escapeHtml(t.text)}</span>`;els.focusList.appendChild(row); });
+}
+
 function renderApp() {
   const selectedDate=els.targetDateSelect.value || todayStr();
   const dateObj=parseLocalDate(selectedDate) || new Date();
@@ -750,6 +889,7 @@ function renderApp() {
   els.kpiTotal.textContent=allApplicable.length;
   els.kpiDone.textContent=allApplicable.filter(t=>completedIds.includes(t.id)).length;
   els.kpiUrgent.textContent=pending.filter(t=>t.priority==='high').length;
+  renderFocus(allApplicable,pending,selectedDate);
 
   let shown=pending;
   if(currentFilter!=='all') shown=shown.filter(t=>t.type===currentFilter);
@@ -806,6 +946,7 @@ function renderArchive() {
         <div style="font-size:10.5px;color:var(--muted)">${type} · ${date}${time}</div>
       </div>
       <span class="sub-actions">
+        <button class="edit-btn" onclick="editTask(${task.id})" title="Modifica"><i class="fa-solid fa-pen"></i></button>
         <button class="delete-btn" onclick="deletePermanentItem(${task.id})" title="Elimina"><i class="fa-solid fa-trash-can"></i></button>
       </span>`;
     els.permanentList.appendChild(row);
@@ -846,24 +987,48 @@ function fireNotice(title,body,withSound=false) {
   if(document.visibilityState==='visible') showToast(body);
 }
 
+let activeAlarmTaskId=null;
+function showAlarmPanel(task) {
+  activeAlarmTaskId=task.id;
+  els.alarmPanelTitle.textContent='🔔 '+task.text;
+  els.alarmPanelText.textContent=`Routine programmata alle ${task.routineTime||'--:--'}`;
+  els.alarmPanel.classList.add('show');
+}
+function hideAlarmPanel(){ els.alarmPanel.classList.remove('show'); activeAlarmTaskId=null; }
+function snoozeAlarm(minutes){
+  if(!activeAlarmTaskId) return;
+  appData.snoozes[activeAlarmTaskId]=Date.now()+minutes*60000;
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));
+  hideAlarmPanel(); showToast(`Sveglia rimandata di ${minutes} min.`);
+}
+
 function checkNotifications() {
   const now=new Date();
   const date=localDateString(now);
 
+  Object.entries(appData.snoozes||{}).forEach(([id,ts])=>{
+    if(now.getTime()>=ts){
+      const task=appData.tasks.find(t=>String(t.id)===String(id));
+      delete appData.snoozes[id];
+      if(task){ fireNotice('🔔 Sveglia rimandata',task.text,true); showAlarmPanel(task); }
+    }
+  });
+
   appData.tasks.forEach(task=>{
-    if(task.type==='routine' && task.alarmEnabled && task.routineTime) {
+    if(task.type==='routine' && task.alarmEnabled && task.routineTime && weekdayApplies(task,date)) {
       const dt=parseLocalDateTime(date,task.routineTime);
       const delta=now-dt;
       const key=`routine:${task.id}:${date}:${task.routineTime}`;
       if(delta>=0 && delta<5*60*1000 && !appData.notificationLog[key]) {
         appData.notificationLog[key]=Date.now();
         fireNotice('🔔 Sveglia · Quartier Generale',`${task.text} · ${task.routineTime}`,true);
+        showAlarmPanel(task);
       }
     }
 
     if(task.type==='timed' && task.date && task.time) {
       const dt=parseLocalDateTime(task.date,task.time);
-      const reminder=Number(appData.settings.timedReminderMinutes)||120;
+      const reminder=Number.isFinite(Number(task.reminderMinutes))?Number(task.reminderMinutes):(Number(appData.settings.timedReminderMinutes)||120);
       const notifyAt=new Date(dt.getTime()-reminder*60000);
       const key=`timed:${task.id}:${task.date}:${task.time}:${reminder}`;
       if(now>=notifyAt && now<dt && !appData.notificationLog[key]) {
@@ -971,6 +1136,12 @@ els.clearDataBtn.addEventListener('click',()=>{
     showToast('Pulizia completata.');
   }
 });
+
+setupWeekdayPicker(els.routineWeekdays);
+setupWeekdayPicker(els.newRoutineWeekdays);
+els.snooze5Btn.addEventListener('click',()=>snoozeAlarm(5));
+els.snooze10Btn.addEventListener('click',()=>snoozeAlarm(10));
+els.dismissAlarmBtn.addEventListener('click',()=>{ if(activeAlarmTaskId) { markCompleted(activeAlarmTaskId,todayStr()); saveData(false); } hideAlarmPanel(); renderApp(); });
 
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') checkNotifications(); });
 window.addEventListener('focus',checkNotifications);
