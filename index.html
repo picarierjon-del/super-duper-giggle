@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Quartier Generale">
-<title>Quartier Generale · V6.1 CLEAN</title>
+<title>Quartier Generale · V6.2 AGENDA</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -170,17 +170,7 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
 .toast{position:fixed;left:50%;bottom:max(env(safe-area-inset-bottom),20px);transform:translate(-50%,18px);background:rgba(28,28,30,.94);color:#fff;padding:9px 13px;border-radius:11px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:2000;max-width:88%;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
-/* V6 PRO */
-.focus-card{padding:14px;display:flex;flex-direction:column;gap:10px}
-.focus-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.focus-title{font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px}
-.focus-percent{font-size:12px;font-weight:800;color:var(--accent)}
-.progress-track{height:7px;border-radius:99px;background:var(--input);overflow:hidden}
-.progress-fill{height:100%;width:0;background:var(--success);border-radius:99px;transition:width .35s ease}
-.focus-list{display:flex;flex-direction:column;gap:6px}
-.focus-item{display:flex;align-items:center;gap:8px;font-size:11.5px;background:var(--input);padding:7px 9px;border-radius:9px}
-.focus-rank{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--card);font-size:10px;font-weight:800;flex:0 0 auto}
-.focus-item-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* V6 PRO · routine e sveglie */
 .weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
 .day-chip{border:0;background:var(--input);color:var(--muted);border-radius:8px;padding:7px 2px;font-size:10px;font-weight:800;cursor:pointer}
 .day-chip.active{background:var(--accent);color:#fff}
@@ -202,6 +192,7 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
 .quick-entry-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .quick-entry-title{font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px;margin-bottom:3px}
 .quick-entry-title i{color:var(--accent)}
+.agenda-type-row{display:flex}.agenda-type-row select{max-width:none!important;width:100%;font-weight:700}
 .quick-date-time{display:grid;grid-template-columns:1fr 105px;gap:8px}
 .quick-date-time input{max-width:none!important;width:100%}
 .compact-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -237,15 +228,6 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
     <div class="kpi-card"><div class="kpi-value" id="kpiUrgent" style="color:var(--danger)">0</div><div class="kpi-label">Critici</div></div>
   </div>
 
-  <div class="focus-card card">
-    <div class="focus-head">
-      <div class="focus-title"><i class="fa-solid fa-bullseye"></i> Focus giornata · Top 3</div>
-      <div class="focus-percent" id="focusPercent">0%</div>
-    </div>
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="focus-list" id="focusList"></div>
-  </div>
-
   <div class="search-bar card">
     <i class="fa-solid fa-crosshairs"></i>
     <input id="searchInput" type="search" placeholder="Cerca nel database operativo..." autocomplete="off">
@@ -259,31 +241,46 @@ input[type="date"],input[type="time"]{color-scheme:light dark}
   <div class="input-card card quick-entry-card">
     <div class="quick-entry-head">
       <div>
-        <div class="quick-entry-title"><i class="fa-solid fa-plus-circle"></i> Nuovo impegno</div>
-        <div class="helper">La data segue automaticamente la giornata selezionata nel calendario.</div>
+        <div class="quick-entry-title"><i class="fa-solid fa-plus-circle"></i> Nuovo elemento</div>
+        <div class="helper">Il calendario in alto filtra la giornata e precompila la data.</div>
       </div>
     </div>
 
     <div class="form-fields">
-      <input type="text" id="taskInput" placeholder="Cosa devi fare?" autocomplete="off">
-      <div class="input-group quick-date-time">
+      <div class="agenda-type-row">
+        <select id="entryType" aria-label="Tipo elemento">
+          <option value="timed">🕒 Impegno</option>
+          <option value="deadline">📌 Scadenza</option>
+          <option value="birthday">🎂 Compleanno</option>
+        </select>
+      </div>
+
+      <input type="text" id="taskInput" placeholder="Descrizione impegno..." autocomplete="off">
+
+      <div class="input-group quick-date-time" id="timedFields">
         <input type="date" id="timedDate" aria-label="Data impegno">
         <input type="time" id="timedTime" aria-label="Ora impegno">
       </div>
-      <div class="input-group compact-options">
+
+      <div class="input-group" id="singleDateFields" style="display:none">
+        <input type="date" id="singleDate" aria-label="Data">
+      </div>
+
+      <div class="input-group compact-options" id="timedOptions">
         <select id="taskPriority" aria-label="Priorità">
           <option value="low">Priorità bassa</option>
           <option value="medium" selected>Priorità media</option>
           <option value="high">Priorità alta</option>
         </select>
         <select id="timedReminder" aria-label="Promemoria">
-          <option value="0">Nessun anticipo</option>
+          <option value="0">All'orario</option>
           <option value="30">30 min prima</option>
           <option value="60">1 ora prima</option>
           <option value="120" selected>2 ore prima</option>
           <option value="1440">1 giorno prima</option>
         </select>
       </div>
+
       <button class="submit-btn" id="addBtn"><i class="fa-solid fa-plus"></i> Registra impegno</button>
     </div>
   </div>
@@ -368,7 +365,8 @@ const LEGACY_KEYS = ['agenda_general_data_v5','agenda_general_data_v4'];
 const $ = id => document.getElementById(id);
 
 const els = {
-  taskInput:$('taskInput'), timedDate:$('timedDate'), timedTime:$('timedTime'),
+  taskInput:$('taskInput'), entryType:$('entryType'), timedDate:$('timedDate'), timedTime:$('timedTime'), singleDate:$('singleDate'),
+  timedFields:$('timedFields'), singleDateFields:$('singleDateFields'), timedOptions:$('timedOptions'),
   taskPriority:$('taskPriority'), addBtn:$('addBtn'), timedReminder:$('timedReminder'),
   searchInput:$('searchInput'), targetDateSelect:$('targetDateSelect'), resetDateBtn:$('resetDateBtn'),
   currentDateHeader:$('currentDateHeader'), sectionTitleText:$('sectionTitleText'),
@@ -380,7 +378,7 @@ const els = {
   newRoutineName:$('newRoutineName'), newRoutineSlot:$('newRoutineSlot'),
   newRoutineTime:$('newRoutineTime'), newRoutineAlarm:$('newRoutineAlarm'),
   addRoutinePresetBtn:$('addRoutinePresetBtn'), routinePresetList:$('routinePresetList'),
-  notificationStatus:$('notificationStatus'), focusList:$('focusList'), focusPercent:$('focusPercent'), progressFill:$('progressFill'), newRoutineWeekdays:$('newRoutineWeekdays'), alarmPanel:$('alarmPanel'), alarmPanelTitle:$('alarmPanelTitle'), alarmPanelText:$('alarmPanelText'), snooze5Btn:$('snooze5Btn'), snooze10Btn:$('snooze10Btn'), dismissAlarmBtn:$('dismissAlarmBtn'), toast:$('toast')
+  notificationStatus:$('notificationStatus'), newRoutineWeekdays:$('newRoutineWeekdays'), alarmPanel:$('alarmPanel'), alarmPanelTitle:$('alarmPanelTitle'), alarmPanelText:$('alarmPanelText'), snooze5Btn:$('snooze5Btn'), snooze10Btn:$('snooze10Btn'), dismissAlarmBtn:$('dismissAlarmBtn'), toast:$('toast')
 };
 
 let currentFilter = 'all';
@@ -526,7 +524,7 @@ function routineStreak(taskId,fromDateStr=todayStr()) {
 function markCompleted(taskId,dateStr) {
   const task=appData.tasks.find(t=>t.id===taskId);
   if(!task) return false;
-  if(task.type!=='routine') {
+  if(task.type==='timed' || task.type==='deadline') {
     if(appData.oneTimeDone[taskId]) return false;
     appData.oneTimeDone[taskId]=Date.now();
   }
@@ -547,28 +545,62 @@ function taskAppliesToDate(task,dateStr) {
 }
 
 function syncComposerDate() {
-  if(els.timedDate) els.timedDate.value = els.targetDateSelect.value || todayStr();
+  const selected = els.targetDateSelect.value || todayStr();
+  if(els.timedDate) els.timedDate.value = selected;
+  if(els.singleDate && els.entryType.value !== 'birthday') els.singleDate.value = selected;
+}
+
+function updateEntryForm() {
+  const type = els.entryType.value;
+  const isTimed = type === 'timed';
+  els.timedFields.style.display = isTimed ? 'flex' : 'none';
+  els.singleDateFields.style.display = isTimed ? 'none' : 'flex';
+  els.timedOptions.style.display = isTimed ? 'grid' : 'none';
+
+  if(type === 'timed') {
+    els.taskInput.placeholder = 'Descrizione impegno...';
+    els.addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Registra impegno';
+    syncComposerDate();
+  } else if(type === 'deadline') {
+    els.taskInput.placeholder = 'Descrizione scadenza...';
+    els.singleDate.value = els.targetDateSelect.value || todayStr();
+    els.addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Registra scadenza';
+  } else {
+    els.taskInput.placeholder = 'Nome del festeggiato...';
+    els.singleDate.value = '';
+    els.addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Registra compleanno';
+  }
 }
 
 function addItem() {
   const text=els.taskInput.value.trim();
-  if(!text) return showToast('Scrivi cosa devi fare.');
+  if(!text) return showToast('Inserisci una descrizione.');
 
-  const date=els.timedDate.value || els.targetDateSelect.value || todayStr();
-  const time=els.timedTime.value || null;
-  const reminder=time ? (Number(els.timedReminder.value)||0) : 0;
+  const type=els.entryType.value;
+  let date=null, time=null, reminder=0, priority='medium';
+
+  if(type==='timed') {
+    date=els.timedDate.value || els.targetDateSelect.value || todayStr();
+    time=els.timedTime.value;
+    priority=els.taskPriority.value;
+    reminder=Number(els.timedReminder.value)||0;
+    if(!date || !time) return showToast('Per un impegno servono data e ora.');
+  } else {
+    date=els.singleDate.value;
+    if(!date) return showToast(type==='birthday' ? 'Inserisci la data di nascita.' : 'Inserisci la data della scadenza.');
+  }
 
   appData.tasks.push({
-    id:uid(), text, type:'timed', priority:els.taskPriority.value,
+    id:uid(), text, type, priority,
     routineSlot:null, routineTime:null, alarmEnabled:false,
     weekdays:[0,1,2,3,4,5,6], reminderMinutes:reminder,
     date, time
   });
 
   els.taskInput.value='';
-  els.timedTime.value='';
+  if(type==='timed') els.timedTime.value='';
   saveData();
-  showToast('Impegno registrato.');
+  showToast(type==='timed'?'Impegno registrato.':type==='deadline'?'Scadenza registrata.':'Compleanno registrato.');
 }
 
 function addRoutinePreset() {
@@ -705,7 +737,7 @@ function updateUpcomingEvents(referenceDateStr = (els.targetDateSelect.value || 
   const events=[];
 
   appData.tasks.forEach(task=>{
-    if(appData.oneTimeDone[task.id]) return;
+    if((task.type==='timed' || task.type==='deadline') && appData.oneTimeDone[task.id]) return;
     if(task.type==='deadline' && task.date) {
       const dt=parseLocalDate(task.date);
       const days=Math.round((dt-refMid)/86400000);
@@ -801,22 +833,6 @@ function renderTaskArray(arr,dateStr) {
   });
 }
 
-function renderFocus(allApplicable,pending,selectedDate) {
-  const done=allApplicable.length-pending.length;
-  const pct=allApplicable.length?Math.round(done/allApplicable.length*100):100;
-  els.focusPercent.textContent=`${pct}%`;
-  els.progressFill.style.width=`${pct}%`;
-  const rank={high:0,medium:1,low:2};
-  const sorted=[...pending].sort((a,b)=>{
-    const at=a.type==='timed'?(a.time||'99:99'):a.type==='deadline'&&a.date<selectedDate?'00:00':a.type==='routine'?(a.routineTime||'99:99'):'99:99';
-    const bt=b.type==='timed'?(b.time||'99:99'):b.type==='deadline'&&b.date<selectedDate?'00:00':b.type==='routine'?(b.routineTime||'99:99'):'99:99';
-    return rank[a.priority||'medium']-rank[b.priority||'medium'] || at.localeCompare(bt);
-  }).slice(0,3);
-  els.focusList.innerHTML='';
-  if(!sorted.length){ els.focusList.innerHTML='<div style="font-size:11px;color:var(--muted)">Giornata completata. Nessuna priorità aperta.</div>'; return; }
-  sorted.forEach((t,i)=>{ const row=document.createElement('div');row.className='focus-item';row.innerHTML=`<span class="focus-rank">${i+1}</span><span class="focus-item-text">${escapeHtml(t.text)}</span>`;els.focusList.appendChild(row); });
-}
-
 function renderApp() {
   const selectedDate=els.targetDateSelect.value || todayStr();
   const dateObj=parseLocalDate(selectedDate) || new Date();
@@ -832,7 +848,6 @@ function renderApp() {
   els.kpiTotal.textContent=allApplicable.length;
   els.kpiDone.textContent=allApplicable.filter(t=>completedIds.includes(t.id)).length;
   els.kpiUrgent.textContent=pending.filter(t=>t.priority==='high').length;
-  renderFocus(allApplicable,pending,selectedDate);
 
   let shown=pending;
   if(currentFilter!=='all') shown=shown.filter(t=>t.type===currentFilter);
@@ -842,7 +857,9 @@ function renderApp() {
   els.emptyState.style.display=shown.length?'none':'block';
   els.tasksList.innerHTML='';
 
-  const daily=shown.filter(t=>t.type!=='routine');
+  const timed=shown.filter(t=>t.type==='timed');
+  const deadlines=shown.filter(t=>t.type==='deadline');
+  const birthdays=shown.filter(t=>t.type==='birthday');
   const morning=shown.filter(t=>t.type==='routine'&&t.routineSlot!=='sera');
   const evening=shown.filter(t=>t.type==='routine'&&t.routineSlot==='sera');
 
@@ -855,7 +872,9 @@ function renderApp() {
     renderTaskArray(arr,selectedDate);
   };
 
-  addGroup('Impegni della giornata','<i class="fa-solid fa-calendar-check" style="color:var(--accent)"></i>',daily);
+  addGroup('Impegni','<i class="fa-solid fa-clock" style="color:var(--accent)"></i>',timed);
+  addGroup('Scadenze','<i class="fa-solid fa-flag" style="color:var(--warning)"></i>',deadlines);
+  addGroup('Compleanni','<i class="fa-solid fa-cake-candles" style="color:var(--pink)"></i>',birthdays);
   addGroup('Routine mattutina','<i class="fa-solid fa-sun" style="color:var(--warning)"></i>',morning);
   addGroup('Routine serale','<i class="fa-solid fa-moon" style="color:var(--purple)"></i>',evening);
 
@@ -1029,6 +1048,7 @@ function cleanHistory() {
 
 els.targetDateSelect.addEventListener('change',()=>{syncComposerDate();renderApp();});
 els.resetDateBtn.addEventListener('click',()=>{els.targetDateSelect.value=todayStr();syncComposerDate();renderApp();});
+els.entryType.addEventListener('change',updateEntryForm);
 els.addBtn.addEventListener('click',addItem);
 els.addRoutinePresetBtn.addEventListener('click',addRoutinePreset);
 els.taskInput.addEventListener('keydown',e=>{if(e.key==='Enter') addItem();});
@@ -1087,6 +1107,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 window.addEventListener('focus',checkNotifications);
 
 syncComposerDate();
+updateEntryForm();
 renderApp();
 renderRoutineManagerList();
 updateNotificationStatus();
