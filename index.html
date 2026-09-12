@@ -578,6 +578,7 @@
             transition: opacity 0.3s ease;
             z-index: 1000;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .modal-overlay.active {
@@ -588,7 +589,7 @@
         .modal-card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             border-radius: 18px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -597,6 +598,8 @@
             display: flex;
             flex-direction: column;
             gap: 14px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-overlay.active .modal-card {
@@ -626,6 +629,41 @@
         .btn-action { background: var(--input-bg); color: var(--text-main); }
         .btn-primary { background: var(--accent); color: white; }
         .btn-danger { background: var(--danger); color: white; }
+
+        /* Stili per il gestore routine nel modale */
+        .routine-manager-box {
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .routine-manager-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .routine-preset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .routine-preset-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -736,7 +774,7 @@
             <p>Nessuna operazione programmata per questa data.</p>
         </div>
 
-        <!-- Sezione Gestione Scadenze e Compleanni Fissi -->
+        <!-- Sezione Gestione Fissa -->
         <div class="management-section">
             <div class="management-header"><i class="fa-solid fa-vault"></i> Archivio Scadenze & Compleanni Fissi</div>
             <div class="sub-list" id="permanentList"></div>
@@ -747,7 +785,22 @@
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-card">
             <h3>Centro Comando & Manutenzione</h3>
-            <p>Configura i protocolli di sicurezza, esegui il backup protetto o la pulizia dei registri storici passati.</p>
+            <p>Configura i protocolli, crea le routine giornaliere fisse o gestisci i backup protetti.</p>
+            
+            <!-- Nuova Sezione Configurazione Routine Fisse -->
+            <div class="routine-manager-box">
+                <h4><i class="fa-solid fa-list-check"></i> Gestore Routine Fisse Giornaliere</h4>
+                <div style="display: flex; gap: 4px;">
+                    <input type="text" id="newRoutineName" placeholder="Nuova abitudine fissa..." style="flex:1; border:none; background:var(--card-bg); padding:6px 8px; border-radius:6px; font-size:12px; color:var(--text-main); outline:none;">
+                    <select id="newRoutineSlot" style="border:none; background:var(--card-bg); padding:6px; border-radius:6px; font-size:11px; color:var(--text-main); outline:none;">
+                        <option value="mattina">☀️ Mattina</option>
+                        <option value="sera">🌙 Sera</option>
+                    </select>
+                    <button class="btn-primary" id="addRoutinePresetBtn" style="border:none; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div class="routine-preset-list" id="routinePresetList"></div>
+            </div>
+
             <div class="modal-buttons">
                 <button class="btn-modal btn-primary" id="notifBtn"><i class="fa-solid fa-bell"></i> Attiva Canale Notifiche</button>
                 <button class="btn-modal btn-action" id="exportBtn"><i class="fa-solid fa-download"></i> Esporta Database Backup (.json)</button>
@@ -793,6 +846,12 @@
         const notifBtn = document.getElementById('notifBtn');
         const exportBtn = document.getElementById('exportBtn');
         const importFile = document.getElementById('importFile');
+
+        // Routine Manager Inputs nel Modale
+        const newRoutineName = document.getElementById('newRoutineName');
+        const newRoutineSlot = document.getElementById('newRoutineSlot');
+        const addRoutinePresetBtn = document.getElementById('addRoutinePresetBtn');
+        const routinePresetList = document.getElementById('routinePresetList');
 
         const typeButtons = document.querySelectorAll('.type-btn');
         const filterTabs = document.querySelectorAll('.filter-tab');
@@ -843,7 +902,7 @@
         });
 
         function loadAppData() {
-            let data = JSON.parse(localStorage.getItem('agenda_general_data_v2')) || { 
+            let data = JSON.parse(localStorage.getItem('agenda_general_data_v3')) || { 
                 lastDate: todayString, 
                 tasks: [
                     { id: 101, text: "Lavare i denti 🪥", type: 'routine', routineSlot: 'mattina', priority: 'medium', date: null },
@@ -860,8 +919,9 @@
         let appData = loadAppData();
 
         function saveAppData() {
-            localStorage.setItem('agenda_general_data_v2', JSON.stringify(appData));
+            localStorage.setItem('agenda_general_data_v3', JSON.stringify(appData));
             renderApp();
+            renderRoutineManagerList();
         }
 
         function addItem() {
@@ -884,6 +944,23 @@
 
             appData.tasks.push(newItem);
             taskInput.value = '';
+            saveAppData();
+        }
+
+        // Aggiunta rapida di routine fissa dalle impostazioni
+        function addRoutinePreset() {
+            const name = newRoutineName.value.trim();
+            if(!name) return;
+            let newItem = {
+                id: Date.now(),
+                text: name,
+                type: 'routine',
+                priority: 'medium',
+                routineSlot: newRoutineSlot.value,
+                date: null
+            };
+            appData.tasks.push(newItem);
+            newRoutineName.value = '';
             saveAppData();
         }
 
@@ -910,6 +987,25 @@
                 appData.hiddenToday[dateKey] = appData.hiddenToday[dateKey].filter(hiddenId => hiddenId !== id);
             });
             saveAppData();
+        }
+
+        function renderRoutineManagerList() {
+            routinePresetList.innerHTML = '';
+            let routines = appData.tasks.filter(t => t.type === 'routine');
+            if(routines.length === 0) {
+                routinePresetList.innerHTML = `<div style="font-size:11px; color:var(--text-secondary); text-align:center;">Nessuna routine configurata.</div>`;
+                return;
+            }
+            routines.forEach(r => {
+                let slotLabel = r.routineSlot === 'mattina' ? '☀️ Mattina' : '🌙 Sera';
+                const el = document.createElement('div');
+                el.className = 'routine-preset-item';
+                el.innerHTML = `
+                    <span><strong>${escapeHtml(r.text)}</strong> (${slotLabel})</span>
+                    <button class="delete-btn" onclick="deletePermanentItem(${r.id})" style="font-size:12px; padding:2px 4px;"><i class="fa-solid fa-trash-can"></i></button>
+                `;
+                routinePresetList.appendChild(el);
+            });
         }
 
         function updateUpcomingEvents() {
@@ -1029,7 +1125,7 @@
                 emptyState.style.display = 'none';
             }
 
-            // Separiamo le routine mattina / sera se stiamo guardando "Tutti" o "Giornalieri"
+            // Separiamo le routine mattina / sera
             let mattinaTasks = selectedTasks.filter(t => t.type === 'routine' && t.routineSlot === 'mattina');
             let seraTasks = selectedTasks.filter(t => t.type === 'routine' && t.routineSlot === 'sera');
             let otherTasks = selectedTasks.filter(t => t.type !== 'routine');
@@ -1108,7 +1204,7 @@
                 renderTaskItems(seraTasks);
             }
 
-            // Render Archivio Fisso
+            // Render Archivio Fisso Scadenze / Compleanni
             if (permanentItems.length === 0) {
                 permanentList.innerHTML = `<div style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 4px;">Nessuna scadenza o compleanno registrato.</div>`;
             } else {
@@ -1183,15 +1279,20 @@
         });
 
         addBtn.addEventListener('click', addItem);
+        addRoutinePresetBtn.addEventListener('click', addRoutinePreset);
         taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addItem(); });
+        newRoutineName.addEventListener('keypress', (e) => { if (e.key === 'Enter') addRoutinePreset(); });
         searchInput.addEventListener('input', renderApp);
 
-        settingsBtn.addEventListener('click', () => settingsModal.classList.add('active'));
+        settingsBtn.addEventListener('click', () => {
+            renderRoutineManagerList();
+            settingsModal.classList.add('active');
+        });
         closeModal.addEventListener('click', () => settingsModal.classList.remove('active'));
         
         clearDataBtn.addEventListener('click', () => {
             if (confirm("Confermi la pulizia dei registri storici passati? Gli eventi futuri e i compleanni rimarranno protetti.")) {
-                appData.tasks = appData.tasks.filter(t => t.type !== 'routine');
+                appData.tasks = appData.tasks.filter(t => t.type !== 'deadline' || new Date(t.date).getTime() >= new Date(todayString).getTime());
                 appData.hiddenToday = {};
                 appData.completedCount = {};
                 saveAppData();
