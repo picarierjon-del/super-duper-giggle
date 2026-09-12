@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Il Generale">
-<title>Agenda del Generale V3 Pro</title>
+<title>Agenda del Generale V2 Supreme</title>
 <style>
 :root{--forest:#173d2b;--forest2:#24563d;--olive:#708453;--gold:#c9a861;--paper:#f4f1e7;--card:#fffef9;--ink:#17241c;--muted:#6f786f;--line:#dce0d7;--danger:#a43b35;--orange:#b87026;--shadow:0 8px 24px rgba(23,61,43,.09)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -32,6 +32,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:7
 .intel{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-top:9px}.intel-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px}.intel-card small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.7px}.intel-card strong{display:block;font-family:Georgia,serif;color:var(--forest);font-size:15px;margin-top:3px}.overdue strong{color:var(--danger)}
 .catdot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}.cat-work{background:#365f46}.cat-personal{background:#b18d43}.cat-family{background:#8e5b5b}.cat-health{background:#3c7780}.cat-other{background:#888}
 .month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.month-head button{border:0;background:#e1e5dd;width:38px;height:38px;border-radius:11px;font-size:18px}.month-head strong{font-family:Georgia,serif;font-size:20px;text-transform:capitalize}.month-week,.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.month-week span{text-align:center;font-size:9px;font-weight:800;color:var(--muted);padding:5px}.mday{min-height:54px;border:1px solid var(--line);background:var(--card);border-radius:10px;color:var(--ink);position:relative;padding:7px 4px;text-align:left}.mday.out{opacity:.3}.mday.today{border:2px solid var(--gold)}.mday.selected{background:var(--forest);color:white}.mday b{font-size:11px}.mday em{position:absolute;right:5px;bottom:5px;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:#173d2b;font-size:9px;font-style:normal;font-weight:900;display:grid;place-items:center}.mday.selected em{background:white}.agenda-all{display:grid;gap:9px}.agenda-date{font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.7px;margin:10px 2px 4px}.hidden{display:none!important}.birthday-strip{margin-top:10px;background:linear-gradient(135deg,#fff9e8,#f3e7bf);border:1px solid #e4d3a1;border-radius:15px;padding:11px 13px}.birthday-strip[hidden]{display:none}.birthday-head{display:flex;justify-content:space-between;align-items:center;font-size:9px;letter-spacing:.8px;font-weight:900;color:#7f672e;text-transform:uppercase;margin-bottom:7px}.birthday-list{display:grid;gap:6px}.birthday-row{display:flex;align-items:center;gap:8px;font-size:12px}.birthday-row b{flex:1}.countdown{background:var(--forest);color:white;border-radius:999px;padding:4px 8px;font-size:9px;font-weight:900;white-space:nowrap}.notif-status{font-size:10px;color:var(--muted);padding:3px 4px 1px}.alarm-flash{animation:alarmPulse .7s ease 3}@keyframes alarmPulse{50%{box-shadow:inset 0 0 0 4px var(--gold)}}
+.birthday-editor{background:#fbf4dc;border:1px solid #e5d39b;border-radius:14px;padding:10px;margin:9px 0}.birthday-editor .birth-grid{display:grid;grid-template-columns:.7fr 1.3fr 1fr;gap:7px}.birthday-editor input,.birthday-editor select{background:#fffef9}.age-preview{margin-top:8px;background:var(--forest);color:white;border-radius:9px;padding:8px 10px;text-align:center;font-size:11px;font-weight:800}.age-preview.warning{background:var(--danger)}
 @media(min-width:721px){.hero{margin-top:14px;border-radius:26px}.overlay{align-items:center}.sheet{border-radius:24px;max-height:88vh}.fab{bottom:25px}}
 </style>
 </head>
@@ -62,7 +63,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:7
  <div class="types"><button class="type active" data-type="event"><span>&#9719;</span>Impegno</button><button class="type" data-type="deadline"><span>&#9873;</span>Scadenza</button><button class="type" data-type="birthday"><span>&#9733;</span>Compleanno</button><button class="type" data-type="routine"><span>&#8635;</span>Routine</button></div>
  <div class="field"><label id="titleLabel">Impegno</label><input id="title" maxlength="120" placeholder="Qual e l'impegno?"></div>
  <div class="field"><label>Note (facoltative)</label><textarea id="notes" rows="2" maxlength="300" placeholder="Dettagli utili..."></textarea></div>
- <div class="row"><div class="field"><label>Data</label><input id="itemDate" type="date"></div><div class="field" id="timeField"><label>Ora inizio</label><input id="itemTime" type="time"></div></div>
+ <div class="row" id="standardDateRow"><div class="field"><label>Data</label><input id="itemDate" type="date"></div><div class="field" id="timeField"><label>Ora inizio</label><input id="itemTime" type="time"></div></div>
+ <div class="birthday-editor hidden" id="birthdayEditor"><div class="field"><label>Data di nascita completa</label><div class="birth-grid"><input id="birthDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Giorno"><select id="birthMonth"><option value="1">Gennaio</option><option value="2">Febbraio</option><option value="3">Marzo</option><option value="4">Aprile</option><option value="5">Maggio</option><option value="6">Giugno</option><option value="7">Luglio</option><option value="8">Agosto</option><option value="9">Settembre</option><option value="10">Ottobre</option><option value="11">Novembre</option><option value="12">Dicembre</option></select><input id="birthYear" type="number" min="1900" max="2100" inputmode="numeric" placeholder="Anno"></div></div><div class="field"><label>Ora avviso compleanno</label><input id="birthdayTime" type="time" value="09:00"></div><div class="age-preview" id="agePreview">Inserisci l'anno di nascita</div></div>
  <div class="row" id="detailTimeRow"><div class="field"><label>Ora fine</label><input id="endTime" type="time"></div><div class="field"><label>Categoria</label><select id="category"><option value="work">Lavoro</option><option value="personal">Personale</option><option value="family">Famiglia</option><option value="health">Salute</option><option value="other">Altro</option></select></div></div>
  <div class="field" id="locationField"><label>Luogo (facoltativo)</label><input id="location" maxlength="100" placeholder="Dove si svolge?"></div>
  <div class="row"><div class="field"><label>Priorit&agrave;</label><select id="priority"><option value="low">Normale</option><option value="medium">Importante</option><option value="high">Critica</option></select></div><div class="field" id="slotField" hidden><label>Momento</label><select id="slot"><option value="morning">Mattina</option><option value="evening">Sera</option></select></div></div>
@@ -81,15 +83,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:7
 
 <div class="overlay" id="command"><div class="sheet">
  <div class="sheet-head"><h3>Centro Comando</h3><button class="x" data-close="command">&times;</button></div>
- <div class="settings-grid">
-  <button class="action" id="notify">&#9679; Attiva notifiche</button>
-  <button class="action" id="testNotify">TEST - Prova notifica adesso</button>
-  <div class="notif-status" id="notifStatus">Stato notifiche: da verificare</div>
-  <button class="action" id="export">&darr; Esporta backup JSON</button>
-  <label class="action">&uarr; Importa backup<input id="import" type="file" accept="application/json,.json" hidden></label>
-  <button class="action" id="cleanup-data-btn" style="background-color: var(--card); color: var(--danger); border-color: var(--danger);">&#10005; Pulisci tutti i dati e cache</button>
-  <button class="action" id="cleanup">&#10003; Pulisci storico completato (>30 giorni)</button>
- </div>
+ <div class="settings-grid"><button class="action" id="notify">&#9679; Attiva notifiche</button><button class="action" id="testNotify">TEST - Prova notifica adesso</button><div class="notif-status" id="notifStatus">Stato notifiche: da verificare</div><button class="action" id="export">&darr; Esporta backup JSON</button><label class="action">&uarr; Importa backup<input id="import" type="file" accept="application/json,.json" hidden></label><button class="action" id="cleanup">&#10003; Pulisci storico completato</button></div>
  <div class="section-head" style="margin-top:18px"><h2>Archivio futuro</h2><span id="archiveCount"></span></div><div class="archive" id="archive"></div>
  <button class="save secondary" data-close="command">Chiudi centro comando</button>
 </div></div>
@@ -97,103 +91,20 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:7
 
 <script>
 (()=>{'use strict';
-const KEY='agenda_generale_v3';
-const DB_NAME='AgendaGeneraleDB';
-const STORE_NAME='tasksStore';
+const KEY='agenda_generale_v1';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-
 let state={version:1,items:[],completions:{}};
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.items))state={version:1,items:x.items,completions:x.completions||{}}}catch(e){}
 let selected=iso(new Date()), filter='all', editing=null, type='event', currentView='day', monthCursor=new Date();
 const labels={event:'Impegno',deadline:'Scadenza',birthday:'Compleanno',routine:'Routine'};
 const icons={event:'ORA',deadline:'SCAD',birthday:'COMPL',routine:'ROUT'};
-
-// 1. Gestione IndexedDB + localStorage ibrido
-function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, 1);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: "id" });
-            }
-        };
-    });
-}
-
-async function loadInitialData() {
-    try {
-        const db = await openDB();
-        const transaction = db.transaction(STORE_NAME, "readonly");
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.getAll();
-        
-        request.onsuccess = async () => {
-            const items = request.result;
-            const localComp = JSON.parse(localStorage.getItem(KEY+'_comp') || '{}');
-            
-            if (items && items.length > 0) {
-                state.items = items;
-                state.completions = localComp;
-            } else {
-                // Fallback legacy localStorage se IndexedDB è vuoto
-                const x = JSON.parse(localStorage.getItem(KEY));
-                if (x && Array.isArray(x.items)) {
-                    state.items = x.items;
-                    state.completions = x.completions || {};
-                    // Migra in IndexedDB
-                    await saveState();
-                }
-            }
-            await rolloverIncompleteTasks();
-            render();
-        };
-    } catch(e) {
-        // Fallback totale su localStorage in caso di errore IndexedDB
-        try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.items))state={version:1,items:x.items,completions:x.completions||{}}}catch(err){}
-        render();
-    }
-}
-
-async function saveState() {
-    try {
-        localStorage.setItem(KEY+'_comp', JSON.stringify(state.completions));
-        const db = await openDB();
-        const transaction = db.transaction(STORE_NAME, "readwrite");
-        const store = transaction.objectStore(STORE_NAME);
-        store.clear();
-        state.items.forEach(item => store.put(item));
-    } catch(e) {
-        localStorage.setItem(KEY, JSON.stringify(state));
-    }
-}
-
-// 2. Rollover automatico delle attività non completate alle giornate successive
-async function rolloverIncompleteTasks() {
-    const today = iso(new Date());
-    const lastLogin = localStorage.getItem("last_login_date") || today;
-
-    if (lastLogin !== today) {
-        state.items.forEach(task => {
-            // Se la data è passata, non è completata e non è una routine/compleanno/ripetitiva fissa
-            if (task.date && task.date < today && task.type !== 'birthday') {
-                const k = completionKey(task, task.date);
-                if (!state.completions[k] && (!task.repeat || task.repeat === 'none')) {
-                    task.date = today; // Sposta a oggi
-                }
-            }
-        });
-        localStorage.setItem("last_login_date", today);
-        await saveState();
-    }
-}
-
+const categoryNames={work:'Lavoro',personal:'Personale',family:'Famiglia',health:'Salute',other:'Altro'};
+function saveState(){localStorage.setItem(KEY,JSON.stringify(state))}
 function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),1800)}
 function occurrence(item,date){
  if(item.type==='routine')return true;if(!item.date)return false;
@@ -231,15 +142,16 @@ function render(){
  const ne=nextOccurrence(),box=$('#nextEvent');if(ne){box.querySelector('strong').textContent=ne.title;box.querySelector('time').textContent=ne._date.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+(ne.time?' - '+ne.time:'')}else{box.querySelector('strong').textContent='Nessun impegno imminente';box.querySelector('time').textContent='--'}
  bindCards();checkAlarms();
 }
-function bindCards(){$$('.task').forEach(el=>{const id=el.dataset.id,date=el.dataset.date||selected;el.querySelector('.check').onclick=async()=>{const k=completionKey(state.items.find(i=>i.id===id),date);if(state.completions[k])delete state.completions[k];else state.completions[k]=Date.now();await saveState();render()};el.querySelector('.more').onclick=()=>openEditor(id)})}
+function bindCards(){$$('.task').forEach(el=>{const id=el.dataset.id,date=el.dataset.date||selected;el.querySelector('.check').onclick=()=>{const k=completionKey(state.items.find(i=>i.id===id),date);if(state.completions[k])delete state.completions[k];else state.completions[k]=Date.now();saveState();render()};el.querySelector('.more').onclick=()=>openEditor(id)})}
 function getOverdue(){const today=iso(new Date());return state.items.filter(i=>i.type==='deadline'&&i.date<today&&!isDone(i,i.date)&&(!i.repeat||i.repeat==='none'))}
 function renderFuture(){const q=$('#search').value.trim().toLowerCase(),start=parse(iso(new Date())),chunks=[];const late=getOverdue().filter(i=>!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q));if(late.length)chunks.push(`<div class="agenda-date" style="color:var(--danger)">ARRETRATI - ${late.length}</div>${late.map(i=>taskCard(i,i.date)).join('')}`);for(let n=0;n<60;n++){const d=new Date(start);d.setDate(start.getDate()+n);const ds=iso(d),arr=dayItems(ds).filter(i=>i.type!=='routine'&&!isDone(i,ds)&&(filter==='all'||i.type===filter)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q))).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));if(arr.length)chunks.push(`<div class="agenda-date">${fmtDate(ds,{weekday:'long',day:'numeric',month:'long'})}</div>${arr.map(i=>taskCard(i,ds)).join('')}`)}return chunks.join('')||'<div class="empty"><b>Nessuna operazione futura</b>I prossimi 60 giorni sono liberi.</div>'}
-function setType(t){type=t;$$('.type').forEach(b=>b.classList.toggle('active',b.dataset.type===t));const routine=t==='routine', birthday=t==='birthday',texts={event:['Impegno',"Qual e l'impegno?"],deadline:['Scadenza','Qual e la scadenza?'],birthday:['Festeggiato','Chi compie gli anni?'],routine:['Routine','Quale routine vuoi creare?']};$('#titleLabel').textContent=texts[t][0];$('#title').placeholder=texts[t][1];$('#slotField').hidden=!routine;$('#timeField').hidden=routine||birthday;$('#detailTimeRow').classList.toggle('hidden',routine||birthday);$('#locationField').classList.toggle('hidden',routine||birthday);$('#repeatField').classList.toggle('hidden',routine||birthday);$('#alarmRow').hidden=routine;$('#itemDate').closest('.field').querySelector('label').textContent=birthday?'Data di nascita':'Data';if(routine)$('#reminderField').hidden=true;else $('#reminderField').hidden=!$('#alarm').checked}
-function openEditor(id=null){editing=id;const i=id?state.items.find(x=>x.id===id):null;$('#editorTitle').textContent=i?'Modifica elemento':'Registra impegno';$('#title').value=i?.title||'';$('#notes').value=i?.notes||'';$('#itemDate').value=i?.date||selected;$('#itemTime').value=i?.time||'09:00';$('#endTime').value=i?.endTime||'';$('#category').value=i?.category||'work';$('#location').value=i?.location||'';$('#repeat').value=i?.repeat||'none';$('#priority').value=i?.priority||'low';$('#slot').value=i?.slot||'morning';$('#alarm').checked=!!i?.alarm;$('#reminder').value=String(i?.reminder??30);$('#delete').hidden=!i;setType(i?.type||'event');$('#editor').classList.add('open');setTimeout(()=>$('#title').focus(),120)}
+function updateAgePreview(){const d=Number($('#birthDay').value),m=Number($('#birthMonth').value),y=Number($('#birthYear').value),box=$('#agePreview'),now=new Date();box.classList.remove('warning');if(!d||!m||!y){box.textContent='Inserisci giorno, mese e anno di nascita';return}const valid=new Date(y,m-1,d);if(valid.getFullYear()!==y||valid.getMonth()!==m-1||valid.getDate()!==d||y>now.getFullYear()){box.textContent='Data di nascita non valida';box.classList.add('warning');return}let next=new Date(now.getFullYear(),m-1,d);if(next<parse(iso(now)))next.setFullYear(now.getFullYear()+1);const age=next.getFullYear()-y,days=Math.round((next-parse(iso(now)))/86400000);box.textContent=`Al prossimo compleanno compira ${age} anni - ${countLabel(days)}`}
+function setType(t){type=t;$$('.type').forEach(b=>b.classList.toggle('active',b.dataset.type===t));const routine=t==='routine', birthday=t==='birthday',texts={event:['Impegno',"Qual e l'impegno?"],deadline:['Scadenza','Qual e la scadenza?'],birthday:['Festeggiato','Chi compie gli anni?'],routine:['Routine','Quale routine vuoi creare?']};$('#titleLabel').textContent=texts[t][0];$('#title').placeholder=texts[t][1];$('#standardDateRow').classList.toggle('hidden',routine||birthday);$('#birthdayEditor').classList.toggle('hidden',!birthday);$('#slotField').hidden=!routine;$('#detailTimeRow').classList.toggle('hidden',routine||birthday);$('#locationField').classList.toggle('hidden',routine||birthday);$('#repeatField').classList.toggle('hidden',routine||birthday);$('#alarmRow').hidden=routine;if(routine)$('#reminderField').hidden=true;else $('#reminderField').hidden=!$('#alarm').checked;if(birthday)updateAgePreview()}
+function openEditor(id=null){editing=id;const i=id?state.items.find(x=>x.id===id):null,parts=i?.type==='birthday'&&i.date?i.date.split('-').map(Number):selected.split('-').map(Number);$('#editorTitle').textContent=i?'Modifica elemento':'Registra impegno';$('#title').value=i?.title||'';$('#notes').value=i?.notes||'';$('#itemDate').value=i?.type==='birthday'?selected:(i?.date||selected);$('#itemTime').value=i?.time||'09:00';$('#birthDay').value=parts[2];$('#birthMonth').value=parts[1];$('#birthYear').value=i?.type==='birthday'?parts[0]:'';$('#birthdayTime').value=i?.type==='birthday'&&i.time?i.time:'09:00';$('#endTime').value=i?.endTime||'';$('#category').value=i?.category||(i?.type==='birthday'?'family':'work');$('#location').value=i?.location||'';$('#repeat').value=i?.repeat||'none';$('#priority').value=i?.priority||'low';$('#slot').value=i?.slot||'morning';$('#alarm').checked=!!i?.alarm;$('#reminder').value=String(i?.reminder??30);$('#delete').hidden=!i;setType(i?.type||'event');$('#editor').classList.add('open');setTimeout(()=>$('#title').focus(),120)}
 function close(id){$('#'+id).classList.remove('open')}
-async function persistEditor(){const title=$('#title').value.trim();if(!title)return toast('Inserisci un titolo');if(type!=='routine'&&!$('#itemDate').value)return toast('Seleziona una data');if(type==='event'&&!$('#itemTime').value)return toast('Seleziona un orario');if($('#endTime').value&&$('#itemTime').value&&$('#endTime').value<=$('#itemTime').value)return toast('Ora fine non valida');const old=editing?state.items.find(i=>i.id===editing):null;const item={id:old?.id||uid(),title,notes:$('#notes').value.trim(),type,date:type==='routine'?null:$('#itemDate').value,time:(type==='event'||type==='deadline')?$('#itemTime').value:null,endTime:type==='event'?$('#endTime').value:null,category:$('#category').value,location:type==='event'?$('#location').value.trim():'',repeat:(type==='routine'||type==='birthday')?'none':$('#repeat').value,priority:$('#priority').value,slot:type==='routine'?$('#slot').value:null,alarm:type!=='routine'&&$('#alarm').checked,reminder:Number($('#reminder').value),notifiedFor:old?.notifiedFor||null,createdAt:old?.createdAt||Date.now()};if(old)Object.assign(old,item);else state.items.push(item);await saveState();close('editor');render();toast(old?'Elemento aggiornato':"Registrato nell'agenda")}
-async function removeEditing(){if(!editing)return;if(confirm('Eliminare definitivamente questo elemento?')){state.items=state.items.filter(i=>i.id!==editing);Object.keys(state.completions).filter(k=>k.startsWith(editing+'@')).forEach(k=>delete state.completions[k]);await saveState();close('editor');render();toast('Elemento eliminato')}}
-function renderArchive(){const now=Date.now();const arr=state.items.filter(i=>i.type!=='routine'&&(i.type==='birthday'||eventStamp(i)>=now-86400000)).sort((a,b)=>eventStamp(a)-eventStamp(b));$('#archiveCount').textContent=arr.length+' elementi';$('#archive').innerHTML=arr.slice(0,50).map(i=>`<div class="archive-item"><span>${icons[i.type]}</span><div><b>${esc(i.title)}</b><br><small>${i.date?fmtDate(i.date,{day:'2-digit',month:'2-digit',year:'numeric'}):''}${i.time?' - '+i.time:''}</small></div><button data-edit="${i.id}">MOD</button></div>`).join('')||'<div class="empty">Archivio vuoto.</div>';$$('[data-edit]').forEach(b=>b.onclick=()=>{close('command');openEditor(b.dataset.edit)})}
+function persistEditor(){const title=$('#title').value.trim();if(!title)return toast('Inserisci un titolo');let date=null,time=null;if(type==='birthday'){const d=Number($('#birthDay').value),m=Number($('#birthMonth').value),y=Number($('#birthYear').value),test=new Date(y,m-1,d);if(!d||!m||!y||test.getFullYear()!==y||test.getMonth()!==m-1||test.getDate()!==d||y>new Date().getFullYear())return toast('Inserisci una data di nascita valida');date=`${y}-${pad(m)}-${pad(d)}`;time=$('#birthdayTime').value||'09:00'}else if(type!=='routine'){date=$('#itemDate').value;time=$('#itemTime').value||null}if(type!=='routine'&&!date)return toast('Seleziona una data');if(type==='event'&&!time)return toast('Seleziona un orario');if(type==='event'&&$('#endTime').value&&time&&$('#endTime').value<=time)return toast('Ora fine non valida');const old=editing?state.items.find(i=>i.id===editing):null;const item={id:old?.id||uid(),title,notes:$('#notes').value.trim(),type,date,time,endTime:type==='event'?$('#endTime').value:null,category:type==='birthday'?'family':$('#category').value,location:type==='event'?$('#location').value.trim():'',repeat:(type==='routine'||type==='birthday')?'none':$('#repeat').value,priority:$('#priority').value,slot:type==='routine'?$('#slot').value:null,alarm:type!=='routine'&&$('#alarm').checked,reminder:Number($('#reminder').value),notifiedFor:old?.notifiedFor||null,createdAt:old?.createdAt||Date.now()};if(old)Object.assign(old,item);else state.items.push(item);saveState();close('editor');render();toast(old?'Elemento aggiornato':"Registrato nell'agenda")}
+function removeEditing(){if(!editing)return;if(confirm('Eliminare definitivamente questo elemento?')){state.items=state.items.filter(i=>i.id!==editing);Object.keys(state.completions).filter(k=>k.startsWith(editing+'@')).forEach(k=>delete state.completions[k]);saveState();close('editor');render();toast('Elemento eliminato')}}
+function renderArchive(){const now=Date.now();const arr=state.items.filter(i=>i.type!=='routine'&&(i.type==='birthday'||eventStamp(i)>=now-86400000)).sort((a,b)=>{const ta=a.type==='birthday'?nextBirthday(a).date.getTime():eventStamp(a),tb=b.type==='birthday'?nextBirthday(b).date.getTime():eventStamp(b);return ta-tb});$('#archiveCount').textContent=arr.length+' elementi';$('#archive').innerHTML=arr.slice(0,50).map(i=>{let info=i.date?fmtDate(i.date,{day:'2-digit',month:'2-digit',year:'numeric'}):'';if(i.type==='birthday'){const b=nextBirthday(i);info=`Nato/a il ${info} - compira ${b.age} anni - ${countLabel(b.days)}`}else if(i.time)info+=` - ${i.time}`;return `<div class="archive-item"><span>${icons[i.type]}</span><div><b>${esc(i.title)}</b><br><small>${info}</small></div><button data-edit="${i.id}">MOD</button></div>`}).join('')||'<div class="empty">Archivio vuoto.</div>';$$('[data-edit]').forEach(b=>b.onclick=()=>{close('command');openEditor(b.dataset.edit)})}
 function renderMonth(){const y=monthCursor.getFullYear(),m=monthCursor.getMonth(),first=new Date(y,m,1),offset=(first.getDay()+6)%7,start=new Date(y,m,1-offset);$('#monthTitle').textContent=first.toLocaleDateString('it-IT',{month:'long',year:'numeric'});let html='';for(let n=0;n<42;n++){const d=new Date(start);d.setDate(start.getDate()+n);const ds=iso(d),count=dayItems(ds).length;html+=`<button class="mday ${d.getMonth()!==m?'out':''} ${ds===iso(new Date())?'today':''} ${ds===selected?'selected':''}" data-day="${ds}"><b>${d.getDate()}</b>${count?`<em>${count}</em>`:''}</button>`}$('#monthGrid').innerHTML=html;$$('[data-day]').forEach(b=>b.onclick=()=>{selected=b.dataset.day;currentView='day';$$('.viewbtn').forEach(x=>x.classList.toggle('active',x.dataset.view==='day'));close('monthModal');render()})}
 function openMonth(){monthCursor=parse(selected);renderMonth();$('#monthModal').classList.add('open')}
 let audioCtx=null;
@@ -249,49 +161,17 @@ function updateNotifStatus(){const el=$('#notifStatus');if(!el)return;if(!('Noti
 async function nativeNotification(title,body){if(!('Notification'in window)||Notification.permission!=='granted')return false;try{if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.showNotification(title,{body,tag:'agenda-generale',renotify:true});return true}}new Notification(title,{body,tag:'agenda-generale'});return true}catch(e){return false}}
 async function fireAlarm(title,body,isTest=false){playBeep();if(navigator.vibrate)navigator.vibrate([250,120,250]);document.body.classList.add('alarm-flash');setTimeout(()=>document.body.classList.remove('alarm-flash'),2300);toast(isTest?'Test avviso eseguito':`PROMEMORIA: ${title}`);await nativeNotification(title,body)}
 async function requestNotifications(){unlockAudio();if(!('Notification'in window)){updateNotifStatus();return toast('Notifiche di sistema non supportate')}let p=Notification.permission;if(p==='default')p=await Notification.requestPermission();updateNotifStatus();if(p==='granted'){await fireAlarm('Agenda del Generale','Notifiche attivate correttamente',true)}else toast('Abilita le notifiche nelle impostazioni del browser')}
-async function checkAlarms(){const now=Date.now(),base=new Date(),dates=[];for(let n=-2;n<=2;n++){const d=new Date(base);d.setDate(base.getDate()+n);dates.push(iso(d))}let changed=false;for(const i of state.items){if(!i.alarm||i.type==='routine')continue;for(const ds of dates){if(!occurrence(i,ds))continue;const target=new Date(`${ds}T${i.time||'00:00'}:00`).getTime(),fire=target-(i.reminder||0)*60000,key=`${ds}T${i.time||'00:00'}-${i.reminder}`;if(now>=fire&&now<target+300000&&i.notifiedFor!==key){await fireAlarm('Agenda del Generale',`${i.title}${i.time?' alle '+i.time:''}`);i.notifiedFor=key;changed=true}}}if(changed)await saveState()}
-
-$('#add').onclick=()=>openEditor();
-$('#settings').onclick=()=>{renderArchive();updateNotifStatus();$('#command').classList.add('open')};
-$$('[data-close]').forEach(b=>b.onclick=()=>close(b.dataset.close));
-$$('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)close(o.id)}));
+async function checkAlarms(){const now=Date.now(),base=new Date(),dates=[];for(let n=-2;n<=2;n++){const d=new Date(base);d.setDate(base.getDate()+n);dates.push(iso(d))}let changed=false;for(const i of state.items){if(!i.alarm||i.type==='routine')continue;for(const ds of dates){if(!occurrence(i,ds))continue;const target=new Date(`${ds}T${i.time||'00:00'}:00`).getTime(),fire=target-(i.reminder||0)*60000,key=`${ds}T${i.time||'00:00'}-${i.reminder}`;if(now>=fire&&now<target+300000&&i.notifiedFor!==key){await fireAlarm('Agenda del Generale',`${i.title}${i.time?' alle '+i.time:''}`);i.notifiedFor=key;changed=true}}}if(changed)saveState()}
+$('#add').onclick=()=>openEditor();$('#settings').onclick=()=>{renderArchive();updateNotifStatus();$('#command').classList.add('open')};$$('[data-close]').forEach(b=>b.onclick=()=>close(b.dataset.close));$$('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)close(o.id)}));
 $$('.viewbtn').forEach(b=>b.onclick=()=>{if(b.dataset.view==='month'){openMonth();return}currentView=b.dataset.view;$$('.viewbtn').forEach(x=>x.classList.toggle('active',x===b));render()});
-$('#monthPrev').onclick=()=>{monthCursor.setMonth(monthCursor.getMonth()-1);renderMonth()};
-$('#monthNext').onclick=()=>{monthCursor.setMonth(monthCursor.getMonth()+1);renderMonth()};
-$('#monthToday').onclick=()=>{selected=iso(new Date());monthCursor=parse(selected);renderMonth()};
-$('#prev').onclick=()=>{const d=parse(selected);d.setDate(d.getDate()-1);selected=iso(d);render()};
-$('#next').onclick=()=>{const d=parse(selected);d.setDate(d.getDate()+1);selected=iso(d);render()};
-$('#today').onclick=()=>{selected=iso(new Date());render()};
-$('#datePicker').onchange=e=>{if(e.target.value){selected=e.target.value;render()}};
-$('#search').oninput=render;
-$('#filters').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.filter;$$('.chip').forEach(x=>x.classList.toggle('active',x===b));render()};
-$$('.type').forEach(b=>b.onclick=()=>setType(b.dataset.type));
-$('#alarm').onchange=async()=>{$('#reminderField').hidden=!$('#alarm').checked;if($('#alarm').checked){unlockAudio();if('Notification'in window&&Notification.permission==='default')await requestNotifications()}};
-$('#save').onclick=persistEditor;
-$('#delete').onclick=removeEditing;
-$('#notify').onclick=requestNotifications;
-$('#testNotify').onclick=async()=>{unlockAudio();if('Notification'in window&&Notification.permission==='default')await requestNotifications();else await fireAlarm('Test Agenda del Generale','Il canale degli avvisi funziona correttamente',true)};
-
-// 3. Pulsante di pulizia generale (impostazioni) con cancellazione IndexedDB e localStorage
-$('#cleanup-data-btn').onclick=async()=>{
-    if(confirm('ATTENZIONE: Questa operazione eliminerà tutti i dati salvati, gli impegni e le preferenze. Vuoi procedere con il reset completo?')){
-        localStorage.clear();
-        try {
-            const db = await openDB();
-            const transaction = db.transaction(STORE_NAME, "readwrite");
-            transaction.objectStore(STORE_NAME).clear();
-        } catch(e){}
-        location.reload();
-    }
-};
-
+$('#monthPrev').onclick=()=>{monthCursor.setMonth(monthCursor.getMonth()-1);renderMonth()};$('#monthNext').onclick=()=>{monthCursor.setMonth(monthCursor.getMonth()+1);renderMonth()};$('#monthToday').onclick=()=>{selected=iso(new Date());monthCursor=parse(selected);renderMonth()};
+$('#prev').onclick=()=>{const d=parse(selected);d.setDate(d.getDate()-1);selected=iso(d);render()};$('#next').onclick=()=>{const d=parse(selected);d.setDate(d.getDate()+1);selected=iso(d);render()};$('#today').onclick=()=>{selected=iso(new Date());render()};$('#datePicker').onchange=e=>{if(e.target.value){selected=e.target.value;render()}};$('#search').oninput=render;
+$('#filters').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.filter;$$('.chip').forEach(x=>x.classList.toggle('active',x===b));render()};$$('.type').forEach(b=>b.onclick=()=>setType(b.dataset.type));$('#alarm').onchange=async()=>{$('#reminderField').hidden=!$('#alarm').checked;if($('#alarm').checked){unlockAudio();if('Notification'in window&&Notification.permission==='default')await requestNotifications()}};$('#save').onclick=persistEditor;$('#delete').onclick=removeEditing;$('#notify').onclick=requestNotifications;$('#testNotify').onclick=async()=>{unlockAudio();if('Notification'in window&&Notification.permission==='default')await requestNotifications();else await fireAlarm('Test Agenda del Generale','Il canale degli avvisi funziona correttamente',true)};
+['birthDay','birthMonth','birthYear'].forEach(id=>$('#'+id).addEventListener('input',updateAgePreview));
 $('#export').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`agenda_generale_backup_${iso(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};
-$('#import').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.items))throw 0;if(confirm('Sostituire i dati attuali con questo backup?')){state={version:1,items:x.items,completions:x.completions||{}};await saveState();render();renderArchive();toast('Backup importato')}}catch(_){alert('File di backup non valido')}};r.readAsText(f);e.target.value=''};
-
-$('#cleanup').onclick=async()=>{if(confirm('Rimuovere lo storico delle spunte piu vecchio di 30 giorni?')){const limit=Date.now()-30*86400000;Object.keys(state.completions).forEach(k=>{if(state.completions[k]<limit)delete state.completions[k]});state.items=state.items.filter(i=>i.type==='routine'||i.type==='birthday'||eventStamp(i)>=limit);await saveState();render();renderArchive();toast('Storico ripulito')}};
-
-setInterval(checkAlarms,30000);
-loadInitialData();
+$('#import').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.items))throw 0;if(confirm('Sostituire i dati attuali con questo backup?')){state={version:1,items:x.items,completions:x.completions||{}};saveState();render();renderArchive();toast('Backup importato')}}catch(_){alert('File di backup non valido')}};r.readAsText(f);e.target.value=''};
+$('#cleanup').onclick=()=>{if(confirm('Rimuovere lo storico delle spunte piu vecchio di 30 giorni?')){const limit=Date.now()-30*86400000;Object.keys(state.completions).forEach(k=>{if(state.completions[k]<limit)delete state.completions[k]});state.items=state.items.filter(i=>i.type==='routine'||i.type==='birthday'||eventStamp(i)>=limit);saveState();render();renderArchive();toast('Storico ripulito')}};
+setInterval(checkAlarms,30000);render();
 })();
 </script>
 </body>
