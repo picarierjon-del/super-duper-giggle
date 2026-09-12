@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#173d2b">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,37 +34,37 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:7
 <body>
 <main class="app">
  <header class="hero">
-  <div class="top"><div><div class="eyebrow">Agenda di comando</div><h1 class="brand">Il Generale</h1></div><button class="round" id="settings" aria-label="Centro comando">â</button></div>
+  <div class="top"><div><div class="eyebrow">Agenda di comando</div><h1 class="brand">Il Generale</h1></div><button class="round" id="settings" aria-label="Centro comando">&#9881;</button></div>
   <p class="quote">Ordine, disciplina, azione. Una giornata alla volta.</p>
-  <div class="calendar-nav"><button class="navbtn" id="prev">â¹</button><div class="datebox"><strong id="dateLong"></strong><span>Tocca per aprire il calendario</span><input id="datePicker" type="date"></div><button class="navbtn" id="next">âº</button></div>
+  <div class="calendar-nav"><button class="navbtn" id="prev">&lsaquo;</button><div class="datebox"><strong id="dateLong"></strong><span>Tocca per aprire il calendario</span><input id="datePicker" type="date"></div><button class="navbtn" id="next">&rsaquo;</button></div>
   <div class="week" id="week"></div>
  </header>
  <div class="content">
-  <div class="status"><div class="stat"><b id="total">0</b><span>Ordini del giorno</span></div><div class="stat"><b id="done">0</b><span>Completati</span></div><div class="stat"><b id="urgent">0</b><span>PrioritÃ  alta</span></div></div>
+  <div class="status"><div class="stat"><b id="total">0</b><span>Ordini del giorno</span></div><div class="stat"><b id="done">0</b><span>Completati</span></div><div class="stat"><b id="urgent">0</b><span>Priorit&agrave; alta</span></div></div>
   <div class="progress"><i id="progress"></i></div>
-  <div class="next" id="nextEvent"><span class="next-icon">ðï¸</span><div><small>Prossima operazione</small><strong>Nessun impegno imminente</strong></div><time>â</time></div>
-  <div class="toolbar"><div class="search"><span>â</span><input id="search" placeholder="Cerca nellâagendaâ¦"></div><button class="primary" id="today">Oggi</button></div>
+  <div class="next" id="nextEvent"><span class="next-icon">&#9733;</span><div><small>Prossima operazione</small><strong>Nessun impegno imminente</strong></div><time>&mdash;</time></div>
+  <div class="toolbar"><div class="search"><span>&#8981;</span><input id="search" placeholder="Cerca nell&apos;agenda..."></div><button class="primary" id="today">Oggi</button></div>
   <div class="filters" id="filters"><button class="chip active" data-filter="all">Tutto</button><button class="chip" data-filter="event">Impegni</button><button class="chip" data-filter="deadline">Scadenze</button><button class="chip" data-filter="birthday">Compleanni</button><button class="chip" data-filter="routine">Routine</button></div>
   <div id="sections"></div>
  </div>
 </main>
-<button class="fab" id="add" aria-label="Registra impegno">ï¼</button>
+<button class="fab" id="add" aria-label="Registra impegno">+</button>
 
 <div class="overlay" id="editor"><div class="sheet">
- <div class="sheet-head"><h3 id="editorTitle">Registra impegno</h3><button class="x" data-close="editor">Ã</button></div>
- <div class="types"><button class="type active" data-type="event"><span>ð</span>Impegno</button><button class="type" data-type="deadline"><span>â</span>Scadenza</button><button class="type" data-type="birthday"><span>ð</span>Compleanno</button><button class="type" data-type="routine"><span>â»</span>Routine</button></div>
+ <div class="sheet-head"><h3 id="editorTitle">Registra impegno</h3><button class="x" data-close="editor">&times;</button></div>
+ <div class="types"><button class="type active" data-type="event"><span>&#9719;</span>Impegno</button><button class="type" data-type="deadline"><span>&#9873;</span>Scadenza</button><button class="type" data-type="birthday"><span>&#9733;</span>Compleanno</button><button class="type" data-type="routine"><span>&#8635;</span>Routine</button></div>
  <div class="field"><label>Titolo</label><input id="title" maxlength="120" placeholder="Cosa devi fare?"></div>
- <div class="field"><label>Note (facoltative)</label><textarea id="notes" rows="2" maxlength="300" placeholder="Dettagli utiliâ¦"></textarea></div>
+ <div class="field"><label>Note (facoltative)</label><textarea id="notes" rows="2" maxlength="300" placeholder="Dettagli utili..."></textarea></div>
  <div class="row"><div class="field"><label>Data</label><input id="itemDate" type="date"></div><div class="field" id="timeField"><label>Ora</label><input id="itemTime" type="time"></div></div>
- <div class="row"><div class="field"><label>PrioritÃ </label><select id="priority"><option value="low">Normale</option><option value="medium">Importante</option><option value="high">Critica</option></select></div><div class="field" id="slotField" hidden><label>Momento</label><select id="slot"><option value="morning">Mattina</option><option value="evening">Sera</option></select></div></div>
- <div class="switchrow" id="alarmRow"><label>ð Sveglia / promemoria</label><input class="switch" id="alarm" type="checkbox"></div>
- <div class="field" id="reminderField" hidden><label>Avvisami</label><select id="reminder"><option value="0">Allâora stabilita</option><option value="15">15 minuti prima</option><option value="30">30 minuti prima</option><option value="60">1 ora prima</option><option value="120">2 ore prima</option><option value="1440">1 giorno prima</option></select></div>
- <button class="save" id="save">Salva nellâagenda</button><button class="save danger" id="delete" hidden>Elimina elemento</button>
+ <div class="row"><div class="field"><label>Priorit&agrave;</label><select id="priority"><option value="low">Normale</option><option value="medium">Importante</option><option value="high">Critica</option></select></div><div class="field" id="slotField" hidden><label>Momento</label><select id="slot"><option value="morning">Mattina</option><option value="evening">Sera</option></select></div></div>
+ <div class="switchrow" id="alarmRow"><label>&#9679; Sveglia / promemoria</label><input class="switch" id="alarm" type="checkbox"></div>
+ <div class="field" id="reminderField" hidden><label>Avvisami</label><select id="reminder"><option value="0">All&apos;ora stabilita</option><option value="15">15 minuti prima</option><option value="30">30 minuti prima</option><option value="60">1 ora prima</option><option value="120">2 ore prima</option><option value="1440">1 giorno prima</option></select></div>
+ <button class="save" id="save">Salva nell&apos;agenda</button><button class="save danger" id="delete" hidden>Elimina elemento</button>
 </div></div>
 
 <div class="overlay" id="command"><div class="sheet">
- <div class="sheet-head"><h3>Centro Comando</h3><button class="x" data-close="command">Ã</button></div>
- <div class="settings-grid"><button class="action" id="notify">ð Attiva notifiche</button><button class="action" id="export">â© Esporta backup JSON</button><label class="action">â§ Importa backup<input id="import" type="file" accept="application/json,.json" hidden></label><button class="action" id="cleanup">ð§¹ Pulisci storico completato</button></div>
+ <div class="sheet-head"><h3>Centro Comando</h3><button class="x" data-close="command">&times;</button></div>
+ <div class="settings-grid"><button class="action" id="notify">&#9679; Attiva notifiche</button><button class="action" id="export">&darr; Esporta backup JSON</button><label class="action">&uarr; Importa backup<input id="import" type="file" accept="application/json,.json" hidden></label><button class="action" id="cleanup">&#10003; Pulisci storico completato</button></div>
  <div class="section-head" style="margin-top:18px"><h2>Archivio futuro</h2><span id="archiveCount"></span></div><div class="archive" id="archive"></div>
  <button class="save secondary" data-close="command">Chiudi centro comando</button>
 </div></div>
@@ -82,7 +83,7 @@ let state={version:1,items:[],completions:{}};
 try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.items))state={version:1,items:x.items,completions:x.completions||{}}}catch(e){}
 let selected=iso(new Date()), filter='all', editing=null, type='event';
 const labels={event:'Impegno',deadline:'Scadenza',birthday:'Compleanno',routine:'Routine'};
-const icons={event:'ð',deadline:'â',birthday:'ð',routine:'â»'};
+const icons={event:'ORA',deadline:'SCAD',birthday:'COMPL',routine:'ROUT'};
 function saveState(){localStorage.setItem(KEY,JSON.stringify(state))}
 function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),1800)}
 function occurrence(item,date){if(item.type==='routine')return true;if(item.type==='birthday')return item.date&&item.date.slice(5)===date.slice(5);return item.date===date}
@@ -92,7 +93,7 @@ function dayItems(date){return state.items.filter(i=>occurrence(i,date))}
 function fmtDate(s,opts={weekday:'long',day:'numeric',month:'long',year:'numeric'}){return parse(s).toLocaleDateString('it-IT',opts)}
 function eventStamp(i,year){let d=i.date;if(i.type==='birthday'&&year)d=year+i.date.slice(4);return new Date(`${d}T${i.time||'00:00'}:00`).getTime()}
 function renderWeek(){const base=parse(selected), day=base.getDay()||7, mon=new Date(base);mon.setDate(base.getDate()-day+1);$('#week').innerHTML='';for(let n=0;n<7;n++){const d=new Date(mon);d.setDate(mon.getDate()+n);const s=iso(d),b=document.createElement('button');b.className='day'+(s===selected?' active':'')+(s===iso(new Date())?' today':'')+(dayItems(s).length?' has':'');b.innerHTML=`<small>${d.toLocaleDateString('it-IT',{weekday:'short'}).replace('.','')}</small><b>${d.getDate()}</b>`;b.onclick=()=>{selected=s;render()};$('#week').appendChild(b)}}
-function taskCard(i){const done=isDone(i,selected), time=i.time?` Â· ${i.time}`:'', note=i.notes?` Â· ${esc(i.notes)}`:'';return `<article class="task ${i.priority||'low'} ${done?'done':''}" data-id="${i.id}"><button class="check" aria-label="Completa">${done?'â':''}</button><div class="task-main"><div class="name">${esc(i.title)}</div><div class="meta"><span class="tag">${icons[i.type]} ${labels[i.type]}</span>${time}${note}${i.alarm?' Â· ð':''}</div></div><button class="more" aria-label="Modifica">â®</button></article>`}
+function taskCard(i){const done=isDone(i,selected), time=i.time?` &middot; ${i.time}`:'', note=i.notes?` &middot; ${esc(i.notes)}`:'';return `<article class="task ${i.priority||'low'} ${done?'done':''}" data-id="${i.id}"><button class="check" aria-label="Completa">${done?'&#10003;':''}</button><div class="task-main"><div class="name">${esc(i.title)}</div><div class="meta"><span class="tag">${icons[i.type]} ${labels[i.type]}</span>${time}${note}${i.alarm?' &middot; ALLARME':''}</div></div><button class="more" aria-label="Modifica">&#8942;</button></article>`}
 function addSection(title,arr){if(!arr.length)return '';return `<section class="section"><div class="section-head"><h2>${title}</h2><span>${arr.length}</span></div><div class="list">${arr.map(taskCard).join('')}</div></section>`}
 function nextOccurrence(){const now=Date.now(), candidates=[];state.items.forEach(i=>{if(i.type==='routine')return;if(i.type==='birthday'){for(const y of [new Date().getFullYear(),new Date().getFullYear()+1]){const t=eventStamp(i,y);if(t>=now)candidates.push({...i,_stamp:t,_date:new Date(t)})}}else{const t=eventStamp(i);if(t>=now)candidates.push({...i,_stamp:t,_date:new Date(t)})}});return candidates.sort((a,b)=>a._stamp-b._stamp)[0]}
 function render(){
@@ -103,16 +104,16 @@ function render(){
  const sorted=a=>a.sort((x,y)=>(x.time||'99:99').localeCompare(y.time||'99:99'));
  let html='';html+=addSection('Impegni e appuntamenti',sorted(view.filter(i=>i.type==='event')));html+=addSection('Scadenze e ricorrenze',sorted(view.filter(i=>i.type==='deadline'||i.type==='birthday')));html+=addSection('Routine del mattino',view.filter(i=>i.type==='routine'&&i.slot!=='evening'));html+=addSection('Routine della sera',view.filter(i=>i.type==='routine'&&i.slot==='evening'));
  $('#sections').innerHTML=html||`<div class="empty"><b>Giornata libera</b>Nessuna operazione registrata per questa data.</div>`;
- const ne=nextOccurrence(),box=$('#nextEvent');if(ne){box.querySelector('strong').textContent=ne.title;box.querySelector('time').textContent=ne._date.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+(ne.time?' Â· '+ne.time:'')}else{box.querySelector('strong').textContent='Nessun impegno imminente';box.querySelector('time').textContent='â'}
+ const ne=nextOccurrence(),box=$('#nextEvent');if(ne){box.querySelector('strong').textContent=ne.title;box.querySelector('time').textContent=ne._date.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+(ne.time?' - '+ne.time:'')}else{box.querySelector('strong').textContent='Nessun impegno imminente';box.querySelector('time').textContent='--'}
  bindCards();checkAlarms();
 }
 function bindCards(){$$('.task').forEach(el=>{const id=el.dataset.id;el.querySelector('.check').onclick=()=>{const k=completionKey(state.items.find(i=>i.id===id),selected);if(state.completions[k])delete state.completions[k];else state.completions[k]=Date.now();saveState();render()};el.querySelector('.more').onclick=()=>openEditor(id)})}
 function setType(t){type=t;$$('.type').forEach(b=>b.classList.toggle('active',b.dataset.type===t));const routine=t==='routine', birthday=t==='birthday';$('#slotField').hidden=!routine;$('#timeField').hidden=routine||birthday;$('#alarmRow').hidden=routine;$('#itemDate').closest('.field').querySelector('label').textContent=birthday?'Data di nascita':'Data';if(routine)$('#reminderField').hidden=true;else $('#reminderField').hidden=!$('#alarm').checked}
 function openEditor(id=null){editing=id;const i=id?state.items.find(x=>x.id===id):null;$('#editorTitle').textContent=i?'Modifica elemento':'Registra impegno';$('#title').value=i?.title||'';$('#notes').value=i?.notes||'';$('#itemDate').value=i?.date||selected;$('#itemTime').value=i?.time||'09:00';$('#priority').value=i?.priority||'low';$('#slot').value=i?.slot||'morning';$('#alarm').checked=!!i?.alarm;$('#reminder').value=String(i?.reminder??30);$('#delete').hidden=!i;setType(i?.type||'event');$('#editor').classList.add('open');setTimeout(()=>$('#title').focus(),120)}
 function close(id){$('#'+id).classList.remove('open')}
-function persistEditor(){const title=$('#title').value.trim();if(!title)return toast('Inserisci un titolo');if(type!=='routine'&&!$('#itemDate').value)return toast('Seleziona una data');if(type==='event'&&!$('#itemTime').value)return toast('Seleziona un orario');const old=editing?state.items.find(i=>i.id===editing):null;const item={id:old?.id||uid(),title,notes:$('#notes').value.trim(),type,date:type==='routine'?null:$('#itemDate').value,time:(type==='event'||type==='deadline')?$('#itemTime').value:null,priority:$('#priority').value,slot:type==='routine'?$('#slot').value:null,alarm:type!=='routine'&&$('#alarm').checked,reminder:Number($('#reminder').value),notifiedFor:old?.notifiedFor||null,createdAt:old?.createdAt||Date.now()};if(old)Object.assign(old,item);else state.items.push(item);saveState();close('editor');render();toast(old?'Elemento aggiornato':'Registrato nellâagenda')}
+function persistEditor(){const title=$('#title').value.trim();if(!title)return toast('Inserisci un titolo');if(type!=='routine'&&!$('#itemDate').value)return toast('Seleziona una data');if(type==='event'&&!$('#itemTime').value)return toast('Seleziona un orario');const old=editing?state.items.find(i=>i.id===editing):null;const item={id:old?.id||uid(),title,notes:$('#notes').value.trim(),type,date:type==='routine'?null:$('#itemDate').value,time:(type==='event'||type==='deadline')?$('#itemTime').value:null,priority:$('#priority').value,slot:type==='routine'?$('#slot').value:null,alarm:type!=='routine'&&$('#alarm').checked,reminder:Number($('#reminder').value),notifiedFor:old?.notifiedFor||null,createdAt:old?.createdAt||Date.now()};if(old)Object.assign(old,item);else state.items.push(item);saveState();close('editor');render();toast(old?'Elemento aggiornato':"Registrato nell'agenda")}
 function removeEditing(){if(!editing)return;if(confirm('Eliminare definitivamente questo elemento?')){state.items=state.items.filter(i=>i.id!==editing);Object.keys(state.completions).filter(k=>k.startsWith(editing+'@')).forEach(k=>delete state.completions[k]);saveState();close('editor');render();toast('Elemento eliminato')}}
-function renderArchive(){const now=Date.now();const arr=state.items.filter(i=>i.type!=='routine'&&(i.type==='birthday'||eventStamp(i)>=now-86400000)).sort((a,b)=>eventStamp(a)-eventStamp(b));$('#archiveCount').textContent=arr.length+' elementi';$('#archive').innerHTML=arr.slice(0,50).map(i=>`<div class="archive-item"><span>${icons[i.type]}</span><div><b>${esc(i.title)}</b><br><small>${i.date?fmtDate(i.date,{day:'2-digit',month:'2-digit',year:'numeric'}):''}${i.time?' Â· '+i.time:''}</small></div><button data-edit="${i.id}">â</button></div>`).join('')||'<div class="empty">Archivio vuoto.</div>';$$('[data-edit]').forEach(b=>b.onclick=()=>{close('command');openEditor(b.dataset.edit)})}
+function renderArchive(){const now=Date.now();const arr=state.items.filter(i=>i.type!=='routine'&&(i.type==='birthday'||eventStamp(i)>=now-86400000)).sort((a,b)=>eventStamp(a)-eventStamp(b));$('#archiveCount').textContent=arr.length+' elementi';$('#archive').innerHTML=arr.slice(0,50).map(i=>`<div class="archive-item"><span>${icons[i.type]}</span><div><b>${esc(i.title)}</b><br><small>${i.date?fmtDate(i.date,{day:'2-digit',month:'2-digit',year:'numeric'}):''}${i.time?' - '+i.time:''}</small></div><button data-edit="${i.id}">MOD</button></div>`).join('')||'<div class="empty">Archivio vuoto.</div>';$$('[data-edit]').forEach(b=>b.onclick=()=>{close('command');openEditor(b.dataset.edit)})}
 async function requestNotifications(){if(!('Notification'in window))return toast('Notifiche non supportate');const p=await Notification.requestPermission();toast(p==='granted'?'Notifiche attivate':'Permesso non concesso')}
 function checkAlarms(){if(!('Notification'in window)||Notification.permission!=='granted')return;const now=Date.now();let changed=false;state.items.forEach(i=>{if(!i.alarm||i.type==='routine'||!i.date)return;const target=eventStamp(i),fire=target-(i.reminder||0)*60000,key=`${i.date}T${i.time||'00:00'}-${i.reminder}`;if(now>=fire&&now<target+300000&&i.notifiedFor!==key){new Notification('Agenda del Generale',{body:`${i.title}${i.time?' alle '+i.time:''}`});i.notifiedFor=key;changed=true}});if(changed)saveState()}
 $('#add').onclick=()=>openEditor();$('#settings').onclick=()=>{renderArchive();$('#command').classList.add('open')};$$('[data-close]').forEach(b=>b.onclick=()=>close(b.dataset.close));$$('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)close(o.id)}));
@@ -120,7 +121,7 @@ $('#prev').onclick=()=>{const d=parse(selected);d.setDate(d.getDate()-1);selecte
 $('#filters').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.filter;$$('.chip').forEach(x=>x.classList.toggle('active',x===b));render()};$$('.type').forEach(b=>b.onclick=()=>setType(b.dataset.type));$('#alarm').onchange=()=>$('#reminderField').hidden=!$('#alarm').checked;$('#save').onclick=persistEditor;$('#delete').onclick=removeEditing;$('#notify').onclick=requestNotifications;
 $('#export').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`agenda_generale_backup_${iso(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};
 $('#import').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.items))throw 0;if(confirm('Sostituire i dati attuali con questo backup?')){state={version:1,items:x.items,completions:x.completions||{}};saveState();render();renderArchive();toast('Backup importato')}}catch(_){alert('File di backup non valido')}};r.readAsText(f);e.target.value=''};
-$('#cleanup').onclick=()=>{if(confirm('Rimuovere lo storico delle spunte piÃ¹ vecchio di 30 giorni?')){const limit=Date.now()-30*86400000;Object.keys(state.completions).forEach(k=>{if(state.completions[k]<limit)delete state.completions[k]});state.items=state.items.filter(i=>i.type==='routine'||i.type==='birthday'||eventStamp(i)>=limit);saveState();render();renderArchive();toast('Storico ripulito')}};
+$('#cleanup').onclick=()=>{if(confirm('Rimuovere lo storico delle spunte piu vecchio di 30 giorni?')){const limit=Date.now()-30*86400000;Object.keys(state.completions).forEach(k=>{if(state.completions[k]<limit)delete state.completions[k]});state.items=state.items.filter(i=>i.type==='routine'||i.type==='birthday'||eventStamp(i)>=limit);saveState();render();renderArchive();toast('Storico ripulito')}};
 setInterval(checkAlarms,30000);render();
 })();
 </script>
