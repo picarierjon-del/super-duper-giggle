@@ -232,16 +232,19 @@ function occurrence(item,date){
  if(item.type==='routine')return true;
  if(!item.date)return false;
  if(item.type==='birthday')return item.date.slice(5)===date.slice(5);
- if(item.date===date)return true;
- if(!item.repeat||item.repeat==='none'||date<item.date)return false;
+ if(!item.repeat||item.repeat==='none')return item.date===date;
+ if(date<item.date)return false;
  const a=parse(item.date),b=parse(date),days=Math.round((b-a)/86400000);
  if(item.repeat==='daily')return days>=0;
  if(item.repeat==='weekly'){
   const weekdays=Array.isArray(item.weeklyDays)&&item.weeklyDays.length
    ?item.weeklyDays.map(Number)
    :[getWeekday(item.date)];
-  return days>=0&&weekdays.includes(getWeekday(date));
+  // La data iniziale non viene forzata: appare solo se il suo giorno
+  // è compreso tra quelli selezionati.
+  return weekdays.includes(getWeekday(date));
  }
+ if(item.date===date)return true;
  if(item.repeat==='monthly')return a.getDate()===b.getDate();
  if(item.repeat==='yearly')return item.date.slice(5)===date.slice(5);
  return false
