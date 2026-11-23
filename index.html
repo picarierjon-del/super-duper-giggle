@@ -86,13 +86,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:7
  <div class="weekday-picker" id="weekdayPicker">
   <div class="weekday-picker-title">Seleziona i giorni della settimana</div>
   <div class="weekday-options">
-   <button type="button" class="weekday-option" data-day="1">L<small>LUN</small></button>
-   <button type="button" class="weekday-option" data-day="2">M<small>MAR</small></button>
-   <button type="button" class="weekday-option" data-day="3">M<small>MER</small></button>
-   <button type="button" class="weekday-option" data-day="4">G<small>GIO</small></button>
-   <button type="button" class="weekday-option" data-day="5">V<small>VEN</small></button>
-   <button type="button" class="weekday-option" data-day="6">S<small>SAB</small></button>
-   <button type="button" class="weekday-option" data-day="7">D<small>DOM</small></button>
+   <button type="button" class="weekday-option" data-weekday="1">L<small>LUN</small></button>
+   <button type="button" class="weekday-option" data-weekday="2">M<small>MAR</small></button>
+   <button type="button" class="weekday-option" data-weekday="3">M<small>MER</small></button>
+   <button type="button" class="weekday-option" data-weekday="4">G<small>GIO</small></button>
+   <button type="button" class="weekday-option" data-weekday="5">V<small>VEN</small></button>
+   <button type="button" class="weekday-option" data-weekday="6">S<small>SAB</small></button>
+   <button type="button" class="weekday-option" data-weekday="7">D<small>DOM</small></button>
   </div>
   <div class="weekday-hint">Puoi selezionare più giorni. L'attività comparirà automaticamente nei giorni scelti.</div>
  </div>
@@ -217,7 +217,9 @@ function renderWeekdayPicker(){
  const visible=$('#repeat').value==='weekly'&&!['routine','birthday'].includes(type);
  picker.classList.toggle('visible',visible);
  $$('#weekdayPicker .weekday-option').forEach(btn=>{
-  btn.classList.toggle('active',selectedWeekdays.includes(Number(btn.dataset.day)));
+  const active=selectedWeekdays.includes(Number(btn.dataset.weekday));
+  btn.classList.toggle('active',active);
+  btn.setAttribute('aria-pressed',String(active));
  });
 }
 function initializeWeeklyDays(days,date){
@@ -412,6 +414,20 @@ $$('.type').forEach(b=>b.onclick=()=>setType(b.dataset.type));
 $('#repeat').addEventListener('change',()=>{
  if($('#repeat').value==='weekly'&&selectedWeekdays.length===0){
   selectedWeekdays=[getWeekday($('#itemDate').value||selected)];
+ }
+ renderWeekdayPicker();
+});
+// Selezione multipla dei giorni: gestita con delega eventi per funzionare
+// anche dopo aperture/chiusure dell'editor e senza interferire col calendario.
+$('#weekdayPicker').addEventListener('click',e=>{
+ const button=e.target.closest('button[data-weekday]');
+ if(!button||!$('#weekdayPicker').contains(button))return;
+ const day=Number(button.dataset.weekday);
+ if(!Number.isInteger(day)||day<1||day>7)return;
+ if(selectedWeekdays.includes(day)){
+  selectedWeekdays=selectedWeekdays.filter(value=>value!==day);
+ }else{
+  selectedWeekdays=[...selectedWeekdays,day].sort((a,b)=>a-b);
  }
  renderWeekdayPicker();
 });
