@@ -206,6 +206,29 @@ function occurrence(item,date){
 }
 function completionKey(item,date){return `${item.id}@${date}`}
 function isDone(item,date){return !!state.completions[completionKey(item,date)]}
+function repairIndexedCompletionKeys(){
+ // Nelle versioni precedenti arr.map(taskCard) passava l'indice (0,1,2...)
+ // al posto della data. Recupera la data dal timestamp salvato, senza perdere le spunte.
+ let changed=false;
+ for(const [key,value] of Object.entries(state.completions||{})){
+  const at=key.lastIndexOf('@');
+  if(at<1)continue;
+  const suffix=key.slice(at+1);
+  if(!/^(0|[1-9]\d*)$/.test(suffix))continue;
+  const id=key.slice(0,at);
+  const item=state.items.find(x=>String(x.id)===id);
+  if(!item)continue;
+  const stamp=Number(value);
+  if(!Number.isFinite(stamp)||stamp<=0)continue;
+  const date=iso(new Date(stamp));
+  const repaired=completionKey(item,date);
+  if(!state.completions[repaired])state.completions[repaired]=value;
+  delete state.completions[key];
+  changed=true;
+ }
+ if(changed)saveState();
+ return changed;
+}
 function dayItems(date){return state.items.filter(i=>occurrence(i,date))}
 function fmtDate(s,opts={weekday:'long',day:'numeric',month:'long',year:'numeric'}){return parse(s).toLocaleDateString('it-IT',opts)}
 function eventStamp(i,year){let d=i.date;if(i.type==='birthday'&&year)d=year+i.date.slice(4);return new Date(`${d}T${i.time||'00:00'}:00`).getTime()}
@@ -214,7 +237,7 @@ function countLabel(days){return days<0?'PASSATO':days===0?'OGGI':days===1?'DOMA
 function renderBirthdays(){const list=state.items.filter(i=>i.type==='birthday'&&i.date).map(i=>({i,...nextBirthday(i)})).sort((a,b)=>a.days-b.days).slice(0,3);$('#birthdayStrip').hidden=!list.length;$('#birthdayList').innerHTML=list.map(x=>`<div class="birthday-row"><span>COMPL</span><b>${esc(x.i.title)} <small>(${x.age} anni)</small></b><span class="countdown">${countLabel(x.days)}</span></div>`).join('')}
 function renderWeek(){const base=parse(selected), day=base.getDay()||7, mon=new Date(base);mon.setDate(base.getDate()-day+1);$('#week').innerHTML='';for(let n=0;n<7;n++){const d=new Date(mon);d.setDate(mon.getDate()+n);const s=iso(d),b=document.createElement('button');b.className='day'+(s===selected?' active':'')+(s===iso(new Date())?' today':'')+(dayItems(s).length?' has':'');b.innerHTML=`<small>${d.toLocaleDateString('it-IT',{weekday:'short'}).replace('.','')}</small><b>${d.getDate()}</b>`;b.onclick=()=>{selected=s;render()};$('#week').appendChild(b)}}
 function taskCard(i,date=selected){const done=isDone(i,date), range=i.time?` &middot; ${i.time}${i.endTime?' - '+i.endTime:''}`:'', loc=i.location?` &middot; ${esc(i.location)}`:'', note=i.notes?`<div class="meta">${esc(i.notes)}</div>`:'', bday=i.type==='birthday'?` &middot; ${countLabel(Math.round((parse(date)-parse(iso(new Date())))/86400000))}`:'', carry=i.type==='task'&&i.carriedFrom?` <span class="carried">${i.carriedFrom===iso(new Date(Date.now()-86400000))?'RIPORTATA DA IERI':'RIPORTATA DAL '+i.carriedFrom.split('-').reverse().join('/')}</span>`:'';return `<article class="task ${i.priority||'low'} ${done?'done':''}" data-id="${i.id}" data-date="${date}"><button class="check" aria-label="Completa">${done?'&#10003;':''}</button><div class="task-main"><div class="name"><span class="catdot cat-${i.category||'other'}"></span>${esc(i.title)}</div><div class="meta"><span class="tag">${icons[i.type]} ${labels[i.type]}</span>${carry}${range}${loc}${bday}${i.alarm?' &middot; ALLARME':''}${i.repeat&&i.repeat!=='none'?' &middot; RICORRENTE':''}</div>${note}</div><button class="more" aria-label="Modifica">&#8942;</button></article>`}
-function addSection(title,arr){if(!arr.length)return '';return `<section class="section"><div class="section-head"><h2>${title}</h2><span>${arr.length}</span></div><div class="list">${arr.map(taskCard).join('')}</div></section>`}
+function addSection(title,arr){if(!arr.length)return '';return `<section class="section"><div class="section-head"><h2>${title}</h2><span>${arr.length}</span></div><div class="list">${arr.map(item=>taskCard(item,selected)).join('')}</div></section>`}
 function nextOccurrence(){const now=Date.now(),start=new Date(),candidates=[];for(let n=0;n<370;n++){const d=new Date(start);d.setDate(start.getDate()+n);const ds=iso(d);state.items.forEach(i=>{if(i.type==='routine'||!occurrence(i,ds)||isDone(i,ds))return;const t=new Date(`${ds}T${i.time||'23:59'}:00`).getTime();if(t>=now)candidates.push({...i,_stamp:t,_date:new Date(t)})});if(candidates.length&&n>1)break}return candidates.sort((a,b)=>a._stamp-b._stamp)[0]}
 function render(){
  $('#datePicker').value=selected;$('#dateLong').textContent=fmtDate(selected);renderWeek();renderBirthdays();
@@ -223,7 +246,7 @@ function render(){
  const overdue=getOverdue();$('#overdueCount').textContent=overdue.length;$('#missionState').textContent=!all.length?'Giornata da pianificare':done===all.length?'Missione completata':done?`${done} di ${all.length} completati`:`${all.length} operazioni attive`;
  const q=$('#search').value.trim().toLowerCase();
  // Le attività completate restano conteggiate nello stato della giornata, ma non vengono più mostrate nella lista.
- // La chiave di completamento include la data: routine e ripetizioni giornaliere si riattivano automaticamente il giorno successivo. Le spunte vengono gestite con click delegato.
+ // La chiave di completamento include la data: routine e ripetizioni giornaliere si riattivano automaticamente il giorno successivo.
  let view=all.filter(i=>!isDone(i,selected)&&(filter==='all'||i.type===filter)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q)));
  const sorted=a=>a.sort((x,y)=>(x.time||'99:99').localeCompare(y.time||'99:99'));
  let html='';html+=addSection('Attivita operative',view.filter(i=>i.type==='task'));html+=addSection('Impegni e appuntamenti',sorted(view.filter(i=>i.type==='event')));html+=addSection('Scadenze e ricorrenze',sorted(view.filter(i=>i.type==='deadline'||i.type==='birthday')));html+=addSection('Routine del mattino',view.filter(i=>i.type==='routine'&&i.slot!=='evening'));html+=addSection('Routine della sera',view.filter(i=>i.type==='routine'&&i.slot==='evening'));
@@ -233,8 +256,8 @@ function render(){
  bindCards();checkAlarms();
 }
 function bindCards(){
- // Gestione delegata: resta attiva anche dopo ogni ridisegno della lista.
  const host=$('#sections');
+ // Un solo listener sul contenitore: continua a funzionare anche dopo ogni render.
  host.onclick=e=>{
   const check=e.target.closest('.check');
   if(check){
@@ -245,8 +268,8 @@ function bindCards(){
    const item=state.items.find(i=>String(i.id)===String(id));
    if(!item)return;
    const key=completionKey(item,date);
-   // Una spunta registra il completamento della singola occorrenza.
-   // Il render successivo la esclude immediatamente dalla lista.
+   // Il completamento viene registrato per la data reale della scheda.
+   // Il render successivo la rimuove immediatamente dalla lista.
    if(!state.completions[key]){
     state.completions[key]=Date.now();
     saveState();
@@ -262,7 +285,7 @@ function bindCards(){
  };
 }
 function getOverdue(){const today=iso(new Date());return state.items.filter(i=>i.type==='deadline'&&i.date<today&&!isDone(i,i.date)&&(!i.repeat||i.repeat==='none'))}
-function renderFuture(){const q=$('#search').value.trim().toLowerCase(),start=parse(iso(new Date())),chunks=[];const late=getOverdue().filter(i=>!isDone(i,i.date)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q)));if(late.length)chunks.push(`<div class="agenda-date" style="color:var(--danger)">ARRETRATI - ${late.length}</div>${late.map(i=>taskCard(i,i.date)).join('')}`);for(let n=0;n<60;n++){const d=new Date(start);d.setDate(start.getDate()+n);const ds=iso(d),arr=dayItems(ds).filter(i=>i.type!=='routine'&&!isDone(i,ds)&&(filter==='all'||i.type===filter)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q))).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));if(arr.length)chunks.push(`<div class="agenda-date">${fmtDate(ds,{weekday:'long',day:'numeric',month:'long'})}</div>${arr.map(i=>taskCard(i,ds)).join('')}`)}return chunks.join('')||'<div class="empty"><b>Nessuna operazione futura</b>I prossimi 60 giorni sono liberi.</div>'}
+function renderFuture(){const q=$('#search').value.trim().toLowerCase(),start=parse(iso(new Date())),chunks=[];const late=getOverdue().filter(i=>!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q));if(late.length)chunks.push(`<div class="agenda-date" style="color:var(--danger)">ARRETRATI - ${late.length}</div>${late.map(i=>taskCard(i,i.date)).join('')}`);for(let n=0;n<60;n++){const d=new Date(start);d.setDate(start.getDate()+n);const ds=iso(d),arr=dayItems(ds).filter(i=>i.type!=='routine'&&!isDone(i,ds)&&(filter==='all'||i.type===filter)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q))).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));if(arr.length)chunks.push(`<div class="agenda-date">${fmtDate(ds,{weekday:'long',day:'numeric',month:'long'})}</div>${arr.map(i=>taskCard(i,ds)).join('')}`)}return chunks.join('')||'<div class="empty"><b>Nessuna operazione futura</b>I prossimi 60 giorni sono liberi.</div>'}
 function updateAgePreview(){const d=Number($('#birthDay').value),m=Number($('#birthMonth').value),y=Number($('#birthYear').value),box=$('#agePreview'),now=new Date();box.classList.remove('warning');if(!d||!m||!y){box.textContent='Inserisci giorno, mese e anno di nascita';return}const valid=new Date(y,m-1,d);if(valid.getFullYear()!==y||valid.getMonth()!==m-1||valid.getDate()!==d||y>now.getFullYear()){box.textContent='Data di nascita non valida';box.classList.add('warning');return}let next=new Date(now.getFullYear(),m-1,d);if(next<parse(iso(now)))next.setFullYear(now.getFullYear()+1);const age=next.getFullYear()-y,days=Math.round((next-parse(iso(now)))/86400000);box.textContent=`Al prossimo compleanno compira ${age} anni - ${countLabel(days)}`}
 function setType(t){type=t;$$('.type').forEach(b=>b.classList.toggle('active',b.dataset.type===t));const routine=t==='routine',birthday=t==='birthday',task=t==='task',texts={task:['Attivita',"Qual e l'attivita?"],event:['Impegno',"Qual e l'impegno?"],deadline:['Scadenza','Qual e la scadenza?'],birthday:['Festeggiato','Chi compie gli anni?'],routine:['Routine','Quale routine vuoi creare?']};$('#titleLabel').textContent=texts[t][0];$('#title').placeholder=texts[t][1];$('#standardDateRow').classList.toggle('hidden',routine||birthday);$('#timeField').hidden=task;$('#birthdayEditor').classList.toggle('hidden',!birthday);$('#slotField').hidden=!routine;$('#detailTimeRow').classList.toggle('hidden',routine||birthday);$('#endTimeField').hidden=task;$('#locationField').classList.toggle('hidden',routine||birthday);$('#repeatField').classList.toggle('hidden',routine||birthday);$('#alarmRow').hidden=routine||task;$('#rolloverRow').hidden=!task;if(routine||task)$('#reminderField').hidden=true;else $('#reminderField').hidden=!$('#alarm').checked;if(birthday)updateAgePreview()}
 function openEditor(id=null){editing=id;const i=id?state.items.find(x=>x.id===id):null,parts=i?.type==='birthday'&&i.date?i.date.split('-').map(Number):selected.split('-').map(Number);$('#editorTitle').textContent=i?'Modifica elemento':'Registra impegno';$('#title').value=i?.title||'';$('#notes').value=i?.notes||'';$('#itemDate').value=i?.type==='birthday'?selected:(i?.date||selected);$('#itemTime').value=i?.time||'09:00';$('#birthDay').value=parts[2];$('#birthMonth').value=parts[1];$('#birthYear').value=i?.type==='birthday'?parts[0]:'';$('#birthdayTime').value=i?.type==='birthday'&&i.time?i.time:'09:00';$('#endTime').value=i?.endTime||'';$('#category').value=i?.category||(i?.type==='birthday'?'family':'work');$('#location').value=i?.location||'';$('#repeat').value=i?.repeat||'none';$('#priority').value=i?.priority||'low';$('#slot').value=i?.slot||'morning';$('#alarm').checked=!!i?.alarm;$('#rollover').checked=i?.rollover!==false;$('#reminder').value=String(i?.reminder??30);$('#delete').hidden=!i;setType(i?.type||'task');$('#editor').classList.add('open');setTimeout(()=>$('#title').focus(),120)}
@@ -294,11 +317,13 @@ document.body.style.visibility='hidden';
 (async()=>{
  try{
   await initializeStorage();
+  repairIndexedCompletionKeys();
   rolloverTasks();
   render();
   setInterval(()=>{if(rolloverTasks())render();checkAlarms()},30000);
  }catch(error){
   console.error('Avvio agenda:',error);
+  try{repairIndexedCompletionKeys()}catch(repairError){console.warn('Ripristino spunte:',repairError)}
   render();
   setInterval(()=>{if(rolloverTasks())render();checkAlarms()},30000);
  }finally{
