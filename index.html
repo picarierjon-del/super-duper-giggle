@@ -223,7 +223,7 @@ function render(){
  const overdue=getOverdue();$('#overdueCount').textContent=overdue.length;$('#missionState').textContent=!all.length?'Giornata da pianificare':done===all.length?'Missione completata':done?`${done} di ${all.length} completati`:`${all.length} operazioni attive`;
  const q=$('#search').value.trim().toLowerCase();
  // Le attività completate restano conteggiate nello stato della giornata, ma non vengono più mostrate nella lista.
- // La chiave di completamento include la data: routine e ripetizioni giornaliere si riattivano automaticamente il giorno successivo.
+ // La chiave di completamento include la data: routine e ripetizioni giornaliere si riattivano automaticamente il giorno successivo. Le spunte vengono gestite con click delegato.
  let view=all.filter(i=>!isDone(i,selected)&&(filter==='all'||i.type===filter)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q)));
  const sorted=a=>a.sort((x,y)=>(x.time||'99:99').localeCompare(y.time||'99:99'));
  let html='';html+=addSection('Attivita operative',view.filter(i=>i.type==='task'));html+=addSection('Impegni e appuntamenti',sorted(view.filter(i=>i.type==='event')));html+=addSection('Scadenze e ricorrenze',sorted(view.filter(i=>i.type==='deadline'||i.type==='birthday')));html+=addSection('Routine del mattino',view.filter(i=>i.type==='routine'&&i.slot!=='evening'));html+=addSection('Routine della sera',view.filter(i=>i.type==='routine'&&i.slot==='evening'));
@@ -232,9 +232,37 @@ function render(){
  const ne=nextOccurrence(),box=$('#nextEvent');if(ne){box.querySelector('strong').textContent=ne.title;box.querySelector('time').textContent=ne._date.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+(ne.time?' - '+ne.time:'')}else{box.querySelector('strong').textContent='Nessun impegno imminente';box.querySelector('time').textContent='--'}
  bindCards();checkAlarms();
 }
-function bindCards(){$$('.task').forEach(el=>{const id=el.dataset.id,date=el.dataset.date||selected;el.querySelector('.check').onclick=()=>{const item=state.items.find(i=>i.id===id);if(!item)return;const k=completionKey(item,date);if(state.completions[k])delete state.completions[k];else state.completions[k]=Date.now();saveState();render()};el.querySelector('.more').onclick=()=>openEditor(id)})}
+function bindCards(){
+ // Gestione delegata: resta attiva anche dopo ogni ridisegno della lista.
+ const host=$('#sections');
+ host.onclick=e=>{
+  const check=e.target.closest('.check');
+  if(check){
+   const card=check.closest('.task');
+   if(!card)return;
+   const id=card.dataset.id;
+   const date=card.dataset.date||selected;
+   const item=state.items.find(i=>String(i.id)===String(id));
+   if(!item)return;
+   const key=completionKey(item,date);
+   // Una spunta registra il completamento della singola occorrenza.
+   // Il render successivo la esclude immediatamente dalla lista.
+   if(!state.completions[key]){
+    state.completions[key]=Date.now();
+    saveState();
+    render();
+   }
+   return;
+  }
+  const edit=e.target.closest('.more');
+  if(edit){
+   const card=edit.closest('.task');
+   if(card)openEditor(card.dataset.id);
+  }
+ };
+}
 function getOverdue(){const today=iso(new Date());return state.items.filter(i=>i.type==='deadline'&&i.date<today&&!isDone(i,i.date)&&(!i.repeat||i.repeat==='none'))}
-function renderFuture(){const q=$('#search').value.trim().toLowerCase(),start=parse(iso(new Date())),chunks=[];const late=getOverdue().filter(i=>!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q));if(late.length)chunks.push(`<div class="agenda-date" style="color:var(--danger)">ARRETRATI - ${late.length}</div>${late.map(i=>taskCard(i,i.date)).join('')}`);for(let n=0;n<60;n++){const d=new Date(start);d.setDate(start.getDate()+n);const ds=iso(d),arr=dayItems(ds).filter(i=>i.type!=='routine'&&!isDone(i,ds)&&(filter==='all'||i.type===filter)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q))).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));if(arr.length)chunks.push(`<div class="agenda-date">${fmtDate(ds,{weekday:'long',day:'numeric',month:'long'})}</div>${arr.map(i=>taskCard(i,ds)).join('')}`)}return chunks.join('')||'<div class="empty"><b>Nessuna operazione futura</b>I prossimi 60 giorni sono liberi.</div>'}
+function renderFuture(){const q=$('#search').value.trim().toLowerCase(),start=parse(iso(new Date())),chunks=[];const late=getOverdue().filter(i=>!isDone(i,i.date)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q)));if(late.length)chunks.push(`<div class="agenda-date" style="color:var(--danger)">ARRETRATI - ${late.length}</div>${late.map(i=>taskCard(i,i.date)).join('')}`);for(let n=0;n<60;n++){const d=new Date(start);d.setDate(start.getDate()+n);const ds=iso(d),arr=dayItems(ds).filter(i=>i.type!=='routine'&&!isDone(i,ds)&&(filter==='all'||i.type===filter)&&(!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q))).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));if(arr.length)chunks.push(`<div class="agenda-date">${fmtDate(ds,{weekday:'long',day:'numeric',month:'long'})}</div>${arr.map(i=>taskCard(i,ds)).join('')}`)}return chunks.join('')||'<div class="empty"><b>Nessuna operazione futura</b>I prossimi 60 giorni sono liberi.</div>'}
 function updateAgePreview(){const d=Number($('#birthDay').value),m=Number($('#birthMonth').value),y=Number($('#birthYear').value),box=$('#agePreview'),now=new Date();box.classList.remove('warning');if(!d||!m||!y){box.textContent='Inserisci giorno, mese e anno di nascita';return}const valid=new Date(y,m-1,d);if(valid.getFullYear()!==y||valid.getMonth()!==m-1||valid.getDate()!==d||y>now.getFullYear()){box.textContent='Data di nascita non valida';box.classList.add('warning');return}let next=new Date(now.getFullYear(),m-1,d);if(next<parse(iso(now)))next.setFullYear(now.getFullYear()+1);const age=next.getFullYear()-y,days=Math.round((next-parse(iso(now)))/86400000);box.textContent=`Al prossimo compleanno compira ${age} anni - ${countLabel(days)}`}
 function setType(t){type=t;$$('.type').forEach(b=>b.classList.toggle('active',b.dataset.type===t));const routine=t==='routine',birthday=t==='birthday',task=t==='task',texts={task:['Attivita',"Qual e l'attivita?"],event:['Impegno',"Qual e l'impegno?"],deadline:['Scadenza','Qual e la scadenza?'],birthday:['Festeggiato','Chi compie gli anni?'],routine:['Routine','Quale routine vuoi creare?']};$('#titleLabel').textContent=texts[t][0];$('#title').placeholder=texts[t][1];$('#standardDateRow').classList.toggle('hidden',routine||birthday);$('#timeField').hidden=task;$('#birthdayEditor').classList.toggle('hidden',!birthday);$('#slotField').hidden=!routine;$('#detailTimeRow').classList.toggle('hidden',routine||birthday);$('#endTimeField').hidden=task;$('#locationField').classList.toggle('hidden',routine||birthday);$('#repeatField').classList.toggle('hidden',routine||birthday);$('#alarmRow').hidden=routine||task;$('#rolloverRow').hidden=!task;if(routine||task)$('#reminderField').hidden=true;else $('#reminderField').hidden=!$('#alarm').checked;if(birthday)updateAgePreview()}
 function openEditor(id=null){editing=id;const i=id?state.items.find(x=>x.id===id):null,parts=i?.type==='birthday'&&i.date?i.date.split('-').map(Number):selected.split('-').map(Number);$('#editorTitle').textContent=i?'Modifica elemento':'Registra impegno';$('#title').value=i?.title||'';$('#notes').value=i?.notes||'';$('#itemDate').value=i?.type==='birthday'?selected:(i?.date||selected);$('#itemTime').value=i?.time||'09:00';$('#birthDay').value=parts[2];$('#birthMonth').value=parts[1];$('#birthYear').value=i?.type==='birthday'?parts[0]:'';$('#birthdayTime').value=i?.type==='birthday'&&i.time?i.time:'09:00';$('#endTime').value=i?.endTime||'';$('#category').value=i?.category||(i?.type==='birthday'?'family':'work');$('#location').value=i?.location||'';$('#repeat').value=i?.repeat||'none';$('#priority').value=i?.priority||'low';$('#slot').value=i?.slot||'morning';$('#alarm').checked=!!i?.alarm;$('#rollover').checked=i?.rollover!==false;$('#reminder').value=String(i?.reminder??30);$('#delete').hidden=!i;setType(i?.type||'task');$('#editor').classList.add('open');setTimeout(()=>$('#title').focus(),120)}
